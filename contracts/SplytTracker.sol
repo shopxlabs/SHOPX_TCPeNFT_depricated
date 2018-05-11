@@ -1,6 +1,7 @@
 pragma solidity ^0.4.23;
 
 import "./Asset.sol";
+import "./Events.sol";
 
 contract TokenInterface {
     function transferFrom(address _from, address _to, uint _value) public returns (bool);
@@ -40,19 +41,19 @@ contract SplytTracker {
         address _mpAddress, 
         uint _mpAmount) 
         public {
-        address newAsset = new Asset(_assetId, _term, _seller, _title, _totalCost, _exiprationDate, _mpAddress, _mpAmount);
-        assetIdByAddress[newAsset] = _assetId;
-        addressByassetId[_assetId] = newAsset;
-        emit Success(1, newAsset);
+            address newAsset = new Asset(_assetId, _term, _seller, _title, _totalCost, _exiprationDate, _mpAddress, _mpAmount);
+            assetIdByAddress[newAsset] = _assetId;
+            addressByassetId[_assetId] = newAsset;
+            emit Success(1, newAsset);
     }
 
     // Getter function. returns asset contract address given asset UUID
-    function getAddressById(bytes12 _listingId) public view returns (address) {
+    function getAddressById(bytes12 _listingId) public constant returns (address) {
         return addressByassetId[_listingId];
     }
 
     // Getter function. returns asset's UUID given asset's contract address
-    function getIdByAddress(address _contractAddr) public view returns (bytes12) {
+    function getIdByAddress(address _contractAddr) public constant returns (bytes12) {
         return assetIdByAddress[_contractAddr];
     }
     

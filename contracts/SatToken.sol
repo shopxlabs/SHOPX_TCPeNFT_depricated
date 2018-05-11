@@ -1,6 +1,6 @@
 pragma solidity ^0.4.23;
 
-import "./ERC20.sol";
+import 'browser/ERC20.sol';
 
 contract SatToken is ERC20 {
     string name;
@@ -16,3 +16,4 @@ contract SatToken is ERC20 {
     
     //TODO: Put splyt related $$ transfer logic here
 }
+

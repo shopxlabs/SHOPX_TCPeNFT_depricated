@@ -27,7 +27,7 @@ contract ERC20 {
         return totalTokensAllowed;
     }
     
-    function balanceOf(address _owner) public view returns (uint balance) {
+    function balanceOf(address _owner) public constant returns (uint balance) {
         return user[_owner].balance;
     }
     
@@ -58,7 +58,7 @@ contract ERC20 {
         return true;
     }
     
-    function allowance(address _owner, address _spender) public view returns (uint remaining) {
+    function allowance(address _owner, address _spender) public constant returns (uint remaining) {
         return user[_owner].allowance[_spender];
     }
     
@@ -73,7 +73,7 @@ contract ERC20 {
     }
     
     // Get ether balance of this contract
-    function getBalance() view public returns (uint) {
+    function getBalance() constant public returns (uint) {
         address a = this;
         return a.balance;
     }
