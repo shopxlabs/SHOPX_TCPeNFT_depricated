@@ -1,6 +1,6 @@
 pragma solidity ^0.4.23;
 
-import 'browser/ERC20.sol';
+import './ERC20.sol';
 
 contract SatToken is ERC20 {
     string name;

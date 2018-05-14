@@ -3,7 +3,7 @@ var SplytTracker = artifacts.require("./SplytTracker.sol");
 contract('SplytTracker', function(accounts) {
 
   var splytTrackerInstance;
-  it('should be able to create an asset using valid parameters', function(){
+  it('should be able to create an asset using valid parameters', function() {
     return SplytTracker.deployed().then(function(instance){
       splytTrackerInstance = instance;
       instance.createAsset(
@@ -23,6 +23,28 @@ contract('SplytTracker', function(accounts) {
     })
   })
   
+  it('should be emitting events upon successful asset creation', function() {
+    return true;
+  })
 
+  it('should be emitting events upon successful contritution(fractional || !)', function() {
+    return true;
+  })
+
+  it('should NOT be able to call internalContribute function from outside', function() {
+    return true;
+  })
+
+  if('should NOT be able to call internalRedeemFunds function from outside', function() {
+    return true;
+  })
+
+  if('should be emitting error events upon failed token transfers for internalRedeemFunds function', function() {
+    return true;
+  })
+
+  it('should be emitting error events upon failed token transfers for internalRedeemFunds', function() {
+    return true;
+  })
 
 })
