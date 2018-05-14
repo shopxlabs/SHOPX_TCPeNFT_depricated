@@ -19,10 +19,6 @@ contract('AssetTest', function(accounts) {
     var assetInstance = await Asset.at(assetAddress);
     var result = await assetInstance.getMyContributions(accounts[0]);
     assert.equal(result.valueOf(), 0, 'I shouldn\'t have any contributions');
-
-    // assetInstance.getMyContributions(accounts[0]).then(function(myContributions) {
-    //   assert.equal(myContributions, 0, 'I shouldn\'t have any contributions');
-    // })
   })
   
   it('should be able to contribute', async function() {
@@ -30,12 +26,6 @@ contract('AssetTest', function(accounts) {
     var result = await assetInstance.contribute(accounts[2], accounts[0], 100);
     var myContributions = await assetInstance.getMyContributions(accounts[0]);
     assert.equal(myContributions, 100, 'I shouldn\'t have any contributions');
-
-    // assetInstance.contribute(accounts[2], accounts[0], 100).then(function() {
-    //   assetInstance.getMyContributions(accounts[0]).then(function() {
-    //     assert.equal(myContributions, 100, 'I shouldn\'t have any contributions');
-    //   })
-    // })
   })
 
 })
