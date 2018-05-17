@@ -57,15 +57,6 @@ contract('AssetTest general test cases.', function(accounts) {
     var assetInstance = await Asset.at(assetAddress);
     await assetInstance.contribute(accounts[2], accounts[0], assetCost);
     var buyerAfterBal = await splytTrackerInstance.getBalance.call(accounts[0]);
-    
-    console.log('buyer before and after: ',buyerBeforeBal, buyerAfterBal);
-    var mpbeforeBuy = await splytTrackerInstance.getBalance.call(accounts[2]);
-    var mpafterBuy = await splytTrackerInstance.getBalance.call(accounts[2]);
-    console.log('mp before and after: ', mpbeforeBuy, mpafterBuy);
-    var sellerbeforeBuy = await splytTrackerInstance.getBalance.call(accounts[1]);
-    var sellerafterBuy = await splytTrackerInstance.getBalance.call(accounts[1]);
-    console.log('mp before and after: ', sellerbeforeBuy, sellerafterBuy);
-
     assert.equal(buyerBeforeBal-buyerAfterBal, assetCost, 'Incorrect amount of money was withdrawn from contributor\'s account.');
   })
 
