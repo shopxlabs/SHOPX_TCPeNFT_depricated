@@ -22,7 +22,7 @@ contract('AssetTest general test cases.', function(accounts) {
     assert.equal(result.valueOf(), 0, 'User shouldn\'t have any contributions.');
   })
 
-  it('should be able to contribute partial cost into fractional asset.', async function() {
+  it('should be able to contribute partial amount into fractional asset.', async function() {
     var getBal0 = await splytTrackerInstance.getBalance.call(accounts[0]);
     await assetInstance.contribute(accounts[2], accounts[0], 100);
     var getBal = await splytTrackerInstance.getBalance.call(accounts[0]);
@@ -31,14 +31,14 @@ contract('AssetTest general test cases.', function(accounts) {
     assert.equal(myContributions, 100, 'User should have contributions.');
   })
 
-  it('buyer is able to contribute full cost into fractional asset.', async function() {
+  it('should allow buyer to contribute full cost into fractional asset.', async function() {
     var assetCost = 1000;
     await assetInstance.contribute(accounts[2], accounts[0], assetCost);
     var myContributions = await assetInstance.getMyContributions(accounts[0]);
     assert.equal(myContributions, assetCost, 'User should have contributions.');
   })
 
-  it('proper amount of money was withdrawn from buyer\'s account after contributing into fractional asset.', async function() {
+  it('should withdraw proper amount of money from buyer\'s account after contributing into fractional asset.', async function() {
     var assetCost = 1000;
     var getBal0 = await splytTrackerInstance.getBalance.call(accounts[0]);
     await assetInstance.contribute(accounts[2], accounts[0], assetCost);
@@ -46,21 +46,30 @@ contract('AssetTest general test cases.', function(accounts) {
     assert.equal(getBal0-getBal, assetCost, 'Incorrect amount of money was withdrawn from contributor\'s account.');
   })
 
-  it('proper amount of money was withdrawn from buyer\'s account after contributing into NOT fractional asset.', async function() {
-    var assetCost = 1000;
+  it('should withraw proper amount of money from buyer\'s account after contributing into NON fractional asset.', async function() {
+    var assetCost = 100;
     var splytTrackerInstance = await SplytTracker.deployed();
     var result = await splytTrackerInstance.createAsset("0x31f2ae92057a7123ef0e490a", 0, accounts[1], "MyTitle", assetCost,
     10001556712588, accounts[2], 2);
     assetAddress = await splytTrackerInstance.getAddressById("0x31f2ae92057a7123ef0e490a");
 
-    var getBal0 = await splytTrackerInstance.getBalance.call(accounts[0]);
+    var buyerBeforeBal = await splytTrackerInstance.getBalance.call(accounts[0]);
     var assetInstance = await Asset.at(assetAddress);
     await assetInstance.contribute(accounts[2], accounts[0], assetCost);
-    var getBal = await splytTrackerInstance.getBalance.call(accounts[0]);
-    assert.equal(getBal0-getBal, assetCost, 'Incorrect amount of money was withdrawn from contributor\'s account.');
+    var buyerAfterBal = await splytTrackerInstance.getBalance.call(accounts[0]);
+    
+    console.log('buyer before and after: ',buyerBeforeBal, buyerAfterBal);
+    var mpbeforeBuy = await splytTrackerInstance.getBalance.call(accounts[2]);
+    var mpafterBuy = await splytTrackerInstance.getBalance.call(accounts[2]);
+    console.log('mp before and after: ', mpbeforeBuy, mpafterBuy);
+    var sellerbeforeBuy = await splytTrackerInstance.getBalance.call(accounts[1]);
+    var sellerafterBuy = await splytTrackerInstance.getBalance.call(accounts[1]);
+    console.log('mp before and after: ', sellerbeforeBuy, sellerafterBuy);
+
+    assert.equal(buyerBeforeBal-buyerAfterBal, assetCost, 'Incorrect amount of money was withdrawn from contributor\'s account.');
   })
 
-  it('seller gets full cost of NOT fractional asset .', async function() {
+  it('should give full cost of NON fractional asset to seller.', async function() {
     var assetCost = 1000;
     var splytTrackerInstance = await SplytTracker.deployed();
     var result = await splytTrackerInstance.createAsset("0x31f2ae92057a7123ef0e490a", 0, accounts[1], "MyTitle", assetCost,
@@ -74,7 +83,7 @@ contract('AssetTest general test cases.', function(accounts) {
     assert.equal(getSellerBal1-getSellerBal0, assetCost, 'Incorrect amount of money seller got from contributor.');
   })
 
-  it('user is NOT able to contribute if date is expired.', async function() {
+  it('should NOT allow user to contribute if date is expired.', async function() {
     var splytTrackerInstance = await SplytTracker.deployed();
     var result = await splytTrackerInstance.createAsset("0x31f2ae92057a7123ef0e490a", 1, accounts[1], "MyTitle", 1000,
     1494694079, accounts[2], 2);
