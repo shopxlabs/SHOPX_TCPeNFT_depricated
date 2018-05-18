@@ -6,24 +6,25 @@ contract('AssetTest general test cases.', function(accounts) {
   var assetAddress;
   var splytTrackerInstance;
   var assetInstance;
+  var assetCost = 1000;
+
+  async function create_asset(_assetId = "0x31f2ae92057a7123ef0e490a", _term = 1, _seller = accounts[1], _title = "MyTitle",
+                              _totalCost = 1000, _expirationDate = 10001556712588, _mpAddress = accounts[2], _mpAmount = 2){
+    splytTrackerInstance = await SplytTracker.deployed();
+    await splytTrackerInstance.createAsset(_assetId, _term, _seller, _title, _totalCost, _expirationDate, _mpAddress, _mpAmount);
+    assetAddress = await splytTrackerInstance.getAddressById(_assetId);
+    console.log('assetAddress is: ', assetAddress.valueOf());
+    assetInstance = await Asset.at(assetAddress);
+  }
 
   beforeEach('Deploying asset contract. ', async function() {
 
-    splytTrackerInstance = await SplytTracker.deployed();
-    await splytTrackerInstance.createAsset("0x31f2ae92057a7123ef0e490a", 1, accounts[1], "MyTitle", 1000, 10001556712588, accounts[2], 2);
-    assetAddress = await splytTrackerInstance.getAddressById("0x31f2ae92057a7123ef0e490a");
-    console.log('assetAddress is: ', assetAddress.valueOf());
-    assetInstance = await Asset.at(assetAddress);
+    await create_asset();
   })
 
   it('should release funds to seller if listing is fully funded and the listing is expired .', async function() {
     var time = Date.now()/1000 | 0;
-    var splytTrackerInstance = await SplytTracker.deployed();
-    await splytTrackerInstance.createAsset("0x31f2ae92057a7123ef0e490a", 1, accounts[1], "MyTitle", 1000,
-    time+1, accounts[2], 2);
-    assetAddress = await splytTrackerInstance.getAddressById("0x31f2ae92057a7123ef0e490a");
-
-    var assetInstance = await Asset.at(assetAddress);
+    await create_asset("0x31f2ae92057a7123ef0e490a", 1, accounts[1], "MyTitle", 1000, time+1, accounts[2], 2);
     await assetInstance.contribute(accounts[2], accounts[0], 1000);
     sleep(10*1000);
     await assetInstance.releaseFunds();
@@ -32,8 +33,15 @@ contract('AssetTest general test cases.', function(accounts) {
     assert.equal(getBal0.valueOf(), 1000, 'Incorrect amount of money has been transfered to sellers wallet.');
   })
 
+  it('should return that my contribution is zero if _assetId is \'0x0\'', async function() {
+    await create_asset("0x0", 1, accounts[1], "MyTitle", 1000, 10001556712588, accounts[2], 2);
+    await assetInstance.contribute(accounts[2], accounts[0], 100);
+    var result = await assetInstance.getMyContributions(accounts[0]);
+    console.log('result is: ', result.valueOf());
+    assert.equal(result.valueOf(), 0, 'User shouldn\'t have any contributions - see \'internalContribute\' function in SplytTracker.sol contract.');
+  })
+
   it('should tell me my contributions && it should be zero.', async function() {
-    console.log('asset address from it should', assetAddress);
     var result = await assetInstance.getMyContributions(accounts[0]);
     assert.equal(result.valueOf(), 0, 'User shouldn\'t have any contributions.');
   })
@@ -43,19 +51,15 @@ contract('AssetTest general test cases.', function(accounts) {
     await assetInstance.contribute(accounts[2], accounts[0], 100);
     var getBal = await splytTrackerInstance.getBalance.call(accounts[0]);
     assert.equal(getBal0-getBal, 100, 'Money were not withdrawn from contributor\'s account.');
-    var myContributions = await assetInstance.getMyContributions(accounts[0]);
-    assert.equal(myContributions, 100, 'User should have contributions.');
   })
 
   it('buyer is able to contribute full cost into fractional asset.', async function() {
-    var assetCost = 1000;
     await assetInstance.contribute(accounts[2], accounts[0], assetCost);
     var myContributions = await assetInstance.getMyContributions(accounts[0]);
     assert.equal(myContributions, assetCost, 'User should have contributions.');
   })
 
   it('proper amount of money was withdrawn from buyer\'s account after contributing into fractional asset.', async function() {
-    var assetCost = 1000;
     var getBal0 = await splytTrackerInstance.getBalance.call(accounts[0]);
     await assetInstance.contribute(accounts[2], accounts[0], assetCost);
     var getBal = await splytTrackerInstance.getBalance.call(accounts[0]);
@@ -63,12 +67,7 @@ contract('AssetTest general test cases.', function(accounts) {
   })
 
   it('proper amount of money was withdrawn from buyer\'s account after contributing into NOT fractional asset.', async function() {
-    var assetCost = 1000;
-    var splytTrackerInstance = await SplytTracker.deployed();
-    await splytTrackerInstance.createAsset("0x31f2ae92057a7123ef0e490a", 0, accounts[1], "MyTitle", assetCost,
-    10001556712588, accounts[2], 2);
-    assetAddress = await splytTrackerInstance.getAddressById("0x31f2ae92057a7123ef0e490a");
-
+    await create_asset("0x31f2ae92057a7123ef0e490a", 0, accounts[1], "MyTitle", 1000, 10001556712588, accounts[2], 2);
     var getBal0 = await splytTrackerInstance.getBalance.call(accounts[0]);
     var assetInstance = await Asset.at(assetAddress);
     await assetInstance.contribute(accounts[2], accounts[0], assetCost);
@@ -77,12 +76,7 @@ contract('AssetTest general test cases.', function(accounts) {
   })
 
   it('seller gets full cost of NOT fractional asset .', async function() {
-    var assetCost = 1000;
-    var splytTrackerInstance = await SplytTracker.deployed();
-    await splytTrackerInstance.createAsset("0x31f2ae92057a7123ef0e490a", 0, accounts[1], "MyTitle", assetCost,
-    10001556712588, accounts[2], 2);
-    assetAddress = await splytTrackerInstance.getAddressById("0x31f2ae92057a7123ef0e490a");
-
+    await create_asset("0x31f2ae92057a7123ef0e490a", 0, accounts[1], "MyTitle", 1000, 10001556712588, accounts[2], 2);
     var getSellerBal0 = await splytTrackerInstance.getBalance.call(accounts[1]);
     var assetInstance = await Asset.at(assetAddress);
     await assetInstance.contribute(accounts[2], accounts[0], assetCost);
@@ -91,13 +85,9 @@ contract('AssetTest general test cases.', function(accounts) {
   })
 
   it('user is NOT able to contribute if date is expired.', async function() {
-    var splytTrackerInstance = await SplytTracker.deployed();
-    await splytTrackerInstance.createAsset("0x31f2ae92057a7123ef0e490a", 1, accounts[1], "MyTitle", 1000,
-    1494694079, accounts[2], 2);
-    assetAddress = await splytTrackerInstance.getAddressById("0x31f2ae92057a7123ef0e490a");
-
-    var assetInstance = await Asset.at(assetAddress);
+    await create_asset("0x31f2ae92057a7123ef0e490a", 1, accounts[1], "MyTitle", 1000, 1494694079, accounts[2], 2);
     var isOpenForContr = await assetInstance.isOpenForContribution(1);
+    console.log('isOpenForContr is: ', isOpenForContr);
     assert.equal(isOpenForContr, false, 'I shouldn\'t be able to contribute due to expired date.');
   })
 
@@ -125,12 +115,7 @@ contract('AssetTest general test cases.', function(accounts) {
 
   it('user should NOT be able to contribute (2 attemps to contribute) if date is expired.', async function() {
     var time = Date.now()/1000 | 0;
-    var splytTrackerInstance = await SplytTracker.deployed();
-    await splytTrackerInstance.createAsset("0x31f2ae92057a7123ef0e490a", 1, accounts[1], "MyTitle", 1000,
-    time+1, accounts[2], 2);
-    assetAddress = await splytTrackerInstance.getAddressById("0x31f2ae92057a7123ef0e490a");
-
-    var assetInstance = await Asset.at(assetAddress);
+    await create_asset("0x31f2ae92057a7123ef0e490a", 1, accounts[1], "MyTitle", 1000, time+1, accounts[2], 2);
     await assetInstance.contribute(accounts[2], accounts[0], 100);
     sleep(10*1000);
     var isOpenForContr = await assetInstance.isOpenForContribution(899);
@@ -155,11 +140,7 @@ contract('AssetTest general test cases.', function(accounts) {
   })
 
   it('isFractional returns false if asset is NOT fractional.', async function() {
-    var splytTrackerInstance = await SplytTracker.deployed();
-    await splytTrackerInstance.createAsset("0x31f2ae92057a7123ef0e490a", 0, accounts[1], "MyTitle", 1000, 10001556712588, accounts[2], 2);
-    assetAddress = await splytTrackerInstance.getAddressById("0x31f2ae92057a7123ef0e490a");
-
-    var assetInstance = await Asset.at(assetAddress);
+    await create_asset("0x31f2ae92057a7123ef0e490a", 0, accounts[1], "MyTitle", 1000, 10001556712588, accounts[2], 2);
     var isFund = await assetInstance.isFractional();
     assert.equal(isFund, false, 'Asset should NOT be fractional.');
   })
