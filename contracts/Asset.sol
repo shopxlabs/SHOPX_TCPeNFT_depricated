@@ -145,7 +145,7 @@ contract Asset {
     function calcDistribution() public constant returns (uint, uint) {
         
         uint kickbackWitheld = kickbackAmount / listOfMarketPlaces.length;
-        uint sellerGets = totalCost - kickbackWitheld;
+        uint sellerGets = totalCost - kickbackWitheld * listOfMarketPlaces.length;
         return (kickbackWitheld, sellerGets);
     }
     
