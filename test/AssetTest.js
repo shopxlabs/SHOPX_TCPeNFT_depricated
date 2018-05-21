@@ -1,6 +1,7 @@
 var Asset = artifacts.require("./Asset.sol");
 var SplytTracker = artifacts.require("./SplytTracker.sol")
 
+
 contract('AssetTest general test cases.', function(accounts) {
 
   var assetAddress;
@@ -13,32 +14,85 @@ contract('AssetTest general test cases.', function(accounts) {
     splytTrackerInstance = await SplytTracker.deployed();
     await splytTrackerInstance.createAsset(_assetId, _term, _seller, _title, _totalCost, _expirationDate, _mpAddress, _mpAmount);
     assetAddress = await splytTrackerInstance.getAddressById(_assetId);
-    console.log('assetAddress is: ', assetAddress.valueOf());
+    // console.log('assetAddress is: ', assetAddress.valueOf());
     assetInstance = await Asset.at(assetAddress);
   }
 
   beforeEach('Deploying asset contract. ', async function() {
-
     await create_asset();
   })
 
-  it('should release funds to seller if listing is fully funded and the listing is expired .', async function() {
+  it('should NOT release funds to seller if asset is NOT fully funded and the asset is NOT expired .', async function() {
+    await create_asset("0x31f2ae92057a7123ef0e490a", 1, accounts[1], "MyTitle", 1000, 10001556712588, accounts[2], 2);
+
+    await assetInstance.contribute(accounts[2], accounts[0], 100);
+    await assetInstance.releaseFunds();
+    var getBal0 = await splytTrackerInstance.getBalance.call(accounts[1]);
+    assert.equal(getBal0.valueOf(), 0, 'No money should be transfered to seller\'s wallet!');
+  })
+
+  it('should NOT release funds to seller if asset is NOT fully funded and the asset is expired .', async function() {
     var time = Date.now()/1000 | 0;
     await create_asset("0x31f2ae92057a7123ef0e490a", 1, accounts[1], "MyTitle", 1000, time+1, accounts[2], 2);
-    await assetInstance.contribute(accounts[2], accounts[0], 1000);
+    await assetInstance.contribute(accounts[2], accounts[0], 100);
     sleep(10*1000);
     await assetInstance.releaseFunds();
     var getBal0 = await splytTrackerInstance.getBalance.call(accounts[1]);
-    console.log('getBal0: ', getBal0.valueOf());
-    assert.equal(getBal0.valueOf(), 1000, 'Incorrect amount of money has been transfered to sellers wallet.');
+    assert.equal(getBal0.valueOf(), 0, 'No money should be transfered to seller\'s wallet!');
+  })
+
+  it('should NOT release funds to seller if asset is fully funded and the asset is expired .', async function() {
+    var time = Date.now()/1000 | 0;
+    await create_asset("0x31f2ae92057a7123ef0e490a", 1, accounts[1], "MyTitle", 1000, time+1, accounts[2], 2);
+    await assetInstance.contribute(accounts[2], accounts[0], 100);
+    sleep(10*1000);
+    await assetInstance.releaseFunds();
+    var getBal0 = await splytTrackerInstance.getBalance.call(accounts[1]);
+    assert.equal(getBal0.valueOf(), 0, 'No money should be transfered to seller\'s wallet!');
+  })
+
+  it('should release funds to seller if asset is fully funded and the asset is expired .', async function() {
+    var time = Date.now()/1000 | 0;
+    await create_asset("0x31f2ae92057a7123ef0e490a", 1, accounts[3], "MyTitle", 1000, time+1, accounts[2], 2);
+    await assetInstance.contribute(accounts[2], accounts[0], 1000);
+    sleep(10*1000);
+    var getBal00 = await splytTrackerInstance.getBalance.call(accounts[3]);
+    await assetInstance.releaseFunds();
+    var getBal0 = await splytTrackerInstance.getBalance.call(accounts[3]);
+    assert.equal(getBal0-getBal00.valueOf(), 1000, 'Incorrect amount of money has been transfered to sellers wallet.');
   })
 
   it('should return that my contribution is zero if _assetId is \'0x0\'', async function() {
     await create_asset("0x0", 1, accounts[1], "MyTitle", 1000, 10001556712588, accounts[2], 2);
-    await assetInstance.contribute(accounts[2], accounts[0], 100);
+    await assetInstance.contribute.call(accounts[2], accounts[0], 100);
     var result = await assetInstance.getMyContributions(accounts[0]);
-    console.log('result is: ', result.valueOf());
     assert.equal(result.valueOf(), 0, 'User shouldn\'t have any contributions - see \'internalContribute\' function in SplytTracker.sol contract.');
+  })
+
+  it('should return revert if mpGets = 0', async function() {
+    await create_asset("0x31f2ae92057a7123ef0e490a", 0, accounts[1], "MyTitle", 1000, 10001556712588, accounts[2], 0);
+    var error;
+    try {
+      await assetInstance.contribute.call(accounts[2], accounts[0], 100);
+    } catch (err) {
+      error = err;
+    }
+    assert.equal(error, 'Error: VM Exception while processing transaction: revert', 'Revert error has not happened!');
+    var result = await assetInstance.getMyContributions(accounts[0]);
+    assert.equal(result.valueOf(), 0, 'User shouldn\'t have any contributions - see \'internalContribute\' function in SplytTracker.sol contract.');
+  })
+
+  it('user is not able to contribute if asset is not open for contribution.', async function() {
+    await create_asset("0x31f2ae92057a7123ef0e490a", 1, accounts[1], "MyTitle", 1000, 10001556712588, accounts[2], 2);
+    var error;
+    try {
+      await assetInstance.contribute.call(accounts[2], accounts[0], 1001);
+    } catch (err) {
+      error = err;
+    }
+    assert.equal(error, 'Error: VM Exception while processing transaction: revert', 'Revert error has not happened!');
+    var result = await assetInstance.getMyContributions(accounts[0]);
+    assert.equal(result.valueOf(), 0, 'User shouldn\'t have any contributions.');
   })
 
   it('should tell me my contributions && it should be zero.', async function() {
@@ -66,6 +120,18 @@ contract('AssetTest general test cases.', function(accounts) {
     assert.equal(getBal0-getBal, assetCost, 'Incorrect amount of money was withdrawn from contributor\'s account.');
   })
 
+  it('buyer is NOT able to contribute because of not having money.', async function() {
+    var error;
+    try {
+      await assetInstance.contribute(accounts[2], accounts[4], assetCost);
+    } catch (err) {
+      error = err;
+    }
+    assert.equal(error, 'Error: VM Exception while processing transaction: revert', 'Revert error has not happened!');
+    var myContributions = await assetInstance.getMyContributions(accounts[4]);
+    assert.equal(myContributions, 0, 'User should NOT have contributions because of not having money.');
+  })
+
   it('proper amount of money was withdrawn from buyer\'s account after contributing into NOT fractional asset.', async function() {
     await create_asset("0x31f2ae92057a7123ef0e490a", 0, accounts[1], "MyTitle", 1000, 10001556712588, accounts[2], 2);
     var getBal0 = await splytTrackerInstance.getBalance.call(accounts[0]);
@@ -87,7 +153,6 @@ contract('AssetTest general test cases.', function(accounts) {
   it('user is NOT able to contribute if date is expired.', async function() {
     await create_asset("0x31f2ae92057a7123ef0e490a", 1, accounts[1], "MyTitle", 1000, 1494694079, accounts[2], 2);
     var isOpenForContr = await assetInstance.isOpenForContribution(1);
-    console.log('isOpenForContr is: ', isOpenForContr);
     assert.equal(isOpenForContr, false, 'I shouldn\'t be able to contribute due to expired date.');
   })
 
@@ -147,8 +212,6 @@ contract('AssetTest general test cases.', function(accounts) {
 
   it('calcDistribution - calculate how much seller gets after kickbacks taken out.', async function() {
     var calc = await assetInstance.calcDistribution();
-    console.log('calc[1] is: ', calc[1].valueOf());
-    console.log('calc[0]: ', calc[0].valueOf());
     assert.equal(calc[0].valueOf(), 2, 'Should be equal = _mpAmount / listOfMarketPlaces.length');
     assert.equal(calc[1].valueOf(), 998, 'Should be equal = totalCost - (_mpAmount / listOfMarketPlaces.length)');
   })
