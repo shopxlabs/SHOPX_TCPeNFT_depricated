@@ -18,6 +18,7 @@ Ethereum contracts for split protocol
  
   - Truffle doesn't like OSX folder `.DS_Store` so keep an eye for it in `/build/contracts` folder as well as anywhere else in the project. Remove that folder and run the instructions again if issues arise.
   - If you still have problems delete everything under `/build/contracts` and re-run the steps above.
+  - If you get this error `Error: sender doesn't have enough funds to send tx` restart testrpc (you ran out of test ether)
   - Or else the problem is with your code. Good luck.
  
  
