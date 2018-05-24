@@ -1,4 +1,6 @@
-const ERC20 = artifacts.require("./ERC20.sol");
+// satTokens.sol extends ERC20.sol thus truffle won't know about ERC20 but it will have all functions
+//  from ERC20 in satToken.sol
+const satToken = artifacts.require("./satToken.sol");
 var SplytTracker = artifacts.require("./SplytTracker.sol")
 
 contract('ERC20 general test cases.', function(accounts) {
@@ -6,7 +8,7 @@ contract('ERC20 general test cases.', function(accounts) {
   let erc20Instance;
 
   beforeEach('Deploying ERC20 contract. ', async function() {
-    erc20Instance = await ERC20.deployed();
+    erc20Instance = await satToken.deployed();
   })
 
   it('totalSupply() function retrieves valeu of totalTokensAllowed variable.', async function() {
@@ -27,6 +29,7 @@ contract('ERC20 general test cases.', function(accounts) {
     assert.equal(bal2, 20500, 'Value should be 0!');
   })
 
+  // This should fail if user A hasn't allowed the transfer based on allowance.
   it('transferFrom() function transfers tockenf from one wallet to another.', async function() {
     await erc20Instance.initUser(accounts[1]);
     let bal2 = await erc20Instance.balanceOf(accounts[1]);
