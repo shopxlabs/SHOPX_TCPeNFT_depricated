@@ -18,8 +18,9 @@ contract('AssetTest general test cases.', function(accounts) {
     assetInstance = await Asset.at(assetAddress);
   }
 
+  // This function gets ran before every test cases in this file.
   beforeEach('Deploying asset contract. ', async function() {
-    await create_asset();
+    // await create_asset();
   })
 
   it('should NOT release funds to seller if asset is NOT fully funded and the asset is NOT expired .', async function() {
@@ -35,17 +36,17 @@ contract('AssetTest general test cases.', function(accounts) {
     var time = Date.now()/1000 | 0;
     await create_asset("0x31f2ae92057a7123ef0e490a", 1, accounts[1], "MyTitle", 1000, time+1, accounts[2], 2);
     await assetInstance.contribute(accounts[2], accounts[0], 100);
-    sleep(10*1000);
+    await sleep(5*1000);
     await assetInstance.releaseFunds();
     var getBal0 = await splytTrackerInstance.getBalance.call(accounts[1]);
     assert.equal(getBal0.valueOf(), 0, 'No money should be transfered to seller\'s wallet!');
   })
 
-  it('should NOT release funds to seller if asset is fully funded and the asset is expired .', async function() {
+  it('should NOT release funds to seller if asset is fully funded && the asset is expired .', async function() {
     var time = Date.now()/1000 | 0;
     await create_asset("0x31f2ae92057a7123ef0e490a", 1, accounts[1], "MyTitle", 1000, time+1, accounts[2], 2);
     await assetInstance.contribute(accounts[2], accounts[0], 100);
-    sleep(10*1000);
+    await sleep(5*1000);
     await assetInstance.releaseFunds();
     var getBal0 = await splytTrackerInstance.getBalance.call(accounts[1]);
     assert.equal(getBal0.valueOf(), 0, 'No money should be transfered to seller\'s wallet!');
@@ -53,13 +54,14 @@ contract('AssetTest general test cases.', function(accounts) {
 
   it('should release funds to seller if asset is fully funded and the asset is expired .', async function() {
     var time = Date.now()/1000 | 0;
-    await create_asset("0x31f2ae92057a7123ef0e490a", 1, accounts[3], "MyTitle", 1000, time+1, accounts[2], 2);
+    var kickbackAmount = 2;
+    await create_asset("0x31f2ae92057a7123ef0e490a", 1, accounts[3], "MyTitle", 1000, time+5, accounts[2], kickbackAmount);
     await assetInstance.contribute(accounts[2], accounts[0], 1000);
-    sleep(10*1000);
+    await sleep(10*1000);
     var getBal00 = await splytTrackerInstance.getBalance.call(accounts[3]);
     await assetInstance.releaseFunds();
     var getBal0 = await splytTrackerInstance.getBalance.call(accounts[3]);
-    assert.equal(getBal0-getBal00.valueOf(), 1000, 'Incorrect amount of money has been transfered to sellers wallet.');
+    assert.equal(getBal0.valueOf()-getBal00.valueOf(), 1000 - kickbackAmount, 'Incorrect amount of money has been transfered to sellers wallet.');
   })
 
   it('should return that my contribution is zero if _assetId is \'0x0\'', async function() {
@@ -108,12 +110,14 @@ contract('AssetTest general test cases.', function(accounts) {
   })
 
   it('buyer is able to contribute full cost into fractional asset.', async function() {
+    await create_asset("0x31f2ae92057a7123ef0e490a", 1, accounts[1], "MyTitle", 1000, 10001556712588, accounts[2], 2);
     await assetInstance.contribute(accounts[2], accounts[0], assetCost);
     var myContributions = await assetInstance.getMyContributions(accounts[0]);
     assert.equal(myContributions, assetCost, 'User should have contributions.');
   })
 
   it('proper amount of money was withdrawn from buyer\'s account after contributing into fractional asset.', async function() {
+    await create_asset("0x31f2ae92057a7123ef0e490a", 0, accounts[1], "MyTitle", 1000, 10001556712588, accounts[2], 2);
     var getBal0 = await splytTrackerInstance.getBalance.call(accounts[0]);
     await assetInstance.contribute(accounts[2], accounts[0], assetCost);
     var getBal = await splytTrackerInstance.getBalance.call(accounts[0]);
@@ -142,12 +146,13 @@ contract('AssetTest general test cases.', function(accounts) {
   })
 
   it('seller gets full cost of NOT fractional asset .', async function() {
-    await create_asset("0x31f2ae92057a7123ef0e490a", 0, accounts[1], "MyTitle", 1000, 10001556712588, accounts[2], 2);
+    var kickbackAmount = 2;
+    await create_asset("0x31f2ae92057a7123ef0e490a", 0, accounts[1], "MyTitle", 1000, 10001556712588, accounts[2], kickbackAmount);
     var getSellerBal0 = await splytTrackerInstance.getBalance.call(accounts[1]);
     var assetInstance = await Asset.at(assetAddress);
     await assetInstance.contribute(accounts[2], accounts[0], assetCost);
     var getSellerBal1 = await splytTrackerInstance.getBalance.call(accounts[1]);
-    assert.equal(getSellerBal1-getSellerBal0, assetCost, 'Incorrect amount of money seller got from contributor.');
+    assert.equal(getSellerBal1-getSellerBal0, assetCost - kickbackAmount, 'Incorrect amount of money seller got from contributor.');
   })
 
   it('user is NOT able to contribute if date is expired.', async function() {
@@ -162,44 +167,59 @@ contract('AssetTest general test cases.', function(accounts) {
   })
 
   it('asset is open for contribution.', async function() {
+    await create_asset("0x31f2ae92057a7123ef0e490a", 0, accounts[1], "MyTitle", 1000, 10001556712588, accounts[2], 2);
     var isOpenForContr = await assetInstance.isOpenForContribution(999);
     assert.equal(isOpenForContr, true, 'I should be able to contribute.');
   })
 
-  it('user is able to contribute (2 attemps to contribute).', async function() {
+  it('user is able to contribute.', async function() {
+    await create_asset("0x31f2ae92057a7123ef0e490a", 1, accounts[1], "MyTitle", 1000, 10001556712588, accounts[2], 2);
     await assetInstance.contribute(accounts[2], accounts[0], 100);
     var isOpenForContr = await assetInstance.isOpenForContribution(899);
     assert.equal(isOpenForContr, true, 'I should be able to contribute.');
   })
 
   it('user should NOT be able to contribute (2 attemps to contribute) if total cost has been exceeded.', async function() {
-    await assetInstance.contribute(accounts[2], accounts[0], 100);
+    await create_asset("0x31f2ae92057a7123ef0e490a", 1, accounts[1], "MyTitle", 1000, 10001556712588, accounts[2], 2);
+    await assetInstance.contribute(accounts[0], accounts[0], 100);
+    await sleep(5*1000);
     var isOpenForContr = await assetInstance.isOpenForContribution(999);
     assert.equal(isOpenForContr, false, 'I should be able to contribute.');
   })
 
-  it('user should NOT be able to contribute (2 attemps to contribute) if date is expired.', async function() {
-    var time = Date.now()/1000 | 0;
+  it('user should NOT be able to contribute (2 attemps to contribute) if date is expired', async function() {
+    var time = parseInt(Date.now()/1000);
     await create_asset("0x31f2ae92057a7123ef0e490a", 1, accounts[1], "MyTitle", 1000, time+1, accounts[2], 2);
-    await assetInstance.contribute(accounts[2], accounts[0], 100);
-    sleep(10*1000);
-    var isOpenForContr = await assetInstance.isOpenForContribution(899);
-    assert.equal(isOpenForContr, false, 'I shouldn\'t be able to contribute if date is expired.');
+    //await assetInstance.contribute(accounts[2], accounts[0], 100);
+    await sleep(5*1000);
+    try {
+      await assetInstance.contribute(accounts[2], accounts[0], 100);
+    } catch (e) {
+      if(e.toString().indexOf('revert') === -1) {
+        return false;
+      } else {
+        return true;
+      }
+
+    }
   })
 
   it('isFunded returns true if asset has been fully funded.', async function() {
+    await create_asset("0x31f2ae92057a7123ef0e490a", 1, accounts[1], "MyTitle", 1000, 10001556712588, accounts[2], 2);
     await assetInstance.contribute(accounts[2], accounts[0], 1000);
     var isFund = await assetInstance.isFunded();
     assert.equal(isFund, true, 'Asset should be fully funded.');
   })
 
   it('isFunded returns false if asset has NOT been fully funded.', async function() {
+    await create_asset("0x31f2ae92057a7123ef0e490a", 1, accounts[1], "MyTitle", 1000, 10001556712588, accounts[2], 2);
     await assetInstance.contribute(accounts[2], accounts[0], 999);
     var isFund = await assetInstance.isFunded();
     assert.equal(isFund, false, 'Asset should NOT be fully funded.');
   })
 
   it('isFractional returns true if asset is fractional.', async function() {
+    await create_asset("0x31f2ae92057a7123ef0e490a", 1, accounts[1], "MyTitle", 1000, 10001556712588, accounts[2], 2);
     var isFund = await assetInstance.isFractional();
     assert.equal(isFund, true, 'Asset should be fractional.');
   })
@@ -216,12 +236,7 @@ contract('AssetTest general test cases.', function(accounts) {
     assert.equal(calc[1].valueOf(), 998, 'Should be equal = totalCost - (_mpAmount / listOfMarketPlaces.length)');
   })
 
-  function sleep(milliseconds) {
-    var start = new Date().getTime();
-    for (var i = 0; i < 1e7; i++) {
-      if ((new Date().getTime() - start) > milliseconds){
-        break;
-      }
-    }
+  async function sleep(milliseconds) {
+    return new Promise(resolve => setTimeout(resolve, milliseconds));
   }
 })
