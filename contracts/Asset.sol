@@ -1,4 +1,4 @@
-pragma solidity ^0.4.23;
+pragma solidity ^0.4.24;
 
 // Interface contracts are interface layers to the main contracts which defines
 // a function and its input/output parameters. 
@@ -15,6 +15,8 @@ contract TrackerInterface {
         uint _amount) public returns (bool);
         
     function getBalance(address _wallet) public returns (uint);
+    
+    function arbitrate(string _reason, address _requestedBy) public returns (address);
 }
 
 contract Asset {
@@ -31,6 +33,7 @@ contract Asset {
     bool public isContract = true;
     string public title;
     mapping(address => uint) contributions;
+    enum report{ SPAM, BROKEN, NOTRECIEVED, NOREASON  }
 
     constructor(
         bytes12 _assetId, 
@@ -127,7 +130,9 @@ contract Asset {
         if (isFractional()) {
             result = trackerContract.internalContribute(_contributor, this, _contributing);
             if(result == true)
-                addToContributions(_contributor, _contributing);            
+                addToContributions(_contributor, _contributing);
+            releaseFunds();
+            
         } else if (_contributing >= totalCost) {
             uint mpGets;
             uint sellerGets;
@@ -168,5 +173,15 @@ contract Asset {
             for (uint i = 0; i < listOfMarketPlaces.length; i++)
                 trackerContract.internalRedeemFunds(this, listOfMarketPlaces[i], mpGets);
         }
+    }
+    
+    // report spam assets
+    // start refund process
+    function arbitrate(string _reason, address _requestedBy) public returns (bool) {
+        
+        // create arbitrate contract and append pause process to all functions.
+        TrackerInterface trackerContract = TrackerInterface(tracker);
+        trackerContract.arbitrate(_reason, _requestedBy);
+
     }
 }

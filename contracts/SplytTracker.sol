@@ -1,18 +1,24 @@
-pragma solidity ^0.4.23;
+pragma solidity ^0.4.21;
 
 import "./Asset.sol";
 import "./Events.sol";
+
 
 contract TokenInterface {
     function transferFrom(address _from, address _to, uint _value) public returns (bool);
     function balanceOf(address _wallet) public returns (uint);
 }
 
-contract SplytTracker {
+contract ArbitratorInterface {
+    function createArbitration(string _reason, address _requesdedBy) public returns (address);
+}
+
+contract SplytTracker is Events {
 
     uint public version;
     string public ownedBy;
     address public satToken;
+    address public arbitrator;
     mapping (address => bytes12) assetIdByAddress;
     mapping (bytes32 => address) addressByassetId;
     
@@ -20,14 +26,15 @@ contract SplytTracker {
     // Success events gets triggered when a listing is created or a listing is fully funded
     // _code: 1 = listing created, 2 = contributions came in
     // _assetAddress: the asset address for which the code happened
-    event Success(uint _code, address _assetAddress);
-    event Error(uint _code, string _message);
+    // event Success(uint _code, address _assetAddress);
+    // event Error(uint _code, string _message);
 
 
-    constructor(uint _version, string _ownedBy, address _satToken) public {
+    constructor(uint _version, string _ownedBy, address _satToken, address _arbitratorAddr) public {
         version = _version;
         ownedBy = _ownedBy;
         satToken = _satToken;
+        arbitrator = _arbitratorAddr;
     }
 
     // Setter functions. creates new asset contract given the parameters
@@ -64,23 +71,32 @@ contract SplytTracker {
             return false;
         TokenInterface tokenContract = TokenInterface(satToken);
         bool result = tokenContract.transferFrom(_from, _to, _amount);
-        // if(result == true) {
-        //     emit Success(2, msg.sender);
-        // }
+        if(result == true)
+            emit Success(2, msg.sender);
+        else 
+            emit Error(2, msg.sender, "Could not make transfer happen");
         return result;
     }
     
     // Used for fractional ownership to transfer tokens from user address to listing address
     function internalRedeemFunds(address _listingAddress, address _seller, uint _amount) public returns (bool) {
         
-        if(assetIdByAddress[msg.sender] == "0x0")
+        if(assetIdByAddress[msg.sender] == "0x0") {
+            emit Error(1, msg.sender, "Asset contract not in splyt tracker");
             return false;
+        }
         TokenInterface tokenContract = TokenInterface(satToken);
         bool result = tokenContract.transferFrom(_listingAddress, _seller, _amount);
-        // if(result == true) {
-        //     emit Success(2, msg.sender);
-        // }
+        if(result == true) 
+            emit Success(2, msg.sender);
+        else 
+            emit Error(2, msg.sender, "Could not make transfer happen");
         return result;
+    }
+    
+    function internalArbitrate(string _reason, address _requestedBy) public returns (address) {
+        ArbitratorInterface arbitratorContract = ArbitratorInterface(arbitrator);
+        return arbitratorContract.createArbitration(_reason, _requestedBy);
     }
     
     // Getter function. returns token contract address
