@@ -1,4 +1,4 @@
-pragma solidity ^0.4.24;
+pragma solidity ^0.4.23;
 
 // Interface contracts are interface layers to the main contracts which defines
 // a function and its input/output parameters. 

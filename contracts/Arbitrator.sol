@@ -1,6 +1,6 @@
-pragma solidity ^0.4.24;
+pragma solidity ^0.4.23;
 
-import "browser/Arbritration.sol";
+import "./Arbitration.sol";
 
 contract Arbitrator {
     

@@ -1,6 +1,7 @@
 var Migrations = artifacts.require("./Migrations.sol");
 var SatToken = artifacts.require("./SatToken.sol");
 var SplytTracker = artifacts.require("./SplytTracker.sol");
+var Arbitrator = artifacts.require("./Arbitrator.sol");
 
 module.exports = function(deployer) {
   var name = "SPLYT";
@@ -10,7 +11,8 @@ module.exports = function(deployer) {
   deployer.deploy(Migrations);
 
   deployer.deploy(SatToken, name, desc, ver).then(async function() {
-    var deployed = await deployer.deploy(SplytTracker, ver, name, SatToken.address);
+    var arbitrator = await deployer.deploy(Arbitrator);
+    var deployed = await deployer.deploy(SplytTracker, ver, name, SatToken.address, arbitrator.address);
   });
 
 };

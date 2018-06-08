@@ -7,6 +7,6 @@ pragma solidity ^0.4.23;
 
 contract Events {
     
-    event Error(uint _code, string _message);
+    event Error(uint _code, address _user, string _message);
     event Success(uint _code, address _assetAddress);
 }
