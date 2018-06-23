@@ -10,9 +10,9 @@ module.exports = function(deployer) {
 
   deployer.deploy(Migrations);
 
-  deployer.deploy(SatToken, name, desc, ver).then(async function() {
+  deployer.deploy(SatToken, name, desc, ver)
+  .then(async function() {
     var arbitrator = await deployer.deploy(Arbitrator);
     var deployed = await deployer.deploy(SplytTracker, ver, name, SatToken.address, arbitrator.address);
   });
-
 };

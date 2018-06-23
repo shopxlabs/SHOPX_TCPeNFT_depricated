@@ -1,51 +1,58 @@
-pragma solidity ^0.4.23;
+pragma solidity ^0.4.21;
+
+import "./SafeMath.sol";
 
 contract ERC20 {
+    using SafeMath for uint256;
     
     string public constant name = "Splyt Autonomous Tokens";
     string public constant symbol = "SAT";
-    uint8 public constant decimals = 0; // We don't use decimals as of now
-    uint constant totalTokensAllowed = 6432168421; // ~6.4 billion
+    uint8 public constant decimals = 4; // We use 4 decimals as of now
+    uint constant totalTokensAllowed = 64321684210000; // ~6.4 billion
     uint public totalMinted;
+    address trackerAddress;
     
-    
-    struct Meta {
-        uint balance;
-        mapping(address => uint) allowance;
-    }
-    mapping(address => Meta) user;
-    
-    modifier onlyOnce() {
-        if(user[msg.sender].balance == 0) _;
-    }
+    mapping(address => mapping (address => uint256)) allowed;
+    mapping(address => mapping (address => bool)) banned;
+    mapping(address => uint) user;
     
     constructor() public {
-        initUser(msg.sender);
     }
+    
+    modifier onlyApprovedOrSplyt(address _from, address _to, uint _value) {
+        if(allowed[_from][_to] <= _value || msg.sender == trackerAddress)
+            _;
+    }
+    
+    modifier onlyNonBanned(address _from) {
+        if(banned[_from][msg.sender] == false)
+            _;
+    }
+    
     
     function totalSupply() public pure returns (uint) {
         return totalTokensAllowed;
     }
     
     function balanceOf(address _owner) public constant returns (uint balance) {
-        return user[_owner].balance;
+        return user[_owner];
     }
     
     function transfer(address _to, uint _value) public returns (bool success) {
         
-        if (user[msg.sender].balance >= _value) {
-            user[msg.sender].balance -= _value;
-            user[_to].balance += _value;
+        if (user[msg.sender] >= _value) {
+            user[msg.sender] -= _value;
+            user[_to] += _value;
             return true;
         }
         return false;
     }
     
-    function transferFrom(address _from, address _to, uint _value) public returns (bool success) {
+    function transferFrom(address _from, address _to, uint _value) public onlyApprovedOrSplyt(_from, _to, _value) onlyNonBanned(_from) returns (bool success) {
         
-        if (user[_from].balance >= _value) {
-            user[_from].balance -= _value;
-            user[_to].balance += _value;
+        if (user[_from] >= _value) {
+            user[_from] -= _value;
+            user[_to] += _value;
             emit TransferEvent(_from, _to, _value);
             return true;
         }
@@ -53,24 +60,15 @@ contract ERC20 {
     }
     
     function approve(address _spender, uint _value) public returns (bool success) {
-        user[msg.sender].allowance[_spender] = _value;
+        allowed[msg.sender][_spender] = _value;
         emit ApprovalEvent(msg.sender, _spender, _value);
         return true;
     }
     
     function allowance(address _owner, address _spender) public constant returns (uint remaining) {
-        return user[_owner].allowance[_spender];
+        return allowed[_owner][_spender];
     }
-    
-    /**
-     *  Splyt specific functionality
-    */
-    
-    // Temperory give each user 2000 tokens for free
-    function initUser(address _user) public {
-        user[_user].balance = 20500;
-        totalMinted += 20500;
-    }
+
     
     // Get ether balance of this contract
     function getBalance() constant public returns (uint) {

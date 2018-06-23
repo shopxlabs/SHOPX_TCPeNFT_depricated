@@ -1,4 +1,6 @@
-pragma solidity ^0.4.23;
+pragma solidity ^0.4.24;
+
+import "./Events.sol";
 
 // Interface contracts are interface layers to the main contracts which defines
 // a function and its input/output parameters. 
@@ -16,7 +18,7 @@ contract TrackerInterface {
         
     function getBalance(address _wallet) public returns (uint);
     
-    function arbitrate(string _reason, address _requestedBy) public returns (address);
+    function internalArbitrate(string _reason, address _requestedBy) public returns (address);
 }
 
 contract Asset {
@@ -34,6 +36,7 @@ contract Asset {
     string public title;
     mapping(address => uint) contributions;
     enum report{ SPAM, BROKEN, NOTRECIEVED, NOREASON  }
+    address arbitrateAddr = 0x0;
 
     constructor(
         bytes12 _assetId, 
@@ -89,10 +92,14 @@ contract Asset {
     // Checks to see if asset is open for contributions or not
     // Based on expired or not, and if incoming contribution will overflow the asset or not
     function isOpenForContribution(uint _contributing) public constant returns (bool) {
+        if(arbitrateAddr != 0x0)
+            return false;
         if (isExpired())
            return false;
         uint willGoOverBoard = _contributing + amountFunded;
         if (willGoOverBoard > totalCost)
+            return false;
+        if (arbitrateAddr != 0x000)
             return false;
         return true;
     }
@@ -181,7 +188,6 @@ contract Asset {
         
         // create arbitrate contract and append pause process to all functions.
         TrackerInterface trackerContract = TrackerInterface(tracker);
-        trackerContract.arbitrate(_reason, _requestedBy);
-
+        arbitrateAddr = trackerContract.internalArbitrate(_reason, _requestedBy);
     }
 }

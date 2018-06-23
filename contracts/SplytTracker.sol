@@ -3,6 +3,9 @@ pragma solidity ^0.4.21;
 import "./Asset.sol";
 import "./Events.sol";
 
+contract StakeInterface {
+    function calculateStakeTokens(uint _itemCost) public returns (uint _stakeToken);
+}
 
 contract TokenInterface {
     function transferFrom(address _from, address _to, uint _value) public returns (bool);
@@ -19,6 +22,7 @@ contract SplytTracker is Events {
     string public ownedBy;
     address public satToken;
     address public arbitrator;
+    address public stake;
     mapping (address => bytes12) assetIdByAddress;
     mapping (bytes32 => address) addressByassetId;
     
@@ -30,11 +34,12 @@ contract SplytTracker is Events {
     // event Error(uint _code, string _message);
 
 
-    constructor(uint _version, string _ownedBy, address _satToken, address _arbitratorAddr) public {
+    constructor(uint _version, string _ownedBy, address _satToken, address _arbitratorAddr, address _stake) public {
         version = _version;
         ownedBy = _ownedBy;
         satToken = _satToken;
         arbitrator = _arbitratorAddr;
+        stake = _stake;
     }
 
     // Setter functions. creates new asset contract given the parameters
@@ -48,9 +53,19 @@ contract SplytTracker is Events {
         address _mpAddress, 
         uint _mpAmount) 
         public {
+            StakeInterface stakeContract = StakeInterface(stake);
+            uint sellersBal = getBalance(_seller);
+            uint stakeTokens = stakeContract.calculateStakeTokens(_totalCost);
+            if(stakeTokens > sellersBal) {
+                revert();
+            }
+            
             address newAsset = new Asset(_assetId, _term, _seller, _title, _totalCost, _exiprationDate, _mpAddress, _mpAmount);
             assetIdByAddress[newAsset] = _assetId;
             addressByassetId[_assetId] = newAsset;
+            
+            internalContribute(_seller, newAsset, stakeTokens);
+            
             emit Success(1, newAsset);
     }
 
@@ -96,7 +111,9 @@ contract SplytTracker is Events {
     
     function internalArbitrate(string _reason, address _requestedBy) public returns (address) {
         ArbitratorInterface arbitratorContract = ArbitratorInterface(arbitrator);
-        return arbitratorContract.createArbitration(_reason, _requestedBy);
+        address arbCont = arbitratorContract.createArbitration(_reason, _requestedBy);
+        emit Success(3, _requestedBy);
+        return arbCont;
     }
     
     // Getter function. returns token contract address

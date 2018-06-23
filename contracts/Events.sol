@@ -1,12 +1,14 @@
 pragma solidity ^0.4.23;
 
-// This contract will handle all events that needs to be emitted. 
-// Some of them includes: success events, error events. 
-// Successfully added an asset.
-// Errored out adding an asset.
+// Events to notify other market places of something
+// Success events gets triggered when a listing is created or a listing is fully/partially funded
+// _code: 1 = listing created, 2 = contributions came in 3 arbitration happened
+// _assetAddress: the asset address for which the code happened
+// event Success(uint _code, address _assetAddress);
+// event Error(uint _code, string _message);
 
 contract Events {
     
-    event Error(uint _code, address _user, string _message);
+    event Error(uint _code, address _assetAddress, string _message);
     event Success(uint _code, address _assetAddress);
 }

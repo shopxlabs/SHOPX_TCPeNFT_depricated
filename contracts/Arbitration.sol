@@ -1,4 +1,4 @@
-pragma solidity ^0.4.23;
+pragma solidity ^0.4.24;
 
 contract Arbritration {
     
@@ -6,7 +6,7 @@ contract Arbritration {
     string public reason;
     address public requestedBy;
     
-    constructor(string _reason, address _requestedBy) {
+    constructor(string _reason, address _requestedBy) public {
         reason = _reason;
         requestedBy = _requestedBy;
     }
