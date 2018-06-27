@@ -1,0 +1,18 @@
+{
+  "package_name'" : "Splyt",
+  "version" : "0.0.5",
+  "description" : "Splyt Autonomous Tokens and protocols",
+  "authors" : [
+    "Dipen Joshi <dhru_7777@yahoo.com>",
+    "ADD ANOTHER DEV HERE"
+  ],
+  "keybords" : [
+    "ethereum",
+    "ERC20",
+    "e-Commerce",
+    "protocol",
+    "distributed",
+    "aggregated listings"
+  ],
+  "license" : "MIT"
+}
