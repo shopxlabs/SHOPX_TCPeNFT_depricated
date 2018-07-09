@@ -1,6 +1,6 @@
 // satTokens.sol extends ERC20.sol thus truffle won't know about ERC20 but it will have all functions
 //  from ERC20 in satToken.sol
-const satToken = artifacts.require("./satToken.sol");
+const satToken = artifacts.require("./SatToken.sol");
 var SplytTracker = artifacts.require("./SplytTracker.sol")
 
 contract('ERC20 general test cases.', function(accounts) {
