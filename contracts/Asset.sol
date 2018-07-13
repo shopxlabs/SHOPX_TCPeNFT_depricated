@@ -1,6 +1,7 @@
 pragma solidity ^0.4.24;
 
 import "./Events.sol";
+import "./AssetBase.sol";
 
 // Interface contracts are interface layers to the main contracts which defines
 // a function and its input/output parameters. 
@@ -21,13 +22,13 @@ contract TrackerInterface {
     function internalArbitrate(string _reason, address _requestedBy) public returns (address);
 }
 
-contract Asset {
+contract Asset is AssetBase {
 
     address public tracker;
     address public seller;
     address[] listOfMarketPlaces;
     bytes12 public assetId;
-    uint public term;
+    uint public term; //in days
     uint public amountFunded = 0;
     uint public totalCost;
     uint public expirationDate;
@@ -38,6 +39,7 @@ contract Asset {
     enum report{ SPAM, BROKEN, NOTRECIEVED, NOREASON  }
     address arbitrateAddr = 0x0;
 
+
     constructor(
         bytes12 _assetId, 
         uint _term, 
@@ -46,7 +48,8 @@ contract Asset {
         uint _totalCost, 
         uint _expirationDate, 
         address _mpAddress, 
-        uint _mpAmount) public {
+        uint _mpAmount,
+        AssetTypes _assetType) public {
             assetId = _assetId;
             term = _term;
             seller = _seller;
@@ -56,9 +59,11 @@ contract Asset {
             kickbackAmount = _mpAmount;
             listOfMarketPlaces.push(_mpAddress);
             tracker = msg.sender;
+            assetType = _assetType;
+            assetStatus = AssetStatuses.ACTIVE;
     }
 
-    function getAssetConfig() public constant returns(
+    function getAssetConfig() public view returns(
         bytes32, 
         uint, 
         address, 
@@ -84,11 +89,6 @@ contract Asset {
             kickbackAmount);
     }
 
-    // Getter function. returns a users's total contributions so far for this asset.
-    function getMyContributions(address _contributor) public constant returns (uint) {
-        return contributions[_contributor];
-    }
-    
     // Checks to see if asset is open for contributions or not
     // Based on expired or not, and if incoming contribution will overflow the asset or not
     function isOpenForContribution(uint _contributing) public constant returns (bool) {
@@ -190,4 +190,12 @@ contract Asset {
         TrackerInterface trackerContract = TrackerInterface(tracker);
         arbitrateAddr = trackerContract.internalArbitrate(_reason, _requestedBy);
     }
+    
+    
+    function setArbitration(address _arbitrationAddress) public {
+        
+        // create arbitrate contract and append pause process to all functions.
+        // arbitration =_arbitrationAddress;
+    }
+    
 }

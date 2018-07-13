@@ -20,11 +20,11 @@ contract SplytTracker is Events {
 
     uint public version;
     string public ownedBy;
-    address public satToken;
+    TokenInterface public satToken;
     address public arbitrator;
-    address public stake;
-    mapping (address => bytes12) assetIdByAddress;
-    mapping (bytes32 => address) addressByassetId;
+    StakeInterface public stake;
+    mapping (address => bytes12) public assetIdByAddress;
+    mapping (bytes32 => address) public addressByassetId;
     
     // Events to notify other market places of something
     // Success events gets triggered when a listing is created or a listing is fully funded
@@ -34,12 +34,11 @@ contract SplytTracker is Events {
     // event Error(uint _code, string _message);
 
 
-    constructor(uint _version, string _ownedBy, address _satToken, address _arbitratorAddr, address _stake) public {
+    constructor(uint _version, string _ownedBy, address _satToken, address _stake) public {
         version = _version;
         ownedBy = _ownedBy;
-        satToken = _satToken;
-        arbitrator = _arbitratorAddr;
-        stake = _stake;
+        satToken = TokenInterface(_satToken);
+        stake = StakeInterface(_stake);
     }
 
     // Setter functions. creates new asset contract given the parameters
@@ -51,7 +50,9 @@ contract SplytTracker is Events {
         uint _totalCost, 
         uint _exiprationDate, 
         address _mpAddress, 
-        uint _mpAmount) 
+        uint _mpAmount,
+        Asset.AssetTypes _assetType
+        ) 
         public {
             StakeInterface stakeContract = StakeInterface(stake);
             uint sellersBal = getBalance(_seller);
@@ -60,7 +61,7 @@ contract SplytTracker is Events {
                 revert();
             }
             
-            address newAsset = new Asset(_assetId, _term, _seller, _title, _totalCost, _exiprationDate, _mpAddress, _mpAmount);
+            address newAsset = new Asset(_assetId, _term, _seller, _title, _totalCost, _exiprationDate, _mpAddress, _mpAmount, _assetType);
             assetIdByAddress[newAsset] = _assetId;
             addressByassetId[_assetId] = newAsset;
             
@@ -69,23 +70,12 @@ contract SplytTracker is Events {
             emit Success(1, newAsset);
     }
 
-    // Getter function. returns asset contract address given asset UUID
-    function getAddressById(bytes12 _listingId) public constant returns (address) {
-        return addressByassetId[_listingId];
-    }
-
-    // Getter function. returns asset's UUID given asset's contract address
-    function getIdByAddress(address _contractAddr) public constant returns (bytes12) {
-        return assetIdByAddress[_contractAddr];
-    }
-    
     // User for single buy to transfer tokens from buyer address to seller address
     function internalContribute(address _from, address _to, uint _amount) public returns (bool) {
         
         if(assetIdByAddress[msg.sender] == "0x0")
             return false;
-        TokenInterface tokenContract = TokenInterface(satToken);
-        bool result = tokenContract.transferFrom(_from, _to, _amount);
+        bool result = satToken.transferFrom(_from, _to, _amount);
         if(result == true)
             emit Success(2, msg.sender);
         else 
@@ -100,8 +90,7 @@ contract SplytTracker is Events {
             emit Error(1, msg.sender, "Asset contract not in splyt tracker");
             return false;
         }
-        TokenInterface tokenContract = TokenInterface(satToken);
-        bool result = tokenContract.transferFrom(_listingAddress, _seller, _amount);
+        bool result = satToken.transferFrom(_listingAddress, _seller, _amount);
         if(result == true) 
             emit Success(2, msg.sender);
         else 
@@ -118,7 +107,6 @@ contract SplytTracker is Events {
     
     // Getter function. returns token contract address
     function getBalance(address _wallet) public returns (uint) {
-        TokenInterface tokenContract = TokenInterface(satToken);
-        return tokenContract.balanceOf(_wallet);
+        return satToken.balanceOf(_wallet);
     }
 }
