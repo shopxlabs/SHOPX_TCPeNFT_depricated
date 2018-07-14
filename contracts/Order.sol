@@ -1,6 +1,6 @@
 pragma solidity ^0.4.24;
 
-import "./Asset.sol";
+import "./AssetSimple.sol";
 
 contract Order {
     
@@ -9,7 +9,8 @@ contract Order {
     
     address public buyer;
     address public arbitrator;
-    Asset public asset;
+    AssetSimple public asset;
+    uint public quantity;
     Reason public reason;
     Status public status;
     
@@ -19,13 +20,13 @@ contract Order {
         _;
     }
     
-    modifier onlySeller() {
-        require(msg.sender == asset.seller());
+    modifier onlySeller(address _seller) {
+        require(_seller == asset.seller());
         _;
     }
 
-    modifier onlyArbitrator() {
-        require(msg.sender == arbitrator);
+    modifier onlyArbitrator(address _arbitrator) {
+        require(arbitrator == _arbitrator);
         _;
     }
 
@@ -34,12 +35,9 @@ contract Order {
         _;
     }
     
-    constructor(address _assetAddress) public {
-        asset = Asset(_assetAddress);
-    }
-
-    function requestRefund() public onlyBuyer {
-        status = Status.REQUESTED_REFUND;
+    constructor(address _assetAddress, address _buyer, uint _qty, uint _tokenAmount) public {
+        asset = AssetSimple(_assetAddress);
+        buyer = _buyer;
     }
 
     function approvedRefund() public onlySellerOrArbitrator {
@@ -47,5 +45,7 @@ contract Order {
         //TODO: refund  token process
         
     }
+    
+    
 
 }

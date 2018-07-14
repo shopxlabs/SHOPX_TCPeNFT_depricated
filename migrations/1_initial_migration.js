@@ -19,6 +19,17 @@ module.exports = function(deployer, network, accounts) {
 
   deployer.deploy(Migrations, walletConfig)
 
+  // deployer.deploy(SatToken, name, desc, ver, walletConfig)
+  // .then(async function() {
+  //   console.log('Sat Token address: ', SatToken.address)
+  //   var arbitrationFactory = await deployer.deploy(ArbitrationFactory, walletConfig)
+  //   console.log('Arbitration Factory address: ', arbitrationFactory.address)
+  //   var stake = await deployer.deploy(Stake, 10000000000000, 2000000000, 100, walletConfig)
+  //   console.log('Stake address: ', stake.address)
+  //   var deployed = await deployer.deploy(SplytTracker, ver, name, SatToken.address, arbitrationFactory.address, stake.address, walletConfig)
+  //   console.log('Splyt Tracker address: ', SplytTracker.address)
+  // });
+
   deployer.deploy(SatToken, name, desc, ver, walletConfig)
   .then(async function() {
     console.log('Sat Token address: ', SatToken.address)
@@ -29,4 +40,5 @@ module.exports = function(deployer, network, accounts) {
     var deployed = await deployer.deploy(SplytTracker, ver, name, SatToken.address, arbitrationFactory.address, stake.address, walletConfig)
     console.log('Splyt Tracker address: ', SplytTracker.address)
   });
+  
 };
