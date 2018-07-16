@@ -21,9 +21,9 @@ contract TrackerInterface {
     function internalArbitrate(string _reason, address _requestedBy) public returns (address);
 }
 
-contract Asset {
+contract Asset is Events {
 
-    address public tracker;
+    TrackerInterface public tracker;
     address public seller;
     address[] listOfMarketPlaces;
     bytes12 public assetId;
@@ -34,10 +34,28 @@ contract Asset {
     uint public kickbackAmount;
     bool public isContract = true;
     string public title;
+    
+    uint initialStakeAmount;
+    uint totalStakeAmount;
+    
     mapping(address => uint) contributions;
     enum report{ SPAM, BROKEN, NOTRECIEVED, NOREASON  }
     address arbitrateAddr = 0x0;
 
+    //User must have enough funds to call functions
+    modifier onlyHasEnoughFunds(address _reporter) {
+        uint balance = tracker.getBalance(_reporter);
+        require(balance >= initialStakeAmount);
+        _;
+    }
+    
+    //only user gets to call certain functions
+    modifier onlySeller(address _seller) {
+        require(seller == _seller);
+        _;
+    }
+
+    
     constructor(
         bytes12 _assetId, 
         uint _term, 
@@ -46,7 +64,8 @@ contract Asset {
         uint _totalCost, 
         uint _expirationDate, 
         address _mpAddress, 
-        uint _mpAmount) public {
+        uint _mpAmount,
+        uint _stakeAmount) public {
             assetId = _assetId;
             term = _term;
             seller = _seller;
@@ -55,7 +74,10 @@ contract Asset {
             expirationDate = _expirationDate;
             kickbackAmount = _mpAmount;
             listOfMarketPlaces.push(_mpAddress);
-            tracker = msg.sender;
+            tracker = TrackerInterface(msg.sender);
+            initialStakeAmount = _stakeAmount;
+            totalStakeAmount = _stakeAmount;
+            
     }
 
     function getAssetConfig() public constant returns(
@@ -128,14 +150,13 @@ contract Asset {
             revert();
         
         bool result;
-        TrackerInterface trackerContract = TrackerInterface(tracker);
-        uint userBalance = trackerContract.getBalance(_contributor);
+        uint userBalance = tracker.getBalance(_contributor);
         if (userBalance < _contributing)
             revert();
         listOfMarketPlaces.push(_marketPlace);
         
         if (isFractional()) {
-            result = trackerContract.internalContribute(_contributor, this, _contributing);
+            result = tracker.internalContribute(_contributor, this, _contributing);
             if(result == true)
                 addToContributions(_contributor, _contributing);
             releaseFunds();
@@ -144,11 +165,11 @@ contract Asset {
             uint mpGets;
             uint sellerGets;
             (mpGets, sellerGets) = calcDistribution();
-            trackerContract.internalContribute(_contributor, seller, sellerGets);
+            tracker.internalContribute(_contributor, seller, sellerGets);
             addToContributions(_contributor, _contributing);
             if(mpGets > 0)
                 for(uint i = 0; i < listOfMarketPlaces.length; i++)
-                    trackerContract.internalContribute(_contributor, listOfMarketPlaces[i], mpGets);
+                    tracker.internalContribute(_contributor, listOfMarketPlaces[i], mpGets);
         } else
             revert();
     }
@@ -184,10 +205,26 @@ contract Asset {
     
     // report spam assets
     // start refund process
-    function arbitrate(string _reason, address _requestedBy) public returns (bool) {
+    function arbitrate(string _reason, address _reporter) public  onlyHasEnoughFunds(_reporter) returns (bool) {
         
         // create arbitrate contract and append pause process to all functions.
-        TrackerInterface trackerContract = TrackerInterface(tracker);
-        arbitrateAddr = trackerContract.internalArbitrate(_reason, _requestedBy);
+        arbitrateAddr = tracker.internalArbitrate(_reason, _reporter);
+        //report stakes the same amount so inital stake amount should be 2x now
+        tracker.internalContribute (_reporter, this, initialStakeAmount); 
+        totalStakeAmount+=initialStakeAmount; //double take amount
+        emit Success(3, arbitrateAddr);
+        return true;        
+        
     }
+    
+    // dispute reported spam
+    // only seller can call
+    function disputeReportedSpam(address _seller) public onlySeller(_seller) onlyHasEnoughFunds(_seller) returns (bool) {
+        
+        tracker.internalContribute (_seller, this, initialStakeAmount); 
+        totalStakeAmount+=initialStakeAmount; //double take amount
+        emit Success(4, arbitrateAddr);
+        return true;        
+        
+    }    
 }

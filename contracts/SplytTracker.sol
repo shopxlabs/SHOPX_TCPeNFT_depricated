@@ -60,7 +60,7 @@ contract SplytTracker is Events {
                 revert();
             }
             
-            address newAsset = new Asset(_assetId, _term, _seller, _title, _totalCost, _exiprationDate, _mpAddress, _mpAmount);
+            address newAsset = new Asset(_assetId, _term, _seller, _title, _totalCost, _exiprationDate, _mpAddress, _mpAmount, stakeTokens);
             assetIdByAddress[newAsset] = _assetId;
             addressByassetId[_assetId] = newAsset;
             
