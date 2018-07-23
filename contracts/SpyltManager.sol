@@ -3,6 +3,7 @@ pragma solidity ^0.4.24;
 import "./AssetManager.sol";
 import "./OrderManager.sol";
 import "./Events.sol";
+import "./Owned.sol";
 
 contract StakeInterface {
     function calculateStakeTokens(uint _itemCost) public returns (uint _stakeToken);
@@ -17,7 +18,7 @@ contract ArbitratorInterface {
     function createArbitration(string _reason, address _requesdedBy) public returns (address);
 }
 
-contract SplytManager is Events {
+contract SplytManager is Events, Owned {
 
     uint public version;
     string public ownedBy;
@@ -27,12 +28,6 @@ contract SplytManager is Events {
     
     AssetManager public assetManager;
     OrderManager public orderManager;
-    address public admin;
-    
-    modifier onlyAdmin() {
-        require(admin == msg.sender);
-        _;
-    }
     
     // Events to notify other market places of something
     // Success events gets triggered when a listing is created or a listing is fully funded
@@ -45,13 +40,12 @@ contract SplytManager is Events {
     constructor(address _assetManager, address _orderManager) public {
         orderManager = OrderManager(_orderManager);
         assetManager = AssetManager(_assetManager);
-        admin = msg.sender;
     }
     
-    function updateAssetManager(address _newAssetManager) onlyAdmin public {
+    function updateAssetManager(address _newAssetManager) onlyOwner public {
         assetManager = AssetManager(_newAssetManager);
     }    
-    function updateOrderManager(address _newAssetManager) onlyAdmin public {
+    function updateOrderManager(address _newAssetManager) onlyOwner public {
         assetManager = AssetManager(_newAssetManager);
     }  
 }
