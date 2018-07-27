@@ -1,7 +1,7 @@
 pragma solidity ^0.4.24;
 
 import "./Asset.sol";
-
+import "./Owned.sol";
 
 contract Arbitration {
     

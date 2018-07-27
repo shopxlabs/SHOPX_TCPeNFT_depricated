@@ -2,13 +2,13 @@ pragma solidity ^0.4.24;
 
 import "./Owned.sol";
 
-contract AssetData  {
+contract AssetData is Owned {
     
     mapping (address => uint) public assetIdByAddress;
     mapping (uint => address) public addressByAssetId;
                                      
     uint public assetId; //increments after creating new
-    address public orderManager; 
+    address public manager; //address of manager contract
 
     // only let order manager security
     modifier onlyOrderManager() {
