@@ -11,13 +11,17 @@ contract AssetData is Owned {
     address public manager; //address of manager contract
 
     // only let order manager security
-    modifier onlyOrderManager() {
-        require(orderManager == msg.sender);
+    modifier onlyManager() {
+        require(manager == msg.sender);
         _;
     }
 
+    constructor(address _manager, address _owner) public {
+        orderManager = _manager;
+        owner = _owner;
+    }
 
-    function save(address _assetAddress) public onlyOrderManager returns (bool success) {
+    function save(address _assetAddress) public onlyManager returns (bool success) {
         assetIdByAddress[_assetAddress] = assetId;
         addressByAssetId[assetId] = _assetAddress;
         assetId++;

@@ -19,6 +19,7 @@ contract AssetManager {
     
     constructor(address _splytManager) public {
        splytManager = _splytManager;
+       assetData = new AssetData();
     }
 
     function createAsset(
@@ -47,7 +48,7 @@ contract AssetManager {
         assetData.save(address(asset));
     }
 
-    function updateDataContract(address _assetData) public {
+    function changeDataContract(address _assetData) public {
        assetData = AssetData(_assetData);
     }
     
