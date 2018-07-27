@@ -59,4 +59,7 @@ contract Asset is AssetBase {
             inventoryCount = _inventoryCount;
     }
  
+    function setStatus(AssetStatuses _status) public {
+        assetStatus = _status;
+    }
 }

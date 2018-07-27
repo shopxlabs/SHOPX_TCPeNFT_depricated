@@ -2,6 +2,8 @@ pragma solidity ^0.4.24;
 
 import "./Arbitration.sol";
 import "./ArbitrationData.sol";
+import "./Asset.sol";
+import "./AssetBase.sol";
 
 contract ArbitrationManager {
     
@@ -17,11 +19,15 @@ contract ArbitrationManager {
        splytManager = _splytManager;
     }
 
-    function createArbitration(string _reason, address _requestedBy) public onlySplytManager {
-        Arbitration a = new Arbitration(_reason, _requestedBy);
+    function createArbitration(address _assetAddress, string _reason, address _requestedBy) public onlySplytManager {
+        Arbitration a = new Arbitration(_assetAddress, _reason, _requestedBy);
         arbitrationData.save(address(a));
+
+        Asset asset = Asset(_assetAddress);
+        asset.setStatus(AssetBase.AssetStatuses.IN_ARBITRATION);
     }
 
+    //@desc change data contract
     function updateDataContract(address _arbitrationData) public {
        arbitrationData = ArbitrationData(_arbitrationData);
     }
