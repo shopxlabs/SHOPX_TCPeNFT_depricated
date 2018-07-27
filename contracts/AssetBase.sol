@@ -9,10 +9,10 @@ contract AssetBase {
     AssetStatuses public assetStatus;
     
 
-    // modifier onlyAssetStatus(AssetSatus _assetStatus) {
-    //     require(assetStatus == _assetStatus);
-    //     _;
-    // }
+    modifier onlyAssetStatus(AssetSatus _assetStatus) {
+         require(assetStatus == _assetStatus);
+         _;
+    }
     
     
 }

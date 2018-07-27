@@ -24,6 +24,7 @@ contract ArbitrationManager {
         arbitrationData.save(address(a));
 
         Asset asset = Asset(_assetAddress);
+        //change status so no one can purchase during arbitration
         asset.setStatus(AssetBase.AssetStatuses.IN_ARBITRATION);
     }
 
