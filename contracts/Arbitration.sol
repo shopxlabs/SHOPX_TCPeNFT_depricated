@@ -5,12 +5,12 @@ import "./Owned.sol";
 
 contract Arbitration {
     
-    enum report { SPAM, BROKEN, NOTRECIEVED, NOREASON }
+    enum Reasons { SPAM, BROKEN, NOTRECIEVED, NOREASON }
     string public reason;
     address public requestedBy;
     Asset asset;
 
-    constructor(address _assetAddress, string _reason, address _requestedBy) public {
+    constructor(address _assetAddress, Reasons _reason, address _requestedBy) public {
         reason = _reason;
         requestedBy = _requestedBy;
         asset = Asset(_assetAddress);

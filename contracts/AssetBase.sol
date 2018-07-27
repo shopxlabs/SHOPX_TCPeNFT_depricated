@@ -9,7 +9,7 @@ contract AssetBase {
     AssetStatuses public assetStatus;
     
 
-    modifier onlyAssetStatus(AssetSatus _assetStatus) {
+    modifier onlyAssetStatus(AssetStatuses _assetStatus) {
          require(assetStatus == _assetStatus);
          _;
     }
