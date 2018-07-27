@@ -11,7 +11,7 @@ Ethereum contracts for split protocol
  - In terminal `cd path/to/project`
  - `truffle compile`. Will compile all contracts
  - `truffle migrate --reset`. Will deploy all contracts to testrpc network
- - `truffle test ./test/[fileName].js`. Will test all functions in that file
+ - `truffle test ./test/[fileName].js`. Will test all functions in that file. Also `truffle test` will run all test in the test folder
  
  
  **Things to look out for: 
