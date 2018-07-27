@@ -1,7 +1,8 @@
 pragma solidity ^0.4.24;
 
-import "./AssetSimple.sol";
+import "./Asset.sol";
 import "./AssetData.sol";
+import "./AssetBase.sol";
 
 contract AssetManager {
     
@@ -20,8 +21,29 @@ contract AssetManager {
        splytManager = _splytManager;
     }
 
-    function createAsset(address _seller, uint _cost, uint _inventoryCount) public onlySplytManager {
-        AssetSimple asset = new AssetSimple(assetData.assetId(), _seller, _cost, _inventoryCount);
+    function createAsset(
+        bytes12 _assetId, 
+        uint _term, 
+        address _seller, 
+        string _title, 
+        uint _totalCost, 
+        uint _expirationDate, 
+        address _mpAddress, 
+        uint _mpAmount,
+        AssetBase.AssetTypes _assetType,
+        uint _inventoryCount) public onlySplytManager {
+
+        Asset asset = new Asset(
+            _assetId, 
+            _term, 
+            _seller, 
+            _title, 
+            _totalCost, 
+            _expirationDate, 
+            _mpAddress, 
+            _mpAmount,
+            _assetType,
+            _inventoryCount); 
         assetData.save(address(asset));
     }
 

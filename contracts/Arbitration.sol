@@ -1,6 +1,6 @@
 pragma solidity ^0.4.24;
 
-contract Arbritration {
+contract Arbitration {
     
     enum report { SPAM, BROKEN, NOTRECIEVED, NOREASON }
     string public reason;
