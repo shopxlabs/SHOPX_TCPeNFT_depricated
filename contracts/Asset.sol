@@ -3,6 +3,7 @@ pragma solidity ^0.4.24;
 import "./Owned.sol";
 import "./Events.sol";
 import "./Arbitration.sol";
+import "./AssetBase.sol";
 
 // Interface contracts are interface layers to the main contracts which defines
 // a function and its input/output parameters. 
@@ -23,9 +24,8 @@ contract TrackerInterface {
     function internalArbitrate(string _reason, address _requestedBy) public returns (address);
 }
 
-contract Asset is Events, Owned {
-
-    public tracker;
+contract Asset is Events, Owned, AssetBase {
+    TrackerInterface public tracker;
     address public seller;
     address[] listOfMarketPlaces;
     bytes12 public assetId;
@@ -45,6 +45,8 @@ contract Asset is Events, Owned {
     
     Arbitration arbitration;
     
+    uint public inventoryCount;
+
     //User must have enough funds to call functions
     modifier onlyHasEnoughFunds(address _reporter) {
         uint balance = tracker.getBalance(_reporter);
@@ -58,7 +60,6 @@ contract Asset is Events, Owned {
         _;
     }
 
-    
     constructor(
         bytes12 _assetId, 
         uint _term, 
@@ -68,7 +69,9 @@ contract Asset is Events, Owned {
         uint _expirationDate, 
         address _mpAddress, 
         uint _mpAmount,
-        uint _stakeAmount) public {
+        uint _stakeAmount,
+        AssetTypes _assetType,
+        uint _inventoryCount) public {
             assetId = _assetId;
             term = _term;
             seller = _seller;
@@ -79,6 +82,8 @@ contract Asset is Events, Owned {
             listOfMarketPlaces.push(_mpAddress);
             tracker = TrackerInterface(msg.sender);
             initialStakeAmount = _stakeAmount;
+            assetType = _assetType;
+            inventoryCount = _inventoryCount;
             
     }
 
@@ -108,7 +113,7 @@ contract Asset is Events, Owned {
             kickbackAmount);
     }
 
-    function setStatus(AssetStatus _status) public onyOwner {
+    function setStatus(AssetStatuses _status) public onlyOwner {
         assetStatus = _status;
     }
 

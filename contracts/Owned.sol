@@ -15,7 +15,7 @@ contract Owned {
     }
 
     modifier onlyPendingOwner {
-        require(msg.sender == owner);
+        require(msg.sender == pendingOwner);
         _;
     }
 
@@ -25,7 +25,7 @@ contract Owned {
     }
 
     //pending owner must accept it to prevent changing to a wallet who lost their key
-    function acceptOwnership(address newOwner) public onlyPendingOwner {
+    function acceptOwnership() public onlyPendingOwner {
         owner = pendingOwner;
     }
 

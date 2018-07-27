@@ -5,12 +5,12 @@ import "./ArbitrationData.sol";
 import "./Asset.sol";
 import "./AssetBase.sol";
 
-contract ArbitrationManager  is Owned {
+contract ArbitrationManager is Owned {
 
     ArbitrationData public arbitrationData;
     
     constructor() public {
-        arbitrationData = new Arbitration();
+    
     }
 
     function createArbitration(address _assetAddress, Arbitration.Reasons _reason, address _requestedBy) public onlyOwner {

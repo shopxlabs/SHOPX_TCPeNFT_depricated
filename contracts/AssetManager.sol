@@ -25,6 +25,7 @@ contract AssetManager is Owned {
         uint _totalCost, 
         uint _expirationDate, 
         address _mpAddress, 
+        uint _initialStakeAmount,
         uint _mpAmount,
         AssetBase.AssetTypes _assetType,
         uint _inventoryCount) public onlyOwner {
@@ -38,6 +39,7 @@ contract AssetManager is Owned {
             _expirationDate, 
             _mpAddress, 
             _mpAmount,
+            _initialStakeAmount,
             _assetType,
             _inventoryCount); 
         assetData.save(address(asset));

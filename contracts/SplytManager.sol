@@ -56,6 +56,6 @@ contract SplytManager is Events, Owned {
     }  
 
     function updateArbitrationManager(address _newAddress) onlyOwner public {
-        assetManager = ArbitrationManager(_newAddress);
+        arbitrationManager = ArbitrationManager(_newAddress);
     }      
 }

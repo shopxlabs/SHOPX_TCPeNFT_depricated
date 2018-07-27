@@ -3,10 +3,10 @@ pragma solidity ^0.4.24;
 import "./Asset.sol";
 import "./Owned.sol";
 
-contract Arbitration {
+contract Arbitration is Owned {
     
     enum Reasons { SPAM, BROKEN, NOTRECIEVED, NOREASON }
-    string public reason;
+    Reasons public reason;
     address public requestedBy;
     Asset asset;
 
