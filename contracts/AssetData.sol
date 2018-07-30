@@ -10,6 +10,7 @@ contract AssetData is Managed {
     uint public assetId; //increments after creating new
  
     function save(address _assetAddress) public onlyManager returns (bool success) {
+
         assetIdByAddress[_assetAddress] = assetId;
         addressByAssetId[assetId] = _assetAddress;
         assetId++;
@@ -18,9 +19,10 @@ contract AssetData is Managed {
     
     function getAssetIdByAddress(address _assetAddress) public view returns (uint) {
         return assetIdByAddress[_assetAddress];
-    }    
+    }   
+     
     function getAddressByAssetId(uint _assetId) public view returns (address) {
         return addressByAssetId[_assetId];
-    }      
-    
+    }    
+
 }

@@ -1,10 +1,11 @@
 pragma solidity ^0.4.24;
 
+import "./Owned.sol";
 import "./Order.sol";
 import "./OrderData.sol";
 import "./AssetBase.sol";
 
-contract OrderManager {
+contract OrderManager is Owned {
     
     enum Reason { DEFECTIVE, NO_REASON, CHANGED_MIND, OTHER }
     enum Status { PAID, CLOSED, REQUESTED_REFUND, REFUNDED, ARBITRATION, OTHER }
@@ -12,10 +13,6 @@ contract OrderManager {
     OrderData public orderData;
     address public splytManagerAddress;
     
-    modifier onlySplytManager() {
-        require(msg.sender == splytManagerAddress);
-        _;
-    }
 
     modifier onlyAssetActive(address _assetAddress) {
         require(AssetBase.AssetStatuses.ACTIVE == Asset(_assetAddress).assetStatus());
@@ -28,11 +25,11 @@ contract OrderManager {
         _;
     } 
 
-    constructor(address _splytManagerAddress) public {
-       splytManagerAddress = _splytManagerAddress;
+    constructor() public {
+      orderData = new OrderData();
     }
 
-    function createOrder(address _assetAddress, address _buyer, uint _qty, uint _tokenAmount) public onlySplytManager onlyAssetActive(_assetAddress) {
+    function createOrder(address _assetAddress, address _buyer, uint _qty, uint _tokenAmount) public onlyOwner onlyAssetActive(_assetAddress) {
         Order order = new Order(_assetAddress, _buyer, _qty, _tokenAmount);
         orderData.save(address(order));
     }
@@ -45,7 +42,7 @@ contract OrderManager {
         return orderData.getAddressByOrderId(_orderId);
     }       
     
-   function setDataContract(address _orderData) public {
+   function setDataContract(address _orderData) onlyOwner public {
        orderData = OrderData(_orderData);
     }
     

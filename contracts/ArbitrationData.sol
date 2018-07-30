@@ -19,8 +19,10 @@ contract ArbitrationData is Managed {
     function getArbitrationIdByAddress(address _arbitrationAddress) public view returns (uint) {
         return arbitrationIdByAddress[_arbitrationAddress];
     }    
+    
     function getAddressByArbitrationId(uint _arbitrationId) public view returns (address) {
         return addressByArbitrationId[_arbitrationId];
-    }      
+    }    
+
     
 }

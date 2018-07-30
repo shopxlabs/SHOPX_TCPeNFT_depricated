@@ -1,7 +1,9 @@
 pragma solidity ^0.4.24;
 
 contract Owned {
+    
     address public owner;
+    address public pendingOwner;
 
     constructor() public {
         owner = msg.sender;
@@ -12,7 +14,19 @@ contract Owned {
         _;
     }
 
-    function transferOwnership(address newOwner) public onlyOwner {
-        owner = newOwner;
+    modifier onlyPendingOwner {
+        require(msg.sender == pendingOwner);
+        _;
     }
+
+    //proposes new ownership
+    function transferOwnership(address newOwner) public onlyOwner {
+        pendingOwner = newOwner;
+    }
+
+    //pending owner must accept it to prevent changing to a wallet who lost their key
+    function acceptOwnership() public onlyPendingOwner {
+        owner = pendingOwner;
+    }
+
 }

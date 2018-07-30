@@ -1,24 +1,20 @@
 pragma solidity ^0.4.24;
 
+
+import "./Owned.sol";
 import "./Asset.sol";
 import "./AssetData.sol";
 import "./AssetBase.sol";
 
-contract AssetManager {
+contract AssetManager is Owned {
     
     enum Reason { DEFECTIVE, NO_REASON, CHANGED_MIND, OTHER }
     enum Status { PAID, CLOSED, REQUESTED_REFUND, REFUNDED, ARBITRATION, OTHER }
     
-    address public splytManager;
     AssetData public assetData;
     
-    modifier onlySplytManager() {
-        require(msg.sender == splytManager);
-        _;
-    }
-    
-    constructor(address _splytManager) public {
-       splytManager = _splytManager;
+    constructor() public {
+       assetData = new AssetData();
     }
 
     function createAsset(
@@ -29,9 +25,10 @@ contract AssetManager {
         uint _totalCost, 
         uint _expirationDate, 
         address _mpAddress, 
+        uint _initialStakeAmount,
         uint _mpAmount,
         AssetBase.AssetTypes _assetType,
-        uint _inventoryCount) public onlySplytManager {
+        uint _inventoryCount) public onlyOwner {
 
         Asset asset = new Asset(
             _assetId, 
@@ -42,15 +39,17 @@ contract AssetManager {
             _expirationDate, 
             _mpAddress, 
             _mpAmount,
+            _initialStakeAmount,
             _assetType,
             _inventoryCount); 
         assetData.save(address(asset));
     }
 
-    function setDataContract(address _assetData) public {
+    function setDataContract(address _assetData) onlyOwner public {
        assetData = AssetData(_assetData);
     }
-    
+   
+
     function getAddressByAssetId(uint _assetId) public view returns (address) {
       return assetData.getAddressByAssetId(_assetId);
     }
@@ -58,4 +57,6 @@ contract AssetManager {
     function getAssetIdByAddress(address _assetAddress) public view returns (uint) {
       return assetData.getAssetIdByAddress(_assetAddress);
     }    
+
+
 }
