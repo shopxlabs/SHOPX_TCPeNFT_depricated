@@ -2,6 +2,8 @@ pragma solidity ^0.4.24;
 
 import "./AssetManager.sol";
 import "./OrderManager.sol";
+import "./ArbitrationManager.sol";
+
 import "./Events.sol";
 import "./Owned.sol";
 
@@ -28,6 +30,7 @@ contract SplytManager is Events, Owned {
     
     AssetManager public assetManager;
     OrderManager public orderManager;
+    ArbitrationManager public arbitrationManager;
     
     // Events to notify other market places of something
     // Success events gets triggered when a listing is created or a listing is fully funded
@@ -37,15 +40,21 @@ contract SplytManager is Events, Owned {
     // event Error(uint _code, string _message);
 
 
-    constructor(address _assetManager, address _orderManager) public {
+    constructor(address _assetManager, address _orderManager, address _arbitrationManager) public {
         orderManager = OrderManager(_orderManager);
         assetManager = AssetManager(_assetManager);
+        arbitrationManager = ArbitrationManager(_arbitrationManager);        
     }
     
-    function updateAssetManager(address _newAssetManager) onlyOwner public {
-        assetManager = AssetManager(_newAssetManager);
+    function setAssetManager(address _newAddress) onlyOwner public {
+        assetManager = AssetManager(_newAddress);
     }    
-    function updateOrderManager(address _newAssetManager) onlyOwner public {
-        assetManager = AssetManager(_newAssetManager);
-    }  
+
+    function setOrderManager(address _newAddress) onlyOwner public {
+        orderManager = OrderManager(_newAddress);
+    } 
+
+    function setArbitrationManager(address _newAddress) onlyOwner public {
+        arbitrationManager = ArbitrationManager(_newAddress);
+    }      
 }

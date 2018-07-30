@@ -47,7 +47,7 @@ contract AssetManager {
         assetData.save(address(asset));
     }
 
-    function updateDataContract(address _assetData) public {
+    function setDataContract(address _assetData) public {
        assetData = AssetData(_assetData);
     }
     

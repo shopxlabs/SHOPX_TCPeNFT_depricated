@@ -1,13 +1,15 @@
 pragma solidity ^0.4.24;
 
-contract ArbitrationData  {
+import "./Managed.sol";
+
+contract ArbitrationData is Managed {
     
     mapping (address => uint) public arbitrationIdByAddress;
     mapping (uint => address) public addressByArbitrationId;
                                      
     uint public arbitrationId; //increments after creating new
  
-    function save(address _arbitrationAddress) public returns (bool success) {
+    function save(address _arbitrationAddress) public onlyManager returns (bool success) {
         arbitrationIdByAddress[_arbitrationAddress] = arbitrationId;
         addressByArbitrationId[arbitrationId] = _arbitrationAddress;
         arbitrationId++;

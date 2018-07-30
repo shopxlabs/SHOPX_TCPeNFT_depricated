@@ -45,7 +45,7 @@ contract OrderManager {
         return orderData.getAddressByOrderId(_orderId);
     }       
     
-   function updateDataContract(address _orderData) public {
+   function setDataContract(address _orderData) public {
        orderData = OrderData(_orderData);
     }
     

@@ -28,7 +28,7 @@ contract ArbitrationManager {
     }
 
     //@desc change data contract
-    function updateDataContract(address _arbitrationData) public {
+    function setDataContract(address _arbitrationData) public {
        arbitrationData = ArbitrationData(_arbitrationData);
     }
     

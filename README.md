@@ -22,3 +22,14 @@ Ethereum contracts for split protocol
   - Or else the problem is with your code. Good luck.
  
  
+### Schema in Ver 0.2.0. 
+Contracts are modular meaning they can be exchanged for updated contracts and disregard the old EXCEPT the Data contracts.  
+
+** Deploy contracts schema.    
+Remeber only the wallet used to deploy these contracts are the 'owner'. The role gives him/her rights to swap addresses.
+-  Deploy 'Data' contracts. Save the address to be used for manager contracts.  
+-  Deploy 'Manager' contracts second and insert the 'Data' contract address. For example AssetData.sol is being used with AssetManager.sol. Now go back go the correlating data contract and setManager(manager address). This will set security of what contracts are allowed to perform certain functions.  
+-  Deploy the SplyManager contract and pass the addresses of all the managers in the constructor.  
+
+
+

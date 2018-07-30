@@ -1,13 +1,15 @@
 pragma solidity ^0.4.24;
 
-contract AssetData  {
+import "./Managed.sol";
+
+contract AssetData is Managed {
     
     mapping (address => uint) public assetIdByAddress;
     mapping (uint => address) public addressByAssetId;
                                      
     uint public assetId; //increments after creating new
  
-    function save(address _assetAddress) public returns (bool success) {
+    function save(address _assetAddress) public onlyManager returns (bool success) {
         assetIdByAddress[_assetAddress] = assetId;
         addressByAssetId[assetId] = _assetAddress;
         assetId++;
