@@ -3,7 +3,7 @@ pragma solidity ^0.4.24;
 import "./Owned.sol";
 import "./Order.sol";
 import "./OrderData.sol";
-import "./AssetBase.sol";
+import "./Asset.sol";
 
 contract OrderManager is Owned {
     
@@ -15,7 +15,7 @@ contract OrderManager is Owned {
     
 
     modifier onlyAssetActive(address _assetAddress) {
-        require(AssetBase.AssetStatuses.ACTIVE == Asset(_assetAddress).assetStatus());
+        require(Asset.Statuses.ACTIVE == Asset(_assetAddress).status());
         _;
     }    
     //@desc if buyer commits full amount of the price

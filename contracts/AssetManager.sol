@@ -4,17 +4,18 @@ pragma solidity ^0.4.24;
 import "./Owned.sol";
 import "./Asset.sol";
 import "./AssetData.sol";
-import "./AssetBase.sol";
+import "./SplytManager.sol";
+import "./Stake.sol";
 
 contract AssetManager is Owned {
     
-    enum Reason { DEFECTIVE, NO_REASON, CHANGED_MIND, OTHER }
-    enum Status { PAID, CLOSED, REQUESTED_REFUND, REFUNDED, ARBITRATION, OTHER }
-    
     AssetData public assetData;
-    
-    constructor() public {
-       assetData = new AssetData();
+    SplytManager public splytManager;
+    Stake public stake;
+
+
+    constructor(address _assetData) public {
+        assetData = AssetData(_assetData);
     }
 
     function createAsset(
@@ -25,12 +26,17 @@ contract AssetManager is Owned {
         uint _totalCost, 
         uint _expirationDate, 
         address _mpAddress, 
-        uint _initialStakeAmount,
         uint _mpAmount,
-        AssetBase.AssetTypes _assetType,
         uint _inventoryCount) public onlyOwner {
 
-        Asset asset = new Asset(
+        //calculate stake
+        uint sellersBal = splytManager.getBalance(_seller);
+        uint stakeTokens = stake.calculateStakeTokens(_totalCost);
+        if(stakeTokens > sellersBal) {
+            revert();
+        }
+
+         Asset asset = new Asset(
             _assetId, 
             _term, 
             _seller, 
@@ -39,16 +45,23 @@ contract AssetManager is Owned {
             _expirationDate, 
             _mpAddress, 
             _mpAmount,
-            _initialStakeAmount,
-            _assetType,
-            _inventoryCount); 
+            _inventoryCount,
+            stakeTokens); 
         assetData.save(address(asset));
     }
 
+    //@desc update data contract address
     function setDataContract(address _assetData) onlyOwner public {
        assetData = AssetData(_assetData);
     }
    
+    function setSplytManager(address _address) public {
+        splytManager = SplytManager(_address);
+    }
+
+    function setStakeLibrary(address _address) public {
+        stake = Stake(_address);
+    }
 
     function getAddressByAssetId(uint _assetId) public view returns (address) {
       return assetData.getAddressByAssetId(_assetId);
@@ -57,6 +70,7 @@ contract AssetManager is Owned {
     function getAssetIdByAddress(address _assetAddress) public view returns (uint) {
       return assetData.getAssetIdByAddress(_assetAddress);
     }    
+
 
 
 }

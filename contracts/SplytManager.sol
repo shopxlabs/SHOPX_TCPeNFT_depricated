@@ -39,22 +39,51 @@ contract SplytManager is Events, Owned {
     // event Success(uint _code, address _assetAddress);
     // event Error(uint _code, string _message);
 
-
-    constructor(address _assetManager, address _orderManager, address _arbitrationManager) public {
-        orderManager = OrderManager(_orderManager);
-        assetManager = AssetManager(_assetManager);
-        arbitrationManager = ArbitrationManager(_arbitrationManager);        
-    }
+    constructor() public {
     
+    }
+
+    // constructor(address _assetManager, address _orderManager, address _arbitrationManager) public {
+    //     orderManager = OrderManager(_orderManager);
+    //     assetManager = AssetManager(_assetManager);
+    //     arbitrationManager = ArbitrationManager(_arbitrationManager);        
+    // }
+    
+    //used to update contracts
     function setAssetManager(address _newAddress) onlyOwner public {
         assetManager = AssetManager(_newAddress);
     }    
 
+    //used to update contracts
     function setOrderManager(address _newAddress) onlyOwner public {
         orderManager = OrderManager(_newAddress);
     } 
-
+    //used to update contracts
     function setArbitrationManager(address _newAddress) onlyOwner public {
         arbitrationManager = ArbitrationManager(_newAddress);
     }      
+    //used to update contracts
+    function setStake(address _newAddress) onlyOwner public {
+        stake = StakeInterface(_newAddress);
+    }      
+
+    // User for single buy to transfer tokens from buyer address to seller address
+    function internalContribute(address _from, address _to, uint _amount) public returns (bool) {
+        bool result = satToken.transferFrom(_from, _to, _amount);
+        return result;
+    }
+    
+    // Used for fractional ownership to transfer tokens from user address to listing address
+    function internalRedeemFunds(address _listingAddress, address _seller, uint _amount) public returns (bool) {
+        
+        bool result = satToken.transferFrom(_listingAddress, _seller, _amount);
+        return result;
+    }
+
+    // Getter function. returns token contract address
+    function getBalance(address _wallet) public returns (uint) {
+        return satToken.balanceOf(_wallet);
+    }
+
+
 }

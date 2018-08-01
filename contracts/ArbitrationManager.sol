@@ -3,23 +3,26 @@ pragma solidity ^0.4.24;
 import "./Arbitration.sol";
 import "./ArbitrationData.sol";
 import "./Asset.sol";
-import "./AssetBase.sol";
+import "./SplytManager.sol";
 
 contract ArbitrationManager is Owned {
 
+    SplytManager public splytManager;
     ArbitrationData public arbitrationData;
     
     constructor() public {
     
     }
 
-    function createArbitration(address _assetAddress, Arbitration.Reasons _reason, address _requestedBy) public onlyOwner {
-        Arbitration a = new Arbitration(_assetAddress, _reason, _requestedBy);
+    function createArbitration(Arbitration.Reasons _reason, address _reporter, address _assetAddress) public onlyOwner {
+        
+        uint stakeAmount; //calcualte stake amount
+        Arbitration a = new Arbitration(_reason, _reporter, stakeAmount, _assetAddress, splytManager);
         arbitrationData.save(address(a));
 
         Asset asset = Asset(_assetAddress);
         //change status so no one can purchase during arbitration
-        asset.setStatus(AssetBase.AssetStatuses.IN_ARBITRATION);
+        asset.setStatus(Asset.Statuses.IN_ARBITRATION);
     }
 
 /*
@@ -41,6 +44,11 @@ contract ArbitrationManager is Owned {
        arbitrationData = ArbitrationData(_arbitrationData);
     }
     
+    //@desc set splytmanager
+    function setSplytManager(address _address) public {
+       splytManager = SplytManager(_address);
+    }
+
     function getAddressByArbitrationId(uint _arbitrationId) public view returns (address) {
       return arbitrationData.getAddressByArbitrationId(_arbitrationId);
     }

@@ -3,7 +3,7 @@ pragma solidity ^0.4.24;
 import "./Owned.sol";
 import "./Events.sol";
 import "./Arbitration.sol";
-import "./AssetBase.sol";
+import "./Asset.sol";
 
 // Interface contracts are interface layers to the main contracts which defines
 // a function and its input/output parameters. 
@@ -24,7 +24,14 @@ contract TrackerInterface {
     function internalArbitrate(string _reason, address _requestedBy) public returns (address);
 }
 
-contract Asset is Events, Owned, AssetBase {
+contract Asset is Events, Owned {
+    
+    enum AssetTypes { NORMAL, FRACTIONAL }
+    AssetTypes public assetType;
+
+    enum Statuses { ACTIVE, IN_ARBITRATION, EXPIRED, CLOSED, OTHER }
+    Statuses public status;
+    
     TrackerInterface public tracker;
     address public seller;
     address[] listOfMarketPlaces;
@@ -60,6 +67,11 @@ contract Asset is Events, Owned, AssetBase {
         _;
     }
 
+    modifier onlyStatus(Statuses _status) {
+         require(status == _status);
+         _;
+    }
+
     constructor(
         bytes12 _assetId, 
         uint _term, 
@@ -70,8 +82,8 @@ contract Asset is Events, Owned, AssetBase {
         address _mpAddress, 
         uint _mpAmount,
         uint _stakeAmount,
-        AssetTypes _assetType,
-        uint _inventoryCount) public {
+        uint _inventoryCount
+        ) public {
             assetId = _assetId;
             term = _term;
             seller = _seller;
@@ -82,39 +94,16 @@ contract Asset is Events, Owned, AssetBase {
             listOfMarketPlaces.push(_mpAddress);
             tracker = TrackerInterface(msg.sender);
             initialStakeAmount = _stakeAmount;
-            assetType = _assetType;
             inventoryCount = _inventoryCount;
-            
+
+            status = Statuses.ACTIVE;
+            assetType =  _term > 0 ? AssetTypes.FRACTIONAL : AssetTypes.NORMAL;
+
+          
     }
 
-    function getAssetConfig() public constant returns(
-        bytes32, 
-        uint, 
-        address, 
-        uint, 
-        string, 
-        bool, 
-        bool, 
-        uint, 
-        uint, 
-        address, 
-        uint) {
-        return (
-            assetId, 
-            term, 
-            seller, 
-            amountFunded, 
-            title, 
-            isFunded(), 
-            isExpired(), 
-            totalCost, 
-            expirationDate, 
-            listOfMarketPlaces[0], 
-            kickbackAmount);
-    }
-
-    function setStatus(AssetStatuses _status) public onlyOwner {
-        assetStatus = _status;
+    function setStatus(Statuses _status) public onlyOwner {
+        status = _status;
     }
 
     // Getter function. returns a users's total contributions so far for this asset.
