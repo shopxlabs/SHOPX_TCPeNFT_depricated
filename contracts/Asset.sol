@@ -202,7 +202,11 @@ contract Asset is Events, Owned {
                 trackerContract.internalRedeemFunds(this, listOfMarketPlaces[i], mpGets);
         }
     }
-    
+ 
+     function removeOneInventory() public {
+        inventoryCount -= inventoryCount;
+    }   
+
     // report spam assets
     // start refund process
     /*

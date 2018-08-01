@@ -1,37 +1,27 @@
 pragma solidity ^0.4.24;
 
 import "./Asset.sol";
+import "./Managed.sol";
 
-contract Order {
+contract Order is Managed {
     
-    enum Reason { DEFECTIVE, NO_REASON, CHANGED_MIND, OTHER }
-    enum Status { PAID, CLOSED, REQUESTED_REFUND, REFUNDED, ARBITRATION, OTHER }
+    enum Reasons { DEFECTIVE, NO_REASON, CHANGED_MIND, OTHER }
+    enum Statuses { PAID, CLOSED, REQUESTED_REFUND, REFUNDED, OTHER }
     
     address public buyer;
-    address public arbitrator;
     Asset public asset;
     uint public quantity;
-    Reason public reason;
-    Status public status;
+    Reasons public reason;
+    Statuses public status;
     uint public tokenAmount;
 
-    modifier onlyBuyer() {
-        require(msg.sender == buyer);
+    modifier onlyBuyer(address _buyer) {
+        require(buyer == _buyer);
         _;
     }
     
     modifier onlySeller(address _seller) {
         require(_seller == asset.seller());
-        _;
-    }
-
-    modifier onlyArbitrator(address _arbitrator) {
-        require(arbitrator == _arbitrator);
-        _;
-    }
-
-    modifier onlySellerOrArbitrator() {
-        require(msg.sender == asset.seller() || msg.sender == arbitrator);
         _;
     }
     
@@ -40,14 +30,18 @@ contract Order {
         buyer = _buyer;
         quantity = _qty;
         tokenAmount = _tokenAmount;
+        status = Statuses.PAID;
     }
 
-    function approvedRefund() public onlySellerOrArbitrator {
-        status = Status.REFUNDED;
+    function approvedRefund(address _seller) public onlySeller(_seller) {
+        status = Statuses.REFUNDED;
         //TODO: refund  token process
         
     }
     
-    
+    function requestedRefund(address  _buyer) public onlyBuyer(_buyer) {
+        status = Statuses.REQUESTED_REFUND;
+        //TODO: refund  token process        
+    }    
 
 }
