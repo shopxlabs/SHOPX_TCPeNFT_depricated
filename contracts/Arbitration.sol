@@ -9,6 +9,7 @@ contract Arbitration {
     enum Winners { UNDECIDED, REPORTER, SELLER  }
     enum Statuses { REPORTED, SELLER_STAKED_2X, REPORTER_STAKED_2X, RESOLVED, UNRESOLVED }
 
+    bytes12 public arbitrationId;
     address public reporter;
     Reasons public reason;
     
@@ -38,7 +39,8 @@ contract Arbitration {
         _;
     }
 
-     constructor(Reasons _reason, address _reporter, uint _stakeAmount, address _assetAddress, address _splytManagerAddress) public {
+     constructor(bytes12 _arbitrationId, Reasons _reason, address _reporter, uint _stakeAmount, address _assetAddress, address _splytManagerAddress) public {
+        arbitrationId = _arbitrationId;
         reason = _reason;
         reporter = _reporter;
         reporterStakeTotal = _stakeAmount;

@@ -14,11 +14,11 @@ contract ArbitrationManager is Owned {
     
     }
 
-    function createArbitration(Arbitration.Reasons _reason, address _reporter, address _assetAddress) public onlyOwner {
+    function createArbitration(bytes12 _arbitrationId, Arbitration.Reasons _reason, address _reporter, address _assetAddress) public onlyOwner {
         
         uint stakeAmount; //calcualte stake amount
-        Arbitration a = new Arbitration(_reason, _reporter, stakeAmount, _assetAddress, splytManager);
-        arbitrationData.save(address(a));
+        Arbitration a = new Arbitration(_arbitrationId, _reason, _reporter, stakeAmount, _assetAddress, splytManager);
+        arbitrationData.save(_arbitrationId, address(a));
 
         Asset asset = Asset(_assetAddress);
         //change status so no one can purchase during arbitration
@@ -49,11 +49,11 @@ contract ArbitrationManager is Owned {
        splytManager = SplytManager(_address);
     }
 
-    function getAddressByArbitrationId(uint _arbitrationId) public view returns (address) {
+    function getAddressByArbitrationId(bytes12 _arbitrationId) public view returns (address) {
       return arbitrationData.getAddressByArbitrationId(_arbitrationId);
     }
     
-    function getArbitrationIdByAddress(address _arbitrationAddress) public view returns (uint) {
+    function getArbitrationIdByAddress(address _arbitrationAddress) public view returns (bytes12) {
       return arbitrationData.getArbitrationIdByAddress(_arbitrationAddress);
     }    
    
