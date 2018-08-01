@@ -42,7 +42,7 @@ contract OrderManager is Owned {
         return orderData.getAddressByOrderId(_orderId);
     }       
     
-   function setDataContract(address _orderData) onlyOwner public {
+   function setDataContract(address _orderData) public onlyOwner{
        orderData = OrderData(_orderData);
     }
     

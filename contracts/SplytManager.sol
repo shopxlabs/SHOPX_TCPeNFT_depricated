@@ -50,30 +50,32 @@ contract SplytManager is Events, Owned {
     // }
     
     //used to update contracts
-    function setAssetManager(address _newAddress) onlyOwner public {
+    function setAssetManager(address _newAddress) public onlyOwner {
         assetManager = AssetManager(_newAddress);
     }    
 
     //used to update contracts
-    function setOrderManager(address _newAddress) onlyOwner public {
+    function setOrderManager(address _newAddress) public onlyOwner {
         orderManager = OrderManager(_newAddress);
     } 
     //used to update contracts
-    function setArbitrationManager(address _newAddress) onlyOwner public {
+    function setArbitrationManager(address _newAddress) public onlyOwner {
         arbitrationManager = ArbitrationManager(_newAddress);
     }      
     //used to update contracts
-    function setStake(address _newAddress) onlyOwner public {
+    function setStake(address _newAddress) public onlyOwner {
         stake = StakeInterface(_newAddress);
     }      
 
     // User for single buy to transfer tokens from buyer address to seller address
+    //TODO: add security
     function internalContribute(address _from, address _to, uint _amount) public returns (bool) {
         bool result = satToken.transferFrom(_from, _to, _amount);
         return result;
     }
     
     // Used for fractional ownership to transfer tokens from user address to listing address
+    // TODO: add security
     function internalRedeemFunds(address _listingAddress, address _seller, uint _amount) public returns (bool) {
         
         bool result = satToken.transferFrom(_listingAddress, _seller, _amount);

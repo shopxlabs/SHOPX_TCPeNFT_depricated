@@ -1,5 +1,6 @@
 pragma solidity ^0.4.24;
 
+import "./Owned.sol";
 import "./Arbitration.sol";
 import "./ArbitrationData.sol";
 import "./Asset.sol";
@@ -40,12 +41,12 @@ contract ArbitrationManager is Owned {
 */
 
     //@desc change data contract
-    function setDataContract(address _arbitrationData) public {
+    function setDataContract(address _arbitrationData) public onlyOwner {
        arbitrationData = ArbitrationData(_arbitrationData);
     }
     
     //@desc set splytmanager
-    function setSplytManager(address _address) public {
+    function setSplytManager(address _address) public onlyOwner {
        splytManager = SplytManager(_address);
     }
 

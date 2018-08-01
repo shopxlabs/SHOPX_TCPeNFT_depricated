@@ -55,11 +55,11 @@ contract AssetManager is Owned {
        assetData = AssetData(_assetData);
     }
    
-    function setSplytManager(address _address) public {
+    function setSplytManager(address _address) public onlyOwner {
         splytManager = SplytManager(_address);
     }
 
-    function setStakeLibrary(address _address) public {
+    function setStakeLibrary(address _address) public onlyOwner {
         stake = Stake(_address);
     }
 
