@@ -47,7 +47,7 @@ contract AssetManager is Owned {
             _mpAmount,
             _inventoryCount,
             stakeTokens); 
-        assetData.save(address(asset));
+        assetData.save(_assetId, address(asset));
     }
 
     //@desc update data contract address
@@ -63,11 +63,11 @@ contract AssetManager is Owned {
         stake = Stake(_address);
     }
 
-    function getAddressByAssetId(uint _assetId) public view returns (address) {
+    function getAddressByAssetId(bytes12 _assetId) public view returns (address) {
       return assetData.getAddressByAssetId(_assetId);
     }
     
-    function getAssetIdByAddress(address _assetAddress) public view returns (uint) {
+    function getAssetIdByAddress(address _assetAddress) public view returns (bytes12) {
       return assetData.getAssetIdByAddress(_assetAddress);
     }    
 

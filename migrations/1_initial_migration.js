@@ -1,7 +1,8 @@
 var Migrations = artifacts.require("./Migrations.sol")
 var SatToken = artifacts.require("./SatToken.sol")
-var SplytTracker = artifacts.require("./SplytTracker.sol")
-var ArbitrationFactory = artifacts.require("./ArbitrationFactory.sol")
+var SplytManager = artifacts.require("./SplytManager.sol")
+var OrderManager = artifacts.require("./OrderManager.sol")
+var OrderData = artifacts.require("./OrderData.sol")
 var Stake = artifacts.require("./Stake.sol")
 var chalk = require('chalk')
 
@@ -33,12 +34,18 @@ module.exports = function(deployer, network, accounts) {
   deployer.deploy(SatToken, name, desc, ver, walletConfig)
   .then(async function() {
     console.log('Sat Token address: ', SatToken.address)
-    var arbitrationFactory = await deployer.deploy(ArbitrationFactory, walletConfig)
-    console.log('Arbitration Factory address: ', arbitrationFactory.address)
+
+    var orderData = await deployer.deploy(OrderData, walletConfig)
+    console.log('OrderData address: ', arbitrationFactory.address)
+
+    var orderManager = await deployer.deploy(OrderManager, walletConfig)
+    console.log('OrderManager address: ', orderManager.address)
+    
     var stake = await deployer.deploy(Stake, 10000000000000, 2000000000, 100, walletConfig)
     console.log('Stake address: ', stake.address)
-    var deployed = await deployer.deploy(SplytTracker, ver, name, SatToken.address, arbitrationFactory.address, stake.address, walletConfig)
-    console.log('Splyt Tracker address: ', SplytTracker.address)
+    
+    var deployed = await deployer.deploy(SplytManager, walletConfig)
+    console.log('Splyt Manager address: ', SplytManager.address)
   });
   
 };

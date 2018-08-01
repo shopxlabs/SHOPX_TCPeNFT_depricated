@@ -28,17 +28,17 @@ contract OrderManager is Owned {
       orderData = OrderData(_orderData);
     }
 
-    function createOrder(address _assetAddress, address _buyer, uint _qty, uint _tokenAmount) public onlyOwner onlyPIF(_assetAddress, _tokenAmount) onlyStatus(Asset.Statuses.ACTIVE, _assetAddress) {
-        Order order = new Order(_assetAddress, _buyer, _qty, _tokenAmount); //create new order if it passes all the qualifiers
+    function createOrder(bytes12 _orderId, address _assetAddress, address _buyer, uint _qty, uint _tokenAmount) public onlyOwner onlyPIF(_assetAddress, _tokenAmount) onlyStatus(Asset.Statuses.ACTIVE, _assetAddress) {
+        Order order = new Order(_orderId, _assetAddress, _buyer, _qty, _tokenAmount); //create new order if it passes all the qualifiers
         Asset(_assetAddress).removeOneInventory(); //update inventory 
-        orderData.save(address(order)); //save it to the data contract
+        orderData.save(_orderId, address(order)); //save it to the data contract
     }
 
-    function getOrderIdByAddress(address _orderAddress) public view returns (uint) {
+    function getOrderIdByAddress(address _orderAddress) public view returns (bytes12) {
         return orderData.getOrderIdByAddress(_orderAddress);
     }  
     
-    function getAddressByOrderId(uint _orderId) public view returns (address) {
+    function getAddressByOrderId(bytes12 _orderId) public view returns (address) {
         return orderData.getAddressByOrderId(_orderId);
     }       
     

@@ -7,7 +7,8 @@ contract Order is Managed {
     
     enum Reasons { DEFECTIVE, NO_REASON, CHANGED_MIND, OTHER }
     enum Statuses { PAID, CLOSED, REQUESTED_REFUND, REFUNDED, OTHER }
-    
+
+    bytes12 public orderId;    
     address public buyer;
     Asset public asset;
     uint public quantity;
@@ -25,7 +26,8 @@ contract Order is Managed {
         _;
     }
     
-    constructor(address _assetAddress, address _buyer, uint _qty, uint _tokenAmount) public {
+    constructor(bytes12 _orderId, address _assetAddress, address _buyer, uint _qty, uint _tokenAmount) public {
+        orderId = _orderId;
         asset = Asset(_assetAddress);
         buyer = _buyer;
         quantity = _qty;
