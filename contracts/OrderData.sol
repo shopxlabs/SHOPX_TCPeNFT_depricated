@@ -4,24 +4,54 @@ import "./Managed.sol";
 
 contract OrderData is Managed {
 
+    struct Order {
+        uint version;
+        uint orderId;
+        address asset;
+        address buyer;
+        uint quantity;
+        uint paidAmount;
+        Statuses status;
+    }
     
-    mapping (address => bytes12) public orderIdByAddress;
-    mapping (bytes12 => address) public addressByOrderId;
+    enum Statuses { PIF, CLOSED, REQUESTED_REFUND, REFUNDED, OTHER }
+
+    uint public version = 1;
+
+    // mapping (address => uint) public orderIdByAddress;
+    mapping (uint => Order) public orders;
                                      
     uint public orderId; //increments after creating new
- 
-    function save(bytes12 _orderId, address _orderAddress) public onlyManager returns (bool) {
-        addressByOrderId[_orderId] = _orderAddress;
-        orderIdByAddress[_orderAddress] = _orderId;
+
+    function save(address _asset, address _buyer, uint _quantity, uint _paidAmount) public onlyManager returns (bool) {
+        orders[orderId] = Order(version, orderId, _asset, _buyer, _quantity, _paidAmount, Statuses.PIF);
+        orderId++;
+        return true;
+    }  
+
+    function updateStatus(uint _orderId, Statuses _status) public onlyManager returns (bool) {
+        orders[_orderId].status  = _status;
         return true;
     }  
     
-    function getOrderIdByAddress(address _orderAddress) public view returns (bytes12) {
-        return orderIdByAddress[_orderAddress];
-    }    
+    function getBuyer(uint _orderId) public view returns (address) {
+        return orders[_orderId].buyer;
+    }   
+
+    function getAsset(uint _orderId) public view returns (address) {
+        return orders[_orderId].asset;
+    }   
+
+    function getOrderByOrderId(uint _orderId) public view returns (uint, uint, address, address, uint, uint, Statuses) {
     
-    function getAddressByOrderId(bytes12 _orderId) public view returns (address) {
-        return addressByOrderId[_orderId];
-    }      
+        return (
+            orders[_orderId].version,    
+            orders[_orderId].orderId,
+            orders[_orderId].asset,    
+            orders[_orderId].buyer,
+            orders[_orderId].quantity,
+            orders[_orderId].paidAmount,
+            orders[_orderId].status);
+    }        
     
 }

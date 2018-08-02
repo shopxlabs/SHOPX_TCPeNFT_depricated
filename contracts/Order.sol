@@ -8,7 +8,7 @@ contract Order is Managed {
     enum Reasons { DEFECTIVE, NO_REASON, CHANGED_MIND, OTHER }
     enum Statuses { PIF, CLOSED, REQUESTED_REFUND, REFUNDED, OTHER }
 
-    bytes12 public orderId;    
+    uint public orderId;    
     address public buyer;
     Asset public asset;
     uint public quantity;
@@ -16,18 +16,18 @@ contract Order is Managed {
     Statuses public status;
     uint public tokenAmount;
 
-    modifier onlyBuyer(address _buyer) {
-        require(buyer == _buyer);
+    modifier onlyBuyer() {
+        require(buyer == msg.sender);
         _;
     }
     
-    modifier onlySeller(address _seller) {
-        require(_seller == asset.seller());
+    modifier onlySeller() {
+        require(asset.seller() == msg.sender);
         _;
     }
     
-    constructor(bytes12 _orderId, address _assetAddress, address _buyer, uint _qty, uint _tokenAmount) public {
-        orderId = _orderId;
+    constructor(address _assetAddress, address _buyer, uint _qty, uint _tokenAmount) public {
+        // orderId = _orderId;
         asset = Asset(_assetAddress);
         buyer = _buyer;
         quantity = _qty;
@@ -35,13 +35,13 @@ contract Order is Managed {
         status = Statuses.PIF;
     }
 
-    function approveRefund() public onlyManager {
+    function approveRefund() public onlySeller {
         status = Statuses.REFUNDED;
         //TODO: refund  token process
         
     }
     
-    function requestRefund() public onlyManager {
+    function requestRefund() public onlyBuyer {
         status = Statuses.REQUESTED_REFUND;
         //TODO: refund  token process        
     }    
