@@ -16,10 +16,6 @@ contract TokenInterface {
     function balanceOf(address _wallet) public returns (uint);
 }
 
-contract ArbitratorInterface {
-    function createArbitration(string _reason, address _requesdedBy) public returns (address);
-}
-
 contract SplytManager is Events, Owned {
 
     uint public version;
@@ -39,42 +35,45 @@ contract SplytManager is Events, Owned {
     // event Success(uint _code, address _assetAddress);
     // event Error(uint _code, string _message);
 
-    constructor() public {
-    
+    //@desc set all contracts it's interacting with
+    constructor(address _assetManager, address _orderManager, address _arbitrationManager, address _token, address _stake) public {
+        orderManager = OrderManager(_orderManager);
+        assetManager = AssetManager(_assetManager);
+        arbitrationManager = ArbitrationManager(_arbitrationManager);    
+        satToken = TokenInterface(_token);
+        stake = StakeInterface(_stake);            
     }
 
-    // constructor(address _assetManager, address _orderManager, address _arbitrationManager) public {
-    //     orderManager = OrderManager(_orderManager);
-    //     assetManager = AssetManager(_assetManager);
-    //     arbitrationManager = ArbitrationManager(_arbitrationManager);        
-    // }
-    
-    //used to update contracts
+    //@desc sets all the managers at once
+    function setManagers(address _assetManager, address _orderManager, address _arbitrationManager) public onlyOwner {
+        assetManager = AssetManager(_assetManager);
+        orderManager = OrderManager(_orderManager);   
+        arbitrationManager = ArbitrationManager(_arbitrationManager);             
+    }        
+
+    //@desc used to update contracts
     function setAssetManager(address _newAddress) public onlyOwner {
         assetManager = AssetManager(_newAddress);
     }    
 
-    //used to update contracts
+    //TODO: add security
+    //@desc used to update contracts
     function setOrderManager(address _newAddress) public onlyOwner {
         orderManager = OrderManager(_newAddress);
     } 
-    //used to update contracts
+    //@desc used to update contracts
     function setArbitrationManager(address _newAddress) public onlyOwner {
         arbitrationManager = ArbitrationManager(_newAddress);
     }      
-    //used to update contracts
-    function setStake(address _newAddress) public onlyOwner {
-        stake = StakeInterface(_newAddress);
-    }      
-
-    // User for single buy to transfer tokens from buyer address to seller address
+ 
+    //@desc User for single buy to transfer tokens from buyer address to seller address
     //TODO: add security
     function internalContribute(address _from, address _to, uint _amount) public returns (bool) {
         bool result = satToken.transferFrom(_from, _to, _amount);
         return result;
     }
     
-    // Used for fractional ownership to transfer tokens from user address to listing address
+    // @desc Used for fractional ownership to transfer tokens from user address to listing address
     // TODO: add security
     function internalRedeemFunds(address _listingAddress, address _seller, uint _amount) public returns (bool) {
         
@@ -82,7 +81,7 @@ contract SplytManager is Events, Owned {
         return result;
     }
 
-    // Getter function. returns token contract address
+    //@desc Getter function. returns token contract address
     function getBalance(address _wallet) public returns (uint) {
         return satToken.balanceOf(_wallet);
     }

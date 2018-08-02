@@ -6,7 +6,7 @@ import "./Managed.sol";
 contract Order is Managed {
     
     enum Reasons { DEFECTIVE, NO_REASON, CHANGED_MIND, OTHER }
-    enum Statuses { PAID, CLOSED, REQUESTED_REFUND, REFUNDED, OTHER }
+    enum Statuses { PIF, CLOSED, REQUESTED_REFUND, REFUNDED, OTHER }
 
     bytes12 public orderId;    
     address public buyer;
@@ -32,16 +32,16 @@ contract Order is Managed {
         buyer = _buyer;
         quantity = _qty;
         tokenAmount = _tokenAmount;
-        status = Statuses.PAID;
+        status = Statuses.PIF;
     }
 
-    function approvedRefund(address _seller) public onlySeller(_seller) {
+    function approveRefund() public onlyManager {
         status = Statuses.REFUNDED;
         //TODO: refund  token process
         
     }
     
-    function requestedRefund(address  _buyer) public onlyBuyer(_buyer) {
+    function requestRefund() public onlyManager {
         status = Statuses.REQUESTED_REFUND;
         //TODO: refund  token process        
     }    
