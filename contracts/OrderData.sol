@@ -12,6 +12,9 @@ contract OrderData is Managed {
         uint quantity;
         uint paidAmount;
         Statuses status;
+        mapping (bytes12 => bytes12) bytesAttributes; //for future 
+        mapping (bytes12 => uint) intAttributes; //for future
+        mapping (bytes12 => address) addressesAttributes; //for future
     }
     
     enum Statuses { PIF, CLOSED, REQUESTED_REFUND, REFUNDED, OTHER }
@@ -53,5 +56,13 @@ contract OrderData is Managed {
             orders[_orderId].paidAmount,
             orders[_orderId].status);
     }        
-    
+
+    function setBytesAttribute(uint _orderId, bytes12 _attributeKey, bytes12 _attributeValue) public returns (bool) {
+        orders[_orderId].bytesAttributes[_attributeKey] = _attributeValue;
+        return true;
+    }  
+
+    function getBytesAttribute(uint _orderId, bytes12 _attributeKey) public view returns (bytes12) {
+        return orders[_orderId].bytesAttributes[_attributeKey];    
+    }         
 }
