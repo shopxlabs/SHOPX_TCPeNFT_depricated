@@ -1,17 +1,26 @@
-const Order = artifacts.require("./Order.sol");
-
+const OrderManager = artifacts.require("./OrderManager.sol");
+const AssetManager = artifacts.require("./AssetManager.sol");
 
 contract('OrderTest general test cases.', function(accounts) {
 
-  let orderInstance;
+  let orderManagerInstance;
+  let assetManagerInstance;
+
   const defaultBuyer = accounts[0];
 
-  async function create_order(_assetAddress = "0x31f2ae92057a7123ef0e490a", _buyer = defaultBuyer, _quantity = 1, _totalPay = 100) {
+  async function create_orderManager(_assetAddress = "0x31f2ae92057a7123ef0e490a", _buyer = defaultBuyer, _quantity = 1, _totalPay = 100) {
     
     orderInstance = await Order.deployed(_assetAddress, _buyer, _quantity, _totalPay);
    
   }
 
+  async function create_assetManager(_assetId = "0x31f2ae92057a7123ef0e490a", _term = 1, _seller = accounts[1], _title = "MyTitle",
+      _totalCost = 1000, _expirationDate = 10001556712588, _mpAddress = accounts[2], _mpAmount = 2){
+    assetManagerInstance = await AssetManager.deployed();
+    await splytTrackerInstance.createAsset(_assetId, _term, _seller, _title, _totalCost, _expirationDate, _mpAddress, _mpAmount);
+    assetAddress = await splytTrackerInstance.getAddressById(_assetId);
+    assetInstance = await Asset.at(assetAddress);
+  }
 
   // This function gets ran before every test cases in this file.
   beforeEach('Deploying asset contract. ', async function() {

@@ -14,7 +14,7 @@ contract OrderData is Managed {
         Statuses status;
         mapping (bytes12 => bytes12) bytesAttributes; //for future 
         mapping (bytes12 => uint) intAttributes; //for future
-        mapping (bytes12 => address) addressesAttributes; //for future
+        mapping (bytes12 => address) addressAttributes; //for future
     }
     
     enum Statuses { PIF, CLOSED, REQUESTED_REFUND, REFUNDED, OTHER }
@@ -57,6 +57,10 @@ contract OrderData is Managed {
             orders[_orderId].status);
     }        
 
+    function getStatusByOrderId(uint _orderId) public view returns (Statuses) {
+        return orders[_orderId].status;    
+    }        
+
     function setBytesAttribute(uint _orderId, bytes12 _attributeKey, bytes12 _attributeValue) public returns (bool) {
         orders[_orderId].bytesAttributes[_attributeKey] = _attributeValue;
         return true;
@@ -64,5 +68,25 @@ contract OrderData is Managed {
 
     function getBytesAttribute(uint _orderId, bytes12 _attributeKey) public view returns (bytes12) {
         return orders[_orderId].bytesAttributes[_attributeKey];    
-    }         
+    }
+
+    function setIntAttribute(uint _orderId, bytes12 _attributeKey, uint _attributeValue) public returns (bool) {
+        orders[_orderId].intAttributes[_attributeKey] = _attributeValue;
+        return true;
+    }  
+
+    function getIntAttribute(uint _orderId, bytes12 _attributeKey) public view returns (uint) {
+        return orders[_orderId].intAttributes[_attributeKey];    
+    }           
+
+    function setAddressAttribute(uint _orderId, bytes12 _attributeKey, address _attributeValue) public returns (bool) {
+        orders[_orderId].addressAttributes[_attributeKey] = _attributeValue;
+        return true;
+    }  
+
+    function getAddressAttribute(uint _orderId, bytes12 _attributeKey) public view returns (address) {
+        return orders[_orderId].addressAttributes[_attributeKey];    
+    }       
+
+
 }

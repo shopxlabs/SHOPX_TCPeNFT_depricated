@@ -1,7 +1,6 @@
 pragma solidity ^0.4.24;
 
 import "./Owned.sol";
-import "./Order.sol";
 import "./OrderData.sol";
 import "./Asset.sol";
 import "./SplytManager.sol";
@@ -33,8 +32,8 @@ contract OrderManager is Owned {
     }  
 
     //@desc middleware to check for certain order statuses to continue
-    modifier onlyOrderStatus(Order.Statuses _status, address _orderAddress) {
-        require(_status == Order(_orderAddress).status());
+    modifier onlyOrderStatus(uint _orderId, OrderData.Statuses _status) {
+        require(_status == orderData.getStatusByOrderId(_orderId));
         _;
     }    
 
