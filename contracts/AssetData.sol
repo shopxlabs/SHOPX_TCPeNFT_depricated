@@ -8,7 +8,7 @@ contract AssetData is Managed {
     mapping (bytes12 => address) public addressByAssetId;
                                      
     uint public assetId; //increments after creating new
- 
+
     function save(bytes12 _assetId, address _assetAddress) public onlyManager returns (bool) {
         assetIdByAddress[_assetAddress] = _assetId;
         addressByAssetId[_assetId] = _assetAddress;

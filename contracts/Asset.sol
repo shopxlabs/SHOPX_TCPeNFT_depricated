@@ -29,7 +29,7 @@ contract Asset is Events, Owned {
     enum AssetTypes { NORMAL, FRACTIONAL }
     AssetTypes public assetType;
 
-    enum Statuses { ACTIVE, IN_ARBITRATION, EXPIRED, CLOSED, OTHER }
+    enum Statuses { NOT_MINED, ACTIVE, IN_ARBITRATION, EXPIRED, CLOSED, OTHER }
     Statuses public status;
     
     TrackerInterface public tracker;

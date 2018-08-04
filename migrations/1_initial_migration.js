@@ -1,8 +1,14 @@
 var Migrations = artifacts.require("./Migrations.sol")
 var SatToken = artifacts.require("./SatToken.sol")
+
 var SplytManager = artifacts.require("./SplytManager.sol")
+
 var OrderManager = artifacts.require("./OrderManager.sol")
 var OrderData = artifacts.require("./OrderData.sol")
+
+var AssetManager = artifacts.require("./AssetManager.sol")
+var AssetData = artifacts.require("./AssetData.sol")
+
 var Stake = artifacts.require("./Stake.sol")
 var chalk = require('chalk')
 
@@ -35,17 +41,26 @@ module.exports = function(deployer, network, accounts) {
   .then(async function() {
     console.log('Sat Token address: ', SatToken.address)
 
-    var orderData = await deployer.deploy(OrderData, walletConfig)
-    console.log('OrderData address: ', arbitrationFactory.address)
-
-    var orderManager = await deployer.deploy(OrderManager, walletConfig)
-    console.log('OrderManager address: ', orderManager.address)
-    
     var stake = await deployer.deploy(Stake, 10000000000000, 2000000000, 100, walletConfig)
     console.log('Stake address: ', stake.address)
-    
-    var deployed = await deployer.deploy(SplytManager, walletConfig)
-    console.log('Splyt Manager address: ', SplytManager.address)
+
+    //TODO: splytManager
+    var splytManager = await deployer.deploy(SplytManager, SatToken.address, stake.address, walletConfig)
+    console.log('Splyt Manager address: ', splytManager.address)
+
+    var assetData = await deployer.deploy(AssetData, walletConfig)
+    console.log('AssetData address: ', assetData.address)
+
+    var assetManager = await deployer.deploy(AssetManager, splytManager.address, assetData.address, walletConfig)
+    console.log('AssetManager address: ', assetManager.address)
+
+    var orderData = await deployer.deploy(OrderData, walletConfig)
+    console.log('OrderData address: ', orderData.address)
+
+    var orderManager = await deployer.deploy(OrderManager, orderData.address, walletConfig)
+    console.log('OrderManager address: ', orderManager.address)
+
+
   });
   
 };

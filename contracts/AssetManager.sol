@@ -14,8 +14,9 @@ contract AssetManager is Owned {
     Stake public stake;
 
 
-    constructor(address _assetData) public {
-        assetData = AssetData(_assetData);
+    constructor() public {
+        assetData = new AssetData();
+        splytManager = SplytManager(msg.sender);
     }
 
     function createAsset(
@@ -32,6 +33,7 @@ contract AssetManager is Owned {
         //calculate stake
         uint sellersBal = splytManager.getBalance(_seller);
         uint stakeTokens = stake.calculateStakeTokens(_totalCost);
+    
         if(stakeTokens > sellersBal) {
             revert();
         }

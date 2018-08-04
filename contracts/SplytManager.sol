@@ -7,22 +7,26 @@ import "./ArbitrationManager.sol";
 import "./Events.sol";
 import "./Owned.sol";
 
-contract StakeInterface {
-    function calculateStakeTokens(uint _itemCost) public returns (uint _stakeToken);
-}
+import "./SatToken.sol";
+import "./Stake.sol";
 
-contract TokenInterface {
-    function transferFrom(address _from, address _to, uint _value) public returns (bool);
-    function balanceOf(address _wallet) public returns (uint);
-}
+
+// contract StakeInterface {
+//     function calculateStakeTokens(uint _itemCost) public returns (uint _stakeToken);
+// }
+
+// contract TokenInterface {
+//     function transferFrom(address _from, address _to, uint _value) public returns (bool);
+//     function balanceOf(address _wallet) public returns (uint);
+// }
 
 contract SplytManager is Events, Owned {
 
     uint public version;
     string public ownedBy;
-    TokenInterface public satToken;
+    SatToken public satToken;
     address public arbitrator;
-    StakeInterface public stake;
+    Stake public stake;
     
     AssetManager public assetManager;
     OrderManager public orderManager;
@@ -36,12 +40,14 @@ contract SplytManager is Events, Owned {
     // event Error(uint _code, string _message);
 
     //@desc set all contracts it's interacting with
-    constructor(address _assetManager, address _orderManager, address _arbitrationManager, address _token, address _stake) public {
-        orderManager = OrderManager(_orderManager);
-        assetManager = AssetManager(_assetManager);
-        arbitrationManager = ArbitrationManager(_arbitrationManager);    
-        satToken = TokenInterface(_token);
-        stake = StakeInterface(_stake);            
+    constructor() public {
+    // constructor(address _assetManager, address _orderManager, address _arbitrationManager, address _token, address _stake) public {
+        orderManager = new OrderManager();
+        assetManager = new AssetManager();
+        arbitrationManager = new ArbitrationManager();    
+
+        satToken = new SatToken('SAT','SplytToken', 1);
+        stake = new Stake(10000000000000, 2000000000, 100);            
     }
 
     //@desc sets all the managers at once
@@ -82,7 +88,7 @@ contract SplytManager is Events, Owned {
     }
 
     //@desc Getter function. returns token contract address
-    function getBalance(address _wallet) public returns (uint) {
+    function getBalance(address _wallet) public view returns (uint) {
         return satToken.balanceOf(_wallet);
     }
 
