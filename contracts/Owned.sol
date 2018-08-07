@@ -6,7 +6,7 @@ contract Owned {
     address public pendingOwner;
 
     constructor() public {
-        owner = msg.sender;
+        // owner = msg.sender;
     }
 
     modifier onlyOwner {

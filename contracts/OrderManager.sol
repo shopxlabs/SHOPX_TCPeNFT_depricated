@@ -4,6 +4,8 @@ import "./Owned.sol";
 import "./OrderData.sol";
 import "./Asset.sol";
 import "./SplytManager.sol";
+import "./AssetManager.sol";
+import "./ArbitrationManager.sol";
 
 contract OrderManager is Owned {
     
@@ -12,7 +14,7 @@ contract OrderManager is Owned {
 
     OrderData public orderData;
     SplytManager public splytManager;
-    
+
     modifier onlyBuyer(uint _orderId) {
         address buyer = orderData.getBuyer(_orderId);  
         require(buyer == msg.sender);
@@ -45,15 +47,16 @@ contract OrderManager is Owned {
         _;
     } 
 
-    constructor() public {
+    constructor(address _owner) public {
         orderData = new OrderData();
-        splytManager = SplytManager(msg.sender);
+        splytManager = SplytManager(msg.sender); //splymanager address
+        owner = _owner;
     }
 
     //@desc buyer must pay it in full to create order
     function createOrder(address _assetAddress, uint _qty, uint _tokenAmount) public onlyPIF(_assetAddress, _qty, _tokenAmount) onlyAssetStatus(Asset.Statuses.ACTIVE, _assetAddress) {
-        orderData.save(_assetAddress, msg.sender, _qty, _tokenAmount); //save it to the data contract        
-        Asset(_assetAddress).removeOneInventory(); //update inventory 
+        orderData.save(_assetAddress, msg.sender, _qty, _tokenAmount); //save it to the data contract                
+        AssetManager(address(splytManager.assetManager)).removeOneInventory(_assetAddress); //update inventory
     }
 
     function approveRefund(uint _orderId) public onlySeller(_orderId) {

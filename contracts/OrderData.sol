@@ -1,8 +1,8 @@
 pragma solidity ^0.4.24;
 
-import "./Managed.sol";
+import "./Owned.sol";
 
-contract OrderData is Managed {
+contract OrderData is Owned {
 
     struct Order {
         uint version;
@@ -11,13 +11,17 @@ contract OrderData is Managed {
         address buyer;
         uint quantity;
         uint paidAmount;
-        Statuses status;
+        Statuses status;        
+        
+        Reasons reason;
+
         mapping (bytes12 => bytes12) bytesAttributes; //for future 
         mapping (bytes12 => uint) intAttributes; //for future
         mapping (bytes12 => address) addressAttributes; //for future
     }
     
     enum Statuses { PIF, CLOSED, REQUESTED_REFUND, REFUNDED, OTHER }
+    enum Reasons { NA, DEFECTIVE, NO_REASON, CHANGED_MIND, OTHER }
 
     uint public version = 1;
 
@@ -26,13 +30,17 @@ contract OrderData is Managed {
                                      
     uint public orderId; //increments after creating new
 
-    function save(address _asset, address _buyer, uint _quantity, uint _paidAmount) public onlyManager returns (bool) {
-        orders[orderId] = Order(version, orderId, _asset, _buyer, _quantity, _paidAmount, Statuses.PIF);
+    constructor() public {
+        owner = msg.sender; //orderManager address
+    }
+
+    function save(address _asset, address _buyer, uint _quantity, uint _paidAmount) public onlyOwner returns (bool) {
+        orders[orderId] = Order(version, orderId, _asset, _buyer, _quantity, _paidAmount, Statuses.PIF, Reasons.NA);
         orderId++;
         return true;
     }  
 
-    function updateStatus(uint _orderId, Statuses _status) public onlyManager returns (bool) {
+    function updateStatus(uint _orderId, Statuses _status) public onlyOwner returns (bool) {
         orders[_orderId].status  = _status;
         return true;
     }  

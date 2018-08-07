@@ -1,15 +1,18 @@
 pragma solidity ^0.4.24;
 
-import "./Managed.sol";
+import "./Owned.sol";
 
-contract ArbitrationData is Managed {
+contract ArbitrationData is Owned {
     
     mapping (address => bytes12) public arbitrationIdByAddress;
     mapping (bytes12 => address) public addressByArbitrationId;
                                      
     uint public arbitrationId; //increments after creating new
  
-    function save(bytes12 _arbitrationId, address _arbitrationAddress) public onlyManager returns (bool) {
+    constructor() public {
+        owner = msg.sender; //arbitrationManager is the owner
+    }
+    function save(bytes12 _arbitrationId, address _arbitrationAddress) public onlyOwner returns (bool) {
         arbitrationIdByAddress[_arbitrationAddress] = _arbitrationId;
         addressByArbitrationId[_arbitrationId] = _arbitrationAddress;
         return true;

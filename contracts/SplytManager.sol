@@ -31,7 +31,13 @@ contract SplytManager is Events, Owned {
     AssetManager public assetManager;
     OrderManager public orderManager;
     ArbitrationManager public arbitrationManager;
-    
+
+    //only these managers are allowed to call these functions
+    modifier onlyManagers() {
+        require(msg.sender == address(orderManager) || msg.sender == address(assetManager) || msg.sender == address(arbitrationManager));
+        _;
+    }
+
     // Events to notify other market places of something
     // Success events gets triggered when a listing is created or a listing is fully funded
     // _code: 1 = listing created, 2 = contributions came in
@@ -42,10 +48,10 @@ contract SplytManager is Events, Owned {
     //@desc set all contracts it's interacting with
     constructor() public {
     // constructor(address _assetManager, address _orderManager, address _arbitrationManager, address _token, address _stake) public {
-        orderManager = new OrderManager();
-        assetManager = new AssetManager();
-        arbitrationManager = new ArbitrationManager();    
-
+        orderManager = new OrderManager(msg.sender);
+        assetManager = new AssetManager(msg.sender);
+        arbitrationManager = new ArbitrationManager(msg.sender);    
+        owner = msg.sender; //the wallet used to deploy these contracts
         satToken = new SatToken('SAT','SplytToken', 1);
         stake = new Stake(10000000000000, 2000000000, 100);            
     }
@@ -74,14 +80,14 @@ contract SplytManager is Events, Owned {
  
     //@desc User for single buy to transfer tokens from buyer address to seller address
     //TODO: add security
-    function internalContribute(address _from, address _to, uint _amount) public returns (bool) {
+    function internalContribute(address _from, address _to, uint _amount) public onlyManagers returns (bool) {
         bool result = satToken.transferFrom(_from, _to, _amount);
         return result;
     }
     
     // @desc Used for fractional ownership to transfer tokens from user address to listing address
     // TODO: add security
-    function internalRedeemFunds(address _listingAddress, address _seller, uint _amount) public returns (bool) {
+    function internalRedeemFunds(address _listingAddress, address _seller, uint _amount) public onlyManagers returns (bool) {
         
         bool result = satToken.transferFrom(_listingAddress, _seller, _amount);
         return result;

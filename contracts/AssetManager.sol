@@ -14,9 +14,10 @@ contract AssetManager is Owned {
     Stake public stake;
 
 
-    constructor() public {
+    constructor(address _owner) public {
         assetData = new AssetData();
         splytManager = SplytManager(msg.sender);
+        owner = _owner; 
     }
 
     function createAsset(
@@ -57,6 +58,11 @@ contract AssetManager is Owned {
        assetData = AssetData(_assetData);
     }
    
+    function removeOneInventory(address _assetData) onlyOwner public {
+       Asset(_assetData).removeOneInventory();
+    }
+   
+
     function setSplytManager(address _address) public onlyOwner {
         splytManager = SplytManager(_address);
     }

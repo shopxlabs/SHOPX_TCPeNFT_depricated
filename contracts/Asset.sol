@@ -203,7 +203,8 @@ contract Asset is Events, Owned {
         }
     }
  
-     function removeOneInventory() public {
+    //asetManager is the owner
+     function removeOneInventory() public onlyOwner {
         inventoryCount -= inventoryCount;
     }   
 
