@@ -19,7 +19,7 @@ contract('AssetManagerTest general test cases.', function(accounts) {
   let assetInstance;
 
   async function create_asset(_assetId = "0x31f2ae92057a7123ef0e490a", _term = 0, _seller = accounts[0], _title = "MyTitle",
-      _totalCost = 1000, _expirationDate = 10001556712588, _mpAddress = accounts[1], _mpAmount = 2, _inventoryCount = 1) {
+      _totalCost = 1000, _expirationDate = 10001556712588, _mpAddress = accounts[1], _mpAmount = 2, _inventoryCount = 2) {
 
     await assetManagerInstance.createAsset(_assetId, _term, _seller, _title, _totalCost, _expirationDate, _mpAddress, _mpAmount, _inventoryCount);
     assetAddress = await assetManagerInstance.getAddressById(_assetId);
@@ -59,20 +59,69 @@ contract('AssetManagerTest general test cases.', function(accounts) {
     await create_asset();
     // assert.equal(orderId, , 'No money should be transfered to seller\'s wallet!');
     let status = await assetInstance.status();
-    console.log('status: ' + status);
+    // console.log('status: ' + status);
     assert.equal(status, 1, "Asset status is NOT 1=ACTIVE as expected!");
   })
 
   it('should status be 2=IN_ARBITRATION', async function() {
     await create_asset();
 
-    console.log('asset address: ' + assetAddress);
+    // console.log('asset address: ' + assetAddress);
     await assetManagerInstance.setStatus(assetAddress, 2);
     let status = await assetInstance.status();
-    console.log('status: ' + status);
-    assert.equal(true, true, "Asset status is NOT 2=IN_ARBITRATION as expected!");
+    // console.log('status: ' + status);
+    assert.equal(status, 2, "Asset status is NOT 2=IN_ARBITRATION as expected!");
   })
 
+
+  it('should status be 3=EXPIRED', async function() {
+    await create_asset();
+
+    // console.log('asset address: ' + assetAddress);
+    await assetManagerInstance.setStatus(assetAddress, 3);
+    let status = await assetInstance.status();
+    // console.log('status: ' + status);
+    assert.equal(status, 3, "Asset status is NOT 3=EXPIRED as expected!");
+  })
+
+  it('should status be 4=CLOSED', async function() {
+    await create_asset();
+
+    // console.log('asset address: ' + assetAddress);
+    await assetManagerInstance.setStatus(assetAddress, 4);
+    let status = await assetInstance.status();
+    //  console.log('status: ' + status);
+    assert.equal(status, 4, "Asset status is NOT 4=CLOSED as expected!");
+  })
+
+  it('should asset id 0x31f2ae92057a7123ef0e490a', async function() {
+    await create_asset();
+
+    // console.log('asset address: ' + assetAddress);
+    let assetInfos = await assetManagerInstance.getAssetInfo(assetAddress);
+    // console.log('asset id: ' + assetInfos[0]);
+    // console.log('asset term: ' + assetInfos[1]);
+    // console.log('assset inventory: ' + assetInfos[2]);
+    assert.equal(assetInfos[0], "0x31f2ae92057a7123ef0e490a", "Asset id is different than expected!");
+  })
+
+  it('should return title MyTitle', async function() {
+    await create_asset();
+
+    // console.log('asset address: ' + assetAddress);
+    let title = await assetInstance.title();
+    // console.log('asset title: ' + title);
+    assert.equal(title, "MyTitle", "Asset title is different than expected!");
+  })
+
+  it('should return inventory of 1', async function() {
+    await create_asset();
+
+    // console.log('asset address: ' + assetAddress);
+    let count = await assetInstance.inventoryCount();
+    // console.log('asset inventory: ' + count);
+    assert.equal(count, 2, "Asset inventory is different than expected!");
+  })
 
   // it('should NOT release funds to seller if asset is NOT fully funded and the asset is expired .', async function() {
   //   var time = Date.now()/1000 | 0;

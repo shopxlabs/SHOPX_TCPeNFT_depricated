@@ -53,6 +53,12 @@ contract AssetManager is Owned {
     }
 
     //@desc update data contract address
+    function getAssetInfo(address _assetAddress) public view returns (bytes12, uint, uint){
+        Asset asset = Asset(_assetAddress);
+        return (asset.assetId(), asset.term(), asset.inventoryCount());
+    }
+
+    //@desc update data contract address
     function setDataContract(address _assetData) onlyOwner public {
        assetData = AssetData(_assetData);
     }
@@ -60,6 +66,11 @@ contract AssetManager is Owned {
     //@desc update data contract address
     function setStatus(address _assetAddress, Asset.Statuses _status) onlyOwner public {
         Asset(_assetAddress).setStatus(_status);
+    }
+
+    //@desc update data contract address
+    function setInventory(address _assetAddress, uint _count) onlyOwner public {
+        Asset(_assetAddress).setInventory(_count);
     }
 
 

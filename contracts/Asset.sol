@@ -81,8 +81,8 @@ contract Asset is Events, Owned {
         uint _expirationDate, 
         address _mpAddress, 
         uint _mpAmount,
-        uint _stakeAmount,
-        uint _inventoryCount
+        uint _inventoryCount,
+        uint _stakeAmount
         ) public {
             assetId = _assetId;
             term = _term;
@@ -203,9 +203,17 @@ contract Asset is Events, Owned {
         }
     }
  
+    function addOneInventory() public onlyOwner {
+        inventoryCount++;
+    }  
     //asetManager is the owner
      function removeOneInventory() public onlyOwner {
-        inventoryCount -= inventoryCount;
+        inventoryCount--;
+    }   
+
+    //asetManager is the owner
+     function setInventory(uint _count) public onlyOwner {
+        inventoryCount = _count;
     }   
 
     // report spam assets
