@@ -98,5 +98,9 @@ contract SplytManager is Events, Owned {
         return satToken.balanceOf(_wallet);
     }
 
+    //@desc calculate stake
+    function calculateStakeTokens(uint _amount) public view returns (uint) {
+        return stake.calculateStakeTokens(_amount); 
+    }
 
 }

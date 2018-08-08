@@ -29,7 +29,6 @@ contract('AssetManagerTest general test cases.', function(accounts) {
 
   // This function gets ran before every test cases in this file.
   beforeEach('Default instances of contracts for each test', async function() {
-    console.log('this has been called onced only') 
     satTokenInstance = await SatToken.deployed()   
     assetManagerInstance = await AssetManager.deployed();
     splytManagerInstance = await SplytManager.deployed();
@@ -41,12 +40,39 @@ contract('AssetManagerTest general test cases.', function(accounts) {
   })
 
 
-  it('should create new asset manager.', async function() {
-    await create_asset();
+  it('should create new asset manager contract successfully!', async function() {
+    // await create_asset();
     
+    let assetManagerAddress = assetManagerInstance.address;
+
     // assert.equal(orderId, , 'No money should be transfered to seller\'s wallet!');
-    assert.equal(true, true, "wtf foolio");
+    assert.notEqual(assetManagerAddress, 0x0, "AssetManager has not been deployed!");
   })
+
+  it('should deploy new asset contract successfully!', async function() {
+    await create_asset();
+    // assert.equal(orderId, , 'No money should be transfered to seller\'s wallet!');
+    assert.notEqual(assetInstance.address, 0x0, "Asset contract has not been deployed!");
+  })
+
+  it('should status be 1=ACTIVE if asset is available for purchase!', async function() {
+    await create_asset();
+    // assert.equal(orderId, , 'No money should be transfered to seller\'s wallet!');
+    let status = await assetInstance.status();
+    console.log('status: ' + status);
+    assert.equal(status, 1, "Asset status is NOT 1=ACTIVE as expected!");
+  })
+
+  it('should status be 2=IN_ARBITRATION', async function() {
+    await create_asset();
+
+    console.log('asset address: ' + assetAddress);
+    await assetManagerInstance.setStatus(assetAddress, 2);
+    let status = await assetInstance.status();
+    console.log('status: ' + status);
+    assert.equal(true, true, "Asset status is NOT 2=IN_ARBITRATION as expected!");
+  })
+
 
   // it('should NOT release funds to seller if asset is NOT fully funded and the asset is expired .', async function() {
   //   var time = Date.now()/1000 | 0;

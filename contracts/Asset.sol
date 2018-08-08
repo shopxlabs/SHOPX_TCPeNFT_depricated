@@ -98,7 +98,7 @@ contract Asset is Events, Owned {
 
             status = Statuses.ACTIVE;
             assetType =  _term > 0 ? AssetTypes.FRACTIONAL : AssetTypes.NORMAL;
-
+            owner = msg.sender; //assetManager deploys the asset thus the owner
           
     }
 
