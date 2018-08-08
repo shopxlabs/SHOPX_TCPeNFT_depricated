@@ -14,10 +14,10 @@ contract AssetManager is Owned {
     Stake public stake;
 
 
-    constructor(address _owner) public {
+    constructor(address _splytManager) public {
         assetData = new AssetData();
-        splytManager = SplytManager(msg.sender);
-        owner = _owner; 
+        splytManager = SplytManager(_splytManager);
+        owner = msg.sender; 
     }
 
     function createAsset(
@@ -29,15 +29,19 @@ contract AssetManager is Owned {
         uint _expirationDate, 
         address _mpAddress, 
         uint _mpAmount,
-        uint _inventoryCount) public onlyOwner {
+        uint _inventoryCount) public {
 
         //calculate stake
-        uint sellersBal = splytManager.getBalance(_seller);
-        uint stakeTokens = stake.calculateStakeTokens(_totalCost);
+        // uint sellersBal = splytManager.getBalance(_seller);
+        // uint stakeTokens = stake.calculateStakeTokens(_totalCost);
+
+        uint sellersBal = 0;
+        uint stakeTokens = 0;
+        
     
-        if(stakeTokens > sellersBal) {
-            revert();
-        }
+        // if(stakeTokens > sellersBal) {
+        //     revert();
+        // }
 
          Asset asset = new Asset(
             _assetId, 
@@ -71,11 +75,11 @@ contract AssetManager is Owned {
         stake = Stake(_address);
     }
 
-    function getAddressByAssetId(bytes12 _assetId) public view returns (address) {
+    function getAddressById(bytes12 _assetId) public view returns (address) {
       return assetData.getAddressByAssetId(_assetId);
     }
     
-    function getAssetIdByAddress(address _assetAddress) public view returns (bytes12) {
+    function getIdByAddress(address _assetAddress) public view returns (bytes12) {
       return assetData.getAssetIdByAddress(_assetAddress);
     }    
 

@@ -4,26 +4,18 @@ contract('SplytManager', function(accounts) {
 
   var splytManagerInstance;
 
-  it('should be able to create an asset using valid parameters', async function() {
+  it('should return a valid address after deploying splytmanager', async function() {
         
     splytManagerInstance = await SplytManager.deployed()
-    await splytManagerInstance.createAsset(
-        "0x31f2ae92057a7123ef0e490a",
-        111,
-        accounts[1],
-        "Test asset",
-        1000,
-        1556712588,
-        accounts[2],
-        4,
-        1
-      )
+    console.log('splytmanager address: ' + SplytManager.address)
+    assert.notEqual(splytManagerInstance, 0x0, 'SplytManager address is 0x0')
+
     return true;
   })
   
-  it('should be emitting events upon successful asset creation', function() {
-    return true;
-  })
+  // it('should be emitting events upon successful asset creation', function() {
+  //   return true;
+  // })
 
 
 })

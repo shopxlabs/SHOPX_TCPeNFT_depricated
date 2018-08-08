@@ -69,7 +69,7 @@ contract OrderData is Owned {
         return orders[_orderId].status;    
     }        
 
-    function setBytesAttribute(uint _orderId, bytes12 _attributeKey, bytes12 _attributeValue) public returns (bool) {
+    function setBytesAttribute(uint _orderId, bytes12 _attributeKey, bytes12 _attributeValue) public onlyOwner returns (bool) {
         orders[_orderId].bytesAttributes[_attributeKey] = _attributeValue;
         return true;
     }  
@@ -78,7 +78,7 @@ contract OrderData is Owned {
         return orders[_orderId].bytesAttributes[_attributeKey];    
     }
 
-    function setIntAttribute(uint _orderId, bytes12 _attributeKey, uint _attributeValue) public returns (bool) {
+    function setIntAttribute(uint _orderId, bytes12 _attributeKey, uint _attributeValue) public onlyOwner returns (bool) {
         orders[_orderId].intAttributes[_attributeKey] = _attributeValue;
         return true;
     }  
@@ -87,7 +87,7 @@ contract OrderData is Owned {
         return orders[_orderId].intAttributes[_attributeKey];    
     }           
 
-    function setAddressAttribute(uint _orderId, bytes12 _attributeKey, address _attributeValue) public returns (bool) {
+    function setAddressAttribute(uint _orderId, bytes12 _attributeKey, address _attributeValue) public onlyOwner returns (bool) {
         orders[_orderId].addressAttributes[_attributeKey] = _attributeValue;
         return true;
     }  

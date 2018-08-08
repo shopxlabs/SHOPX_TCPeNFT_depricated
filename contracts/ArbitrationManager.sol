@@ -11,10 +11,10 @@ contract ArbitrationManager is Owned {
     SplytManager public splytManager;
     ArbitrationData public arbitrationData;
     
-    constructor(address _owner) public {
-        splytManager =SplytManager(msg.sender);
+    constructor(address _splytManager) public {
+        splytManager = SplytManager(_splytManager);
         arbitrationData = new ArbitrationData();
-        owner = _owner;
+        owner = msg.sender;
     }
 
     function createArbitration(bytes12 _arbitrationId, Arbitration.Reasons _reason, address _reporter, address _assetAddress) public onlyOwner {

@@ -9,6 +9,9 @@ var OrderData = artifacts.require("./OrderData.sol")
 var AssetManager = artifacts.require("./AssetManager.sol")
 var AssetData = artifacts.require("./AssetData.sol")
 
+var ArbitrationManager = artifacts.require("./ArbitrationManager.sol")
+var ArbitrationData = artifacts.require("./ArbitrationData.sol")
+
 var Stake = artifacts.require("./Stake.sol")
 var chalk = require('chalk')
 
@@ -21,6 +24,7 @@ module.exports = function(deployer, network, accounts) {
 
   if(network === 'testnet')
     walletConfig = { from: "0xd9e5e4bde24faa2b277ab2be78c95b9ae24259a8" }
+                                                                                   
    else
     walletConfig = { from: accounts[0] }
 
@@ -48,18 +52,17 @@ module.exports = function(deployer, network, accounts) {
     var splytManager = await deployer.deploy(SplytManager, SatToken.address, stake.address, walletConfig)
     console.log('Splyt Manager address: ', splytManager.address)
 
-    var assetData = await deployer.deploy(AssetData, walletConfig)
-    console.log('AssetData address: ', assetData.address)
-
-    var assetManager = await deployer.deploy(AssetManager, splytManager.address, assetData.address, walletConfig)
+    var assetManager = await deployer.deploy(AssetManager, splytManager.address, walletConfig)
     console.log('AssetManager address: ', assetManager.address)
+    await splytManager.setAssetManager(assetManager.address)
 
-    var orderData = await deployer.deploy(OrderData, walletConfig)
-    console.log('OrderData address: ', orderData.address)
-
-    var orderManager = await deployer.deploy(OrderManager, orderData.address, walletConfig)
+    var orderManager = await deployer.deploy(OrderManager, splytManager.address, walletConfig)
     console.log('OrderManager address: ', orderManager.address)
+    await splytManager.setOrderManager(orderManager.address)
 
+    var arbitrationManager = await deployer.deploy(ArbitrationManager, splytManager.address, walletConfig)
+    console.log('ArbitrationManager address: ', arbitrationManager.address)
+    await splytManager.setArbitrationManager(arbitrationManager.address)
 
   });
   

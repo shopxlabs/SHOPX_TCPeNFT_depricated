@@ -47,10 +47,10 @@ contract OrderManager is Owned {
         _;
     } 
 
-    constructor(address _owner) public {
+    constructor(address _splytManager) public {
         orderData = new OrderData();
-        splytManager = SplytManager(msg.sender); //splymanager address
-        owner = _owner;
+        splytManager = SplytManager(_splytManager); //splymanager address
+        owner = msg.sender;
     }
 
     //@desc buyer must pay it in full to create order

@@ -46,14 +46,14 @@ contract SplytManager is Events, Owned {
     // event Error(uint _code, string _message);
 
     //@desc set all contracts it's interacting with
-    constructor() public {
+    constructor(address _tokenAddress, address _stakeAddress) public {
     // constructor(address _assetManager, address _orderManager, address _arbitrationManager, address _token, address _stake) public {
-        orderManager = new OrderManager(msg.sender);
-        assetManager = new AssetManager(msg.sender);
-        arbitrationManager = new ArbitrationManager(msg.sender);    
+        // orderManager = new OrderManager(msg.sender);
+        // assetManager = new AssetManager(msg.sender);
+        // arbitrationManager = new ArbitrationManager(msg.sender);    
         owner = msg.sender; //the wallet used to deploy these contracts
-        satToken = new SatToken('SAT','SplytToken', 1);
-        stake = new Stake(10000000000000, 2000000000, 100);            
+        satToken = SatToken(_tokenAddress);
+        stake = Stake(_stakeAddress);            
     }
 
     //@desc sets all the managers at once
