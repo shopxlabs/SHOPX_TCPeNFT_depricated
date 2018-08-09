@@ -11,6 +11,7 @@ contract('OrderManagerTest general test cases.', function(accounts) {
   const defaultBuyer = accounts[0];
   const defaultSeller = accounts[1];
   const defaultMarketPlace = accounts[2];
+  const defaultPrice = 1000;
 
   let satTokenInstance;
   let assetManagerInstance;
@@ -22,8 +23,8 @@ contract('OrderManagerTest general test cases.', function(accounts) {
   init();
 
 
-  async function create_asset(_assetId = "0x31f2ae92057a7123ef0e490a", _term = 0, _seller = accounts[0], _title = "MyTitle",
-      _totalCost = 1000, _expirationDate = 10001556712588, _mpAddress = accounts[1], _mpAmount = 2, _inventoryCount = 2) {
+  async function create_asset(_assetId = "0x31f2ae92057a7123ef0e490a", _term = 0, _seller = defaultSeller, _title = "MyTitle",
+      _totalCost = defaultPrice, _expirationDate = 10001556712588, _mpAddress = defaultMarketPlace, _mpAmount = 2, _inventoryCount = 2) {
 
     await assetManagerInstance.createAsset(_assetId, _term, _seller, _title, _totalCost, _expirationDate, _mpAddress, _mpAmount, _inventoryCount);
     assetAddress = await assetManagerInstance.getAddressById(_assetId);
@@ -32,74 +33,93 @@ contract('OrderManagerTest general test cases.', function(accounts) {
   }
 
 
-  async function create_order(_assetAddress = "0x31f2ae92057a7123ef0e490a", _quantity = 1, _amount = 100) {
+  async function create_order(_assetAddress = "0x31f2ae92057a7123ef0e490a", _quantity = 1, _amount = defaultPrice) {
 
-    let orderId = await orderManagerInstance.createOrder(_assetAddress, _quantity, _amount);
+    let orderId = await orderManagerInstance.createOrder(_assetAddress, _quantity, _amount, { from: defaultBuyer });
     console.log('orderId: ' + orderId);
     // assetInstance = await Asset.at(assetAddress);
 
   }
 
+  //Instantiate it only once
   async function init() {
     
-    satTokenInstance = await SatToken.deployed()   
-    assetManagerInstance = await AssetManager.deployed();
-    splytManagerInstance = await SplytManager.deployed();
-    orderManagerInstance = await OrderManager.deployed();
+    console.log('defaultBuyer wallet: ' + defaultBuyer);
+    console.log('defaulSeller wallet: ' + defaultSeller);
+    console.log('defaultMarketPlace wallet: ' + defaultMarketPlace);
 
-    accounts.forEach(async function(acc) {
-      await satTokenInstance.initUser(acc)
-    })
+    satTokenInstance = await SatToken.deployed()   
+    assetManagerInstance = await AssetManager.deployed()
+    splytManagerInstance = await SplytManager.deployed()
+    orderManagerInstance = await OrderManager.deployed()
+
+    //give your account some tokens
+    // accounts.forEach(async function(acc) {
+    //   await satTokenInstance.initUser(acc)
+    // })
  
   }
 
   
   // This function gets ran before every test cases in this file.
   beforeEach('Default instances of contracts for each test', async function() {
-    // satTokenInstance = await SatToken.deployed()   
-    // assetManagerInstance = await AssetManager.deployed();
-    // splytManagerInstance = await SplytManager.deployed();
-    // orderManagerInstance = await OrderManager.deployed();
+    //reinitalize each account balance
+    accounts.forEach(async function(acc) {
+      await satTokenInstance.initUser(acc)
+    })
 
-    // accounts.forEach(async function(acc) {
-    //   await satTokenInstance.initUser(acc)
-    // })
+    let balance = await satTokenInstance.balanceOf(defaultBuyer)
+    console.log('defaultBuyer balance:' + balance)
+
+    balance = await satTokenInstance.balanceOf(defaultSeller)
+    console.log('defaultSeller balance:' + balance)
 
   })
 
 
-  it('should create new order manager contract successfully!', async function() {
-    // await create_managers();
-    
+  it('should create new order manager contract successfully!', async function() {    
     let orderManagerAddress = orderManagerInstance.address;
-    console.log('orderManager address: ' + orderManagerAddress)
+    // console.log('orderManager address: ' + orderManagerAddress)
     // assert.equal(orderId, , 'No money should be transfered to seller\'s wallet!');
     assert.notEqual(orderManagerAddress, 0x0, "OrderManager has not been deployed!");
   })
 
   it('should deploy new order contract successfully!', async function() {
     await create_asset();
-    await create_order(assetAddress, 1, 100);
+    await create_order(assetAddress, 1, 1000);
     let length = await orderManagerInstance.getOrdersLength();
     console.log('number of orders: ' + length);
-    // await create_asset();
-    // assert.equal(orderId, , 'No money should be transfered to seller\'s wallet!');
     assert.equal(length, 1, "Number of orders is not 1!");
   })
 
-  it('should deploy new order contract making total of 2 successfully!', async function() {
-    await create_order(assetAddress, 1, 100);
-    let length = await orderManagerInstance.getOrdersLength();
-    console.log('number of orders: ' + length);
-    // await create_asset();
+  it('should defaultBuyer balance be less than 1000', async function() {
+    await create_asset();
+
+    let initBalance = await satTokenInstance.balanceOf(defaultBuyer);
+    console.log('before purchase balance:' + initBalance);
+
+    await create_order(assetAddress, 1, 1000);
+
+    let updatedBalance = await satTokenInstance.balanceOf(defaultBuyer);
+    console.log('after purchase balance:' + updatedBalance);
+
     // assert.equal(orderId, , 'No money should be transfered to seller\'s wallet!');
-    assert.equal(length, 2, "Number of orders is not2!");
+    assert.equal((initBalance - defaultPrice), updatedBalance, "Balance is not -1000 as expected!");
   })
+
+  // it('should deploy new order contract making total of 2 successfully!', async function() {
+  //   await create_order(assetAddress, 1, 1000);
+  //   let length = await orderManagerInstance.getOrdersLength();
+  //   console.log('number of orders: ' + length);
+  //   // await create_asset();
+  //   // assert.equal(orderId, , 'No money should be transfered to seller\'s wallet!');
+  //   assert.equal(length, 2, "Number of orders is not2!");
+  // })
 
   it('should status be 1=ACTIVE if asset is available for purchase!', async function() {
 
     let orderManagerAddress = orderManagerInstance.address;
-    console.log('orderManager address: ' + orderManagerAddress)
+    // console.log('orderManager address: ' + orderManagerAddress)
 
 
     // await create_asset();

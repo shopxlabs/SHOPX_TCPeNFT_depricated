@@ -1,13 +1,14 @@
 pragma solidity ^0.4.24;
 
 import "./Owned.sol";
+import "./Events.sol";
 import "./OrderData.sol";
 import "./Asset.sol";
 import "./SplytManager.sol";
 import "./AssetManager.sol";
 import "./ArbitrationManager.sol";
 
-contract OrderManager is Owned {
+contract OrderManager is Owned, Events {
     
     enum Reason { DEFECTIVE, NO_REASON, CHANGED_MIND, OTHER }
     enum Statuses { PAID, CLOSED, REQUESTED_REFUND, REFUNDED, ARBITRATION, OTHER }
@@ -58,7 +59,9 @@ contract OrderManager is Owned {
     function createOrder(address _assetAddress, uint _qty, uint _tokenAmount) public returns (uint) {
 
         uint orderId = orderData.save(_assetAddress, msg.sender, _qty, _tokenAmount); //save it to the data contract                
+        splytManager.internalContribute(msg.sender, _assetAddress, _tokenAmount);        
         splytManager.removeOneInventory(_assetAddress); //update inventory
+        emit NewOrder(200, 123);
         return orderId;
     }
 
