@@ -103,4 +103,8 @@ contract SplytManager is Events, Owned {
         return stake.calculateStakeTokens(_amount); 
     }
 
+    function removeOneInventory(address _assetAddress) public {
+        assetManager.removeOneInventory(_assetAddress); 
+    }    
+
 }

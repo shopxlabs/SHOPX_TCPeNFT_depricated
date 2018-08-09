@@ -49,14 +49,17 @@ contract OrderManager is Owned {
 
     constructor(address _splytManager) public {
         orderData = new OrderData();
-        splytManager = SplytManager(_splytManager); //splymanager address
+        splytManager = SplytManager(_splytManager); //splytManager address
         owner = msg.sender;
     }
 
     //@desc buyer must pay it in full to create order
-    function createOrder(address _assetAddress, uint _qty, uint _tokenAmount) public onlyPIF(_assetAddress, _qty, _tokenAmount) onlyAssetStatus(Asset.Statuses.ACTIVE, _assetAddress) {
-        orderData.save(_assetAddress, msg.sender, _qty, _tokenAmount); //save it to the data contract                
-        AssetManager(address(splytManager.assetManager)).removeOneInventory(_assetAddress); //update inventory
+    // function createOrder(address _assetAddress, uint _qty, uint _tokenAmount) public onlyPIF(_assetAddress, _qty, _tokenAmount) onlyAssetStatus(Asset.Statuses.ACTIVE, _assetAddress) returns (uint) {
+    function createOrder(address _assetAddress, uint _qty, uint _tokenAmount) public returns (uint) {
+
+        uint orderId = orderData.save(_assetAddress, msg.sender, _qty, _tokenAmount); //save it to the data contract                
+        splytManager.removeOneInventory(_assetAddress); //update inventory
+        return orderId;
     }
 
     function approveRefund(uint _orderId) public onlySeller(_orderId) {
@@ -83,5 +86,10 @@ contract OrderManager is Owned {
     function getDataVersion() public view returns (uint) {
       return orderData.version();
     }    
+
+
+    function getOrdersLength() public view returns (uint) {
+      return orderData.orderId();
+    }       
     
 }

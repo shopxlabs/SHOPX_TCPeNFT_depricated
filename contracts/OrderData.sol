@@ -34,10 +34,10 @@ contract OrderData is Owned {
         owner = msg.sender; //orderManager address
     }
 
-    function save(address _asset, address _buyer, uint _quantity, uint _paidAmount) public onlyOwner returns (bool) {
+    function save(address _asset, address _buyer, uint _quantity, uint _paidAmount) public onlyOwner returns (uint) {
         orders[orderId] = Order(version, orderId, _asset, _buyer, _quantity, _paidAmount, Statuses.PIF, Reasons.NA);
         orderId++;
-        return true;
+        return orderId;
     }  
 
     function updateStatus(uint _orderId, Statuses _status) public onlyOwner returns (bool) {

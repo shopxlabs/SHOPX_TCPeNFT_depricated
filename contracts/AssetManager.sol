@@ -18,6 +18,12 @@ contract AssetManager is Owned {
         owner = msg.sender; 
     }
 
+    //allow owner or splytManager
+    modifier onlyOwnerOrSplyt() {
+        require(owner == msg.sender || address(splytManager) == msg.sender);
+        _;
+    }
+
     function createAsset(
         bytes12 _assetId, 
         uint _term, 
@@ -74,8 +80,8 @@ contract AssetManager is Owned {
     }
 
 
-    function removeOneInventory(address _assetData) onlyOwner public {
-       Asset(_assetData).removeOneInventory();
+    function removeOneInventory(address _assetAddress) public onlyOwnerOrSplyt {
+       Asset(_assetAddress).removeOneInventory();
     }
    
 
