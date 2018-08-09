@@ -55,7 +55,7 @@ contract AssetManager is Owned {
             _mpAmount,
             _inventoryCount,
             stakeTokens); 
-         
+
         splytManager.internalContribute(_seller, asset, stakeTokens);
         assetData.save(_assetId, address(asset));
     }

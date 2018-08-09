@@ -29,7 +29,7 @@ contract Asset is Events, Owned {
     enum AssetTypes { NORMAL, FRACTIONAL }
     AssetTypes public assetType;
 
-    enum Statuses { NOT_MINED, ACTIVE, IN_ARBITRATION, EXPIRED, CLOSED, OTHER }
+    enum Statuses { NOT_MINED, ACTIVE, IN_ARBITRATION, EXPIRED, SOLD_OUT, CLOSED, OTHER }
     Statuses public status;
     
     TrackerInterface public tracker;
@@ -206,12 +206,15 @@ contract Asset is Events, Owned {
     function addOneInventory() public onlyOwner {
         inventoryCount++;
     }  
-    //asetManager is the owner
+    //assetManager is the owner
      function removeOneInventory() public onlyOwner {
         inventoryCount--;
+        if (inventoryCount == 0) {
+            status = Statuses.SOLD_OUT;
+        }
     }   
 
-    //asetManager is the owner
+    //assetManager is the owner
      function setInventory(uint _count) public onlyOwner {
         inventoryCount = _count;
     }   

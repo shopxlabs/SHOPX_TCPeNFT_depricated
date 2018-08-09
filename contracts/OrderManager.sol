@@ -57,11 +57,11 @@ contract OrderManager is Owned, Events {
     //@desc buyer must pay it in full to create order
     // function createOrder(address _assetAddress, uint _qty, uint _tokenAmount) public onlyPIF(_assetAddress, _qty, _tokenAmount) onlyAssetStatus(Asset.Statuses.ACTIVE, _assetAddress) returns (uint) {
     function createOrder(address _assetAddress, uint _qty, uint _tokenAmount) public returns (uint) {
-
-        uint orderId = orderData.save(_assetAddress, msg.sender, _qty, _tokenAmount); //save it to the data contract                
+        uint orderId = orderData.orderId();
+        orderData.save(_assetAddress, msg.sender, _qty, _tokenAmount); //save it to the data contract                
         splytManager.internalContribute(msg.sender, _assetAddress, _tokenAmount);        
         splytManager.removeOneInventory(_assetAddress); //update inventory
-        emit NewOrder(200, 123);
+        emit NewOrder(200, orderId);
         return orderId;
     }
 

@@ -12,6 +12,9 @@ contract('OrderManagerTest general test cases.', function(accounts) {
   const defaultSeller = accounts[1];
   const defaultMarketPlace = accounts[2];
   const defaultPrice = 1000;
+  const defaultExpDate = (new Date().getTime() / 1000) + 60;
+  const defaultAssetId = "0x31f2ae92057a7123ef0e490a";
+  const defaultInventoryCount = 2;
 
   let satTokenInstance;
   let assetManagerInstance;
@@ -24,7 +27,7 @@ contract('OrderManagerTest general test cases.', function(accounts) {
 
 
   async function create_asset(_assetId = "0x31f2ae92057a7123ef0e490a", _term = 0, _seller = defaultSeller, _title = "MyTitle",
-      _totalCost = defaultPrice, _expirationDate = 10001556712588, _mpAddress = defaultMarketPlace, _mpAmount = 2, _inventoryCount = 2) {
+      _totalCost = defaultPrice, _expirationDate = defaultExpDate, _mpAddress = defaultMarketPlace, _mpAmount = 2, _inventoryCount = defaultInventoryCount) {
 
     await assetManagerInstance.createAsset(_assetId, _term, _seller, _title, _totalCost, _expirationDate, _mpAddress, _mpAmount, _inventoryCount);
     assetAddress = await assetManagerInstance.getAddressById(_assetId);
@@ -68,11 +71,11 @@ contract('OrderManagerTest general test cases.', function(accounts) {
       await satTokenInstance.initUser(acc)
     })
 
-    let balance = await satTokenInstance.balanceOf(defaultBuyer)
-    console.log('defaultBuyer balance:' + balance)
+    // let balance = await satTokenInstance.balanceOf(defaultBuyer)
+    // console.log('defaultBuyer balance:' + balance)
 
-    balance = await satTokenInstance.balanceOf(defaultSeller)
-    console.log('defaultSeller balance:' + balance)
+    // balance = await satTokenInstance.balanceOf(defaultSeller)
+    // console.log('defaultSeller balance:' + balance)
 
   })
 
@@ -84,12 +87,21 @@ contract('OrderManagerTest general test cases.', function(accounts) {
     assert.notEqual(orderManagerAddress, 0x0, "OrderManager has not been deployed!");
   })
 
+
   it('should deploy new order contract successfully!', async function() {
     await create_asset();
     await create_order(assetAddress, 1, 1000);
     let length = await orderManagerInstance.getOrdersLength();
     console.log('number of orders: ' + length);
     assert.equal(length, 1, "Number of orders is not 1!");
+  })
+
+  it('should current inventory at 2', async function() {
+
+    let currentInventory = await assetInstance.inventoryCount();
+    console.log('current inventory count: ' + currentInventory);
+    assert.equal(defaultInventoryCount - 1, currentInventory, "Initial inventory count is not expected!");
+
   })
 
   it('should defaultBuyer balance be less than 1000', async function() {
@@ -107,26 +119,25 @@ contract('OrderManagerTest general test cases.', function(accounts) {
     assert.equal((initBalance - defaultPrice), updatedBalance, "Balance is not -1000 as expected!");
   })
 
-  // it('should deploy new order contract making total of 2 successfully!', async function() {
-  //   await create_order(assetAddress, 1, 1000);
-  //   let length = await orderManagerInstance.getOrdersLength();
-  //   console.log('number of orders: ' + length);
-  //   // await create_asset();
-  //   // assert.equal(orderId, , 'No money should be transfered to seller\'s wallet!');
-  //   assert.equal(length, 2, "Number of orders is not2!");
-  // })
+  it('should deploy new order contract making total of 3 successfully!', async function() {
+    await create_order(assetAddress, 1, defaultPrice);
+    let length = await orderManagerInstance.getOrdersLength();
+    console.log('number of orders: ' + length);
+    assert.equal(length, 3, "Number of orders is not 2!");
+  })
 
-  it('should status be 1=ACTIVE if asset is available for purchase!', async function() {
+  it('should current inventory at 0', async function() {
 
-    let orderManagerAddress = orderManagerInstance.address;
-    // console.log('orderManager address: ' + orderManagerAddress)
+    let inventory = await assetInstance.inventoryCount();
+
+    console.log('current inventory count: ' + inventory);
 
 
     // await create_asset();
     // assert.equal(orderId, , 'No money should be transfered to seller\'s wallet!');
     // let status = await assetInstance.status();
     // console.log('status: ' + status);
-    // assert.equal(status, 1, "Asset status is NOT 1=ACTIVE as expected!");
+    // assert.equal(true, false, "Asset status is NOT 1=ACTIVE as expected!");
   })
 
   // it('should status be 2=IN_ARBITRATION', async function() {
