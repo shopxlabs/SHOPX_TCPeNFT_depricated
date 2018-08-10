@@ -34,18 +34,20 @@ contract ArbitrationManager is Owned {
         owner = msg.sender;
     }
 
-    function createArbitration(bytes12 _arbitrationId, Arbitration.Reasons _reason, address _reporter, address _assetAddress) public onlyOwner {
+    function createArbitration(address _assetAddress, bytes12 _arbitrationId, Arbitration.Reasons _reason) public {
 
         Asset asset = Asset(_assetAddress);
         uint stakeAmount = asset.initialStakeAmount(); //get initital stake amount
         
-        Arbitration arbitration = new Arbitration(_arbitrationId, _reason, _reporter, stakeAmount, _assetAddress);
+        address reporter = msg.sender;
+
+        Arbitration arbitration = new Arbitration(_assetAddress, _arbitrationId, _reason, reporter, stakeAmount);
         arbitrationData.save(_arbitrationId, address(arbitration));
 
         //change status so no one can purchase during arbitration
         splytManager.setAssetStatus(_assetAddress, Asset.Statuses.IN_ARBITRATION);
         //set stake for reporter
-        splytManager.internalContribute(_reporter, asset, stakeAmount);
+        splytManager.internalContribute(reporter, asset, stakeAmount);
       
     }
 

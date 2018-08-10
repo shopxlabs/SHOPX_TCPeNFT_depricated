@@ -33,7 +33,7 @@ contract Arbitration is Owned {
         _;
     }
 
-    constructor(bytes12 _arbitrationId, Reasons _reason, address _reporter, uint _stakeAmount, address _assetAddress) public {
+    constructor(address _assetAddress, bytes12 _arbitrationId, Reasons _reason, address _reporter, uint _stakeAmount) public {
         arbitrationId = _arbitrationId;
         reason = _reason;
         reporter = _reporter;
