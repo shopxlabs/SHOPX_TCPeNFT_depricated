@@ -41,11 +41,11 @@ contract OrderManager is Owned, Events {
     }    
 
     //@desc if buyer sends total amount
-    modifier onlyPurchaseAmountValid(address _assetAddress, uint _qty, uint _tokenAmount) {     
+    modifier onlyOrderRequestQualifies(address _assetAddress, uint _qty, uint _tokenAmount) {     
         uint buyerBalance = splytManager.getBalance(msg.sender);
         uint totalCost = Asset(_assetAddress).totalCost() * _qty;
-        require(_tokenAmount >=
-         totalCost && buyerBalance >= totalCost);
+        uint qty = Asset(_assetAddress).inventoryCount();
+        require(_tokenAmount >=totalCost && buyerBalance >= totalCost && _qty <= qty);
         _;
     } 
 
@@ -58,11 +58,11 @@ contract OrderManager is Owned, Events {
     //@desc buyer must pay it in full to create order
     // To succcessfully purchase an asset, buy must purchase the whole amount times the quantity.
     // The asset must be in 'ACTIVE' status.    
-    function createOrder(address _assetAddress, uint _qty, uint _tokenAmount) public onlyAssetStatus(Asset.Statuses.ACTIVE, _assetAddress) onlyPurchaseAmountValid(_assetAddress, _qty, _tokenAmount)  returns (uint) {
+    function createOrder(address _assetAddress, uint _qty, uint _tokenAmount) public onlyAssetStatus(Asset.Statuses.ACTIVE, _assetAddress) onlyOrderRequestQualifies(_assetAddress, _qty, _tokenAmount)  returns (uint) {
         uint orderId = orderData.orderId();
         orderData.save(_assetAddress, msg.sender, _qty, _tokenAmount); //save it to the data contract                
         splytManager.internalContribute(msg.sender, _assetAddress, _tokenAmount);        
-        splytManager.removeOneInventory(_assetAddress); //update inventory
+        splytManager.subtractInventory(_assetAddress, _qty); //update inventory
         emit NewOrder(200, orderId);
         return orderId;
     }

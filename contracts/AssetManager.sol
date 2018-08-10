@@ -82,8 +82,8 @@ contract AssetManager is Owned {
     }
 
 
-    function removeOneInventory(address _assetAddress) public onlyOwnerOrSplyt {
-       Asset(_assetAddress).removeOneInventory();
+    function subtractInventory(address _assetAddress, uint _qty) public onlyOwnerOrSplyt {
+       Asset(_assetAddress).subtractInventory(_qty);
     }
    
 

@@ -203,12 +203,12 @@ contract Asset is Events, Owned {
         }
     }
  
-    function addOneInventory() public onlyOwner {
-        inventoryCount++;
+    function addInventory(uint _qty) public onlyOwner {
+        inventoryCount += _qty;
     }  
     //assetManager is the owner
-     function removeOneInventory() public onlyOwner {
-        inventoryCount--;
+     function subtractInventory(uint _qty) public onlyOwner {
+        inventoryCount -=  _qty;
         if (inventoryCount == 0) {
             status = Statuses.SOLD_OUT;
         }
