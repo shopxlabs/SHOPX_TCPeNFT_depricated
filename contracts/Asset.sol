@@ -44,8 +44,8 @@ contract Asset is Events, Owned {
     bool public isContract = true;
     string public title;
     
-    uint initialStakeAmount;
-    
+    uint public initialStakeAmount;
+
     mapping(address => uint) contributions;
     enum report{ SPAM, BROKEN, NOTRECIEVED, NOREASON  }
     address arbitrateAddr = 0x0;

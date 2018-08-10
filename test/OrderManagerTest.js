@@ -23,8 +23,8 @@ contract('OrderManagerTest general test cases.', function(accounts) {
   let splytManagerInstance;
   let assetInstance;
 
+  //Instantiate the contracts
   init();
-
 
   async function create_asset(_assetId = "0x31f2ae92057a7123ef0e490a", _term = 0, _seller = defaultSeller, _title = "MyTitle",
       _totalCost = defaultPrice, _expirationDate = defaultExpDate, _mpAddress = defaultMarketPlace, _mpAmount = 2, _inventoryCount = defaultInventoryCount) {
@@ -34,7 +34,6 @@ contract('OrderManagerTest general test cases.', function(accounts) {
     assetInstance = await Asset.at(assetAddress);
 
   }
-
 
   async function create_order(_assetAddress = "0x31f2ae92057a7123ef0e490a", _quantity = 1, _amount = defaultPrice) {
 
@@ -87,7 +86,6 @@ contract('OrderManagerTest general test cases.', function(accounts) {
     assert.notEqual(orderManagerAddress, 0x0, "OrderManager has not been deployed!");
   })
 
-
   it('should deploy new order contract successfully!', async function() {
     await create_asset();
     await create_order(assetAddress, 1, 1000);
@@ -104,7 +102,7 @@ contract('OrderManagerTest general test cases.', function(accounts) {
 
   })
 
-  it('should defaultBuyer balance be less than 1000', async function() {
+  it('should defaultBuyer balance be less than 1000 off original balance', async function() {
     await create_asset();
 
     let initBalance = await satTokenInstance.balanceOf(defaultBuyer);
@@ -119,7 +117,7 @@ contract('OrderManagerTest general test cases.', function(accounts) {
     assert.equal((initBalance - defaultPrice), updatedBalance, "Balance is not -1000 as expected!");
   })
 
-  it('should deploy new order contract making total of 3 successfully!', async function() {
+  it('should deploy new purchase order contract making total of 3 successfully!', async function() {
     await create_order(assetAddress, 1, defaultPrice);
     let length = await orderManagerInstance.getOrdersLength();
     console.log('number of orders: ' + length);
@@ -131,7 +129,6 @@ contract('OrderManagerTest general test cases.', function(accounts) {
     let inventory = await assetInstance.inventoryCount();
 
     console.log('current inventory count: ' + inventory);
-
 
     // await create_asset();
     // assert.equal(orderId, , 'No money should be transfered to seller\'s wallet!');

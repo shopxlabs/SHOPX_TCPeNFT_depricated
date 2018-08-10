@@ -9,6 +9,7 @@ import "./Owned.sol";
 
 import "./SatToken.sol";
 import "./Stake.sol";
+import "./Asset.sol";
 
 
 // contract StakeInterface {
@@ -106,5 +107,11 @@ contract SplytManager is Events, Owned {
     function removeOneInventory(address _assetAddress) public {
         assetManager.removeOneInventory(_assetAddress); 
     }    
+
+    //@desc used to update    
+    function setAssetStatus(address _assetAddress, Asset.Statuses _status) public onlyManagers {
+        assetManager.setStatus(_assetAddress, _status);
+    }    
+
 
 }
