@@ -16,7 +16,10 @@ contract('ArbitrationManagerTest general test cases.', function(accounts) {
   const defaultPrice = 1000;
   const defaultExpDate = (new Date().getTime() / 1000) + 60;
   const defaultAssetId = "0x31f2ae92057a7123ef0e490a";
+  const defaultArbitrationId = "0x31f2ae92057a7123ef0e490a";
+
   const defaultInventoryCount = 2;
+
 
   let satTokenInstance;
   let assetManagerInstance;
@@ -24,6 +27,10 @@ contract('ArbitrationManagerTest general test cases.', function(accounts) {
 
   let splytManagerInstance;
   let assetInstance;
+  let assetAddress;
+
+  let arbitrationInstance;
+  let arbitrationAddress;
 
   //Instantiate the contracts
   init();
@@ -37,10 +44,11 @@ contract('ArbitrationManagerTest general test cases.', function(accounts) {
 
   }
 
-  async function create_arbitration(_assetAddress = "0x31f2ae92057a7123ef0e490a", _arbitrationId = "0x31f2ae92057a7123ef0e490a", _reason = 1, _reporter = defaultBuyer) {
+  async function create_arbitration(_assetAddress = assetAddress, _arbitrationId = "0x31f2ae92057a7123ef0e490a", _reason = 1) {
 
-    await arbitrationManagerInstance.createArbitration(_assetAddress, _arbitrationId, reason, reporter, { from: defaultBuyer });
-    // assetInstance = await Asset.at(assetAddress);
+    await arbitrationManagerInstance.createArbitration(assetAddress, _arbitrationId, _reason, { from: defaultBuyer });
+    arbitrationAddress = await arbitrationManagerInstance.getAddressById(_arbitrationId);
+    arbitrationInstance = Arbitration.at(arbitrationAddress);
 
   }
 
@@ -53,6 +61,7 @@ contract('ArbitrationManagerTest general test cases.', function(accounts) {
 
     satTokenInstance = await SatToken.deployed()   
     arbitrationManagerInstance = await ArbitrationManager.deployed()
+    assetManagerInstance = await AssetManager.deployed()
     splytManagerInstance = await SplytManager.deployed()
  
   }
@@ -65,11 +74,11 @@ contract('ArbitrationManagerTest general test cases.', function(accounts) {
       await satTokenInstance.initUser(acc)
     })
 
-    // let balance = await satTokenInstance.balanceOf(defaultBuyer)
-    // console.log('defaultBuyer balance:' + balance)
+    let balance = await satTokenInstance.balanceOf(defaultBuyer)
+    console.log('defaultBuyer balance:' + balance)
 
-    // balance = await satTokenInstance.balanceOf(defaultSeller)
-    // console.log('defaultSeller balance:' + balance)
+    balance = await satTokenInstance.balanceOf(defaultSeller)
+    console.log('defaultSeller balance:' + balance)
 
   })
 
@@ -81,15 +90,15 @@ contract('ArbitrationManagerTest general test cases.', function(accounts) {
     assert.notEqual(arbitrationManagerAddress, 0x0, "Arbitration manager has not been deployed!");
   })
 
-  // it('should deploy new arbitration contract successfully!', async function() {
+  it('should be 1 arbitration contract successfully!', async function() {
     
-  //   await create_asset();
-  //   await create_arbitration();
+    await create_asset();
+    await create_arbitration();
 
-  //   let length = await arbitrationManagerInstance.getOrdersLength();
-  //   console.log('number of orders: ' + length);
-  //   assert.equal(length, 1, "Number of orders is not 1!");
-  // })
+    let length = await arbitrationManagerInstance.getArbitrationsLength();
+    console.log('number of arbitrations: ' + length);
+    assert.equal(length, 1, "Number of arbitrations is not 1!");
+  })
 
   // it('should current inventory at 2', async function() {
 

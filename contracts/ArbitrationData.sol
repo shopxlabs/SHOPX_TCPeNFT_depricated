@@ -6,16 +6,20 @@ contract ArbitrationData is Owned {
     
     mapping (address => bytes12) public arbitrationIdByAddress;
     mapping (bytes12 => address) public addressByArbitrationId;
-                                     
+    mapping (uint => address) public addressByIndex;
+    
     uint public arbitrationId; //increments after creating new
- 
+    uint public arbitrationIndex;
+
     constructor() public {
         owner = msg.sender; //arbitrationManager is the owner
     }
-    function save(bytes12 _arbitrationId, address _arbitrationAddress) public onlyOwner returns (bool) {
+
+    function save(bytes12 _arbitrationId, address _arbitrationAddress) public onlyOwner {
         arbitrationIdByAddress[_arbitrationAddress] = _arbitrationId;
         addressByArbitrationId[_arbitrationId] = _arbitrationAddress;
-        return true;
+        addressByIndex[arbitrationIndex] = _arbitrationAddress;
+        arbitrationIndex++;
     }  
     
     function getArbitrationIdByAddress(address _arbitrationAddress) public view returns (bytes12) {
@@ -26,5 +30,8 @@ contract ArbitrationData is Owned {
         return addressByArbitrationId[_arbitrationId];
     }    
 
+    function getAddressByIndex(uint _index) public view returns (address) {
+        return addressByIndex[_index];
+    }    
     
 }
