@@ -13,6 +13,8 @@ contract('ArbitrationManagerTest general test cases.', function(accounts) {
   const defaultBuyer = accounts[0];
   const defaultSeller = accounts[1];
   const defaultMarketPlace = accounts[2];
+  const defaultArbitrator = accounts[3];
+  
   const defaultPrice = 1000;
   const defaultExpDate = (new Date().getTime() / 1000) + 60;
   const defaultAssetId = "0x31f2ae92057a7123ef0e490a";
@@ -52,6 +54,13 @@ contract('ArbitrationManagerTest general test cases.', function(accounts) {
 
   }
 
+  async function create_order(_assetAddress = assetAddress, _quantity = 1, _amount = defaultPrice) {
+
+    await orderManagerInstance.createOrder(_assetAddress, _quantity, _amount, { from: defaultBuyer });
+    // assetInstance = await Asset.at(assetAddress);
+
+  }
+
   //Instantiate it only once
   async function init() {
     
@@ -63,6 +72,7 @@ contract('ArbitrationManagerTest general test cases.', function(accounts) {
     arbitrationManagerInstance = await ArbitrationManager.deployed()
     assetManagerInstance = await AssetManager.deployed()
     splytManagerInstance = await SplytManager.deployed()
+    ordertManagerInstance = await OrderManager.deployed()    
  
   }
 
@@ -74,11 +84,11 @@ contract('ArbitrationManagerTest general test cases.', function(accounts) {
       await satTokenInstance.initUser(acc)
     })
 
-    let balance = await satTokenInstance.balanceOf(defaultBuyer)
-    console.log('defaultBuyer balance:' + balance)
+    // let balance = await satTokenInstance.balanceOf(defaultBuyer)
+    // console.log('defaultBuyer balance:' + balance)
 
-    balance = await satTokenInstance.balanceOf(defaultSeller)
-    console.log('defaultSeller balance:' + balance)
+    // balance = await satTokenInstance.balanceOf(defaultSeller)
+    // console.log('defaultSeller balance:' + balance)
 
   })
 
@@ -100,13 +110,49 @@ contract('ArbitrationManagerTest general test cases.', function(accounts) {
     assert.equal(length, 1, "Number of arbitrations is not 1!");
   })
 
-  // it('should current inventory at 2', async function() {
 
-  //   let currentInventory = await assetInstance.inventoryCount();
-  //   console.log('current inventory count: ' + currentInventory);
-  //   assert.equal(defaultInventoryCount - 1, currentInventory, "Initial inventory count is not expected!");
+  it('should be status 2=IN_ARBITRATION after reporter creates an arbitration!', async function() {
+    
+    let status = await assetInstance.status();
 
-  // })
+    console.log('asset status after being reported:: ' + status);
+    assert.equal(status, 2, "Status is not in IN_ARBITRATION!");
+  })
+
+
+  it('should not be able to purchase order a asset in status 2=IN_ARBITRATION!', async function() {
+
+    try {
+      await orderManagerInstance.createOrder();
+      assert.isTrue(false, "Should have error out. Should have not created a order if status is 2=IN_ARBITRATION!");
+    } catch (e) {
+      // console.log(e)
+      console.log('yes it errored out as expected since you cannot create a order in status IN_ARBITRATION')
+      assert.isTrue(true, "should error. Expected outsome so no output!");
+    }
+
+  })
+
+
+  it('should be able to assign arbitrator in the Arbitration contract!', async function() {
+
+    await arbitrationManagerInstance.setArbitrator(arbitrationAddress, defaultArbitrator);
+    console.log('assigning arbitrator: ' + defaultArbitrator);
+    let arbitrator = await arbitrationManagerInstance.getArbitrator(arbitrationAddress);
+    console.log('returned arbitrator: ' + arbitrator);
+    assert.equal(defaultArbitrator, arbitrator,"Arbitrator did not get assigned!");
+
+  })
+
+  it('should arbitrator to set the winner to reporter!', async function() {
+
+    console.log('arbitrator: ' + defaultArbitrator);
+    await arbitrationManagerInstance.setWinner(arbitrationAddress, 1, { from: defaultArbitrator });
+    // let winner = await arbitrationManagerInstance.getWinner(arbitrationAddress);
+    // console.log('winner is ' + winner)
+    // assert.equal(1, winner,"Winner is not reporter as expected!");
+
+  })
 
   // it('should defaultBuyer balance be less than 1000 off original balance', async function() {
   //   await create_asset();

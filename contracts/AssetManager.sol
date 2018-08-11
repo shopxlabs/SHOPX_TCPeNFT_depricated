@@ -77,7 +77,7 @@ contract AssetManager is Owned {
     }
 
     //@desc update data contract address
-    function setInventory(address _assetAddress, uint _count) onlyOwner public {
+    function setInventory(address _assetAddress, uint _count) onlyOwnerOrSplyt public {
         Asset(_assetAddress).setInventory(_count);
     }
 
@@ -87,7 +87,7 @@ contract AssetManager is Owned {
     }
    
 
-    function setSplytManager(address _address) public onlyOwner {
+    function setSplytManager(address _address) public onlyOwnerOrSplyt {
         splytManager = SplytManager(_address);
     }
 

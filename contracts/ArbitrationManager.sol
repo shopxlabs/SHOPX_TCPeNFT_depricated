@@ -51,8 +51,8 @@ contract ArbitrationManager is Owned {
       
     }
 
-
-    function setWinner(address _arbitrationAddress, Arbitration.Winners _winner) public onlyOwner {
+    //TODO: use splytmanager to change status
+    function setWinner(address _arbitrationAddress, Arbitration.Winners _winner) public {
         
         Arbitration arbitration = Arbitration(_arbitrationAddress);
         address assetAddress = arbitration.asset();
@@ -69,6 +69,12 @@ contract ArbitrationManager is Owned {
              //TODO: gives the stakes to seller
         }
     }    
+
+    function getWinner(address _arbitrationAddress) public view returns (Arbitration.Winners){
+        
+        return Arbitration(_arbitrationAddress).winner();
+    }    
+
 
     //@desc set arbitrator so that person resolves this arbitration
     function setArbitrator(address _arbitrationAddress, address _arbitrator) public onlyOwner {
