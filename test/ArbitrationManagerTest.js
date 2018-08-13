@@ -148,9 +148,16 @@ contract('ArbitrationManagerTest general test cases.', function(accounts) {
 
     console.log('arbitrator: ' + defaultArbitrator);
     await arbitrationManagerInstance.setWinner(arbitrationAddress, 1, { from: defaultArbitrator });
-    // let winner = await arbitrationManagerInstance.getWinner(arbitrationAddress);
-    // console.log('winner is ' + winner)
-    // assert.equal(1, winner,"Winner is not reporter as expected!");
+    let winner = await arbitrationManagerInstance.getWinner(arbitrationAddress);
+    console.log('winner is ' + winner)
+    assert.equal(1, winner,"Winner is not reporter as expected!");
+
+  })
+
+  it('should asset status be 5=CLOSED after arbitration sides with reporter!', async function() {
+    let status = await assetManagerInstance.getStatus(assetAddress);
+    console.log('status is ' + status);
+    assert.equal(5,status,"Status is not in 5=CLOSED as expected!");
 
   })
 

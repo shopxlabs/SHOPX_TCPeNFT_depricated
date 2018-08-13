@@ -70,7 +70,12 @@ contract AssetManager is Owned {
     function setDataContract(address _assetData) onlyOwner public {
        assetData = AssetData(_assetData);
     }
-   
+
+    //@desc get asset status
+    function getStatus(address _assetAddress) public view returns (Asset.Statuses) {
+        return Asset(_assetAddress).status();
+    }
+
     //@desc update data contract address
     function setStatus(address _assetAddress, Asset.Statuses _status) onlyOwnerOrSplyt public {
         Asset(_assetAddress).setStatus(_status);

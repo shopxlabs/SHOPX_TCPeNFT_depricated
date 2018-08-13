@@ -56,16 +56,15 @@ contract ArbitrationManager is Owned {
         
         Arbitration arbitration = Arbitration(_arbitrationAddress);
         address assetAddress = arbitration.asset();
-        Asset asset = Asset(assetAddress);
         
         arbitration.setWinner(_winner);
 
         if (_winner == Arbitration.Winners.REPORTER) {
-            asset.setStatus(Asset.Statuses.CLOSED);
+            splytManager.setAssetStatus(assetAddress, Asset.Statuses.CLOSED);
              //TODO: gives the stakes to reporter
         }
         if (_winner == Arbitration.Winners.SELLER) {
-            asset.setStatus(Asset.Statuses.ACTIVE);
+            splytManager.setAssetStatus(assetAddress, Asset.Statuses.ACTIVE);
              //TODO: gives the stakes to seller
         }
     }    
