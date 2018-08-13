@@ -158,6 +158,7 @@ contract Asset is Events, Owned {
     //             addToContributions(_contributor, _contributing);
     //         releaseFunds();
             
+    //TODO: integrate this into the ordermanager contract
     //     } else if (_contributing >= totalCost) {
     //         uint mpGets;
     //         uint sellerGets;
