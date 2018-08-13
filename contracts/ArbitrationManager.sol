@@ -23,7 +23,8 @@ contract ArbitrationManager is Owned {
     }
         
     modifier onlySeller(address _arbitrationAddress) {
-        require(Arbitration(_arbitrationAddress).reporter() == msg.sender);        
+        address assetAddress = Arbitration(_arbitrationAddress).asset();
+        require(Asset(assetAddress).seller() == msg.sender);        
         _;
     }
         
@@ -83,6 +84,11 @@ contract ArbitrationManager is Owned {
     //@desc get arbitrator
     function getArbitrator(address _arbitrationAddress) public view returns (address) {
        return Arbitration(_arbitrationAddress).arbitrator();
+    } 
+
+    //@desc get arbitration status
+    function getStatus(address _arbitrationAddress) public view returns (Arbitration.Statuses) {
+       return Arbitration(_arbitrationAddress).status();
     } 
 
 /*

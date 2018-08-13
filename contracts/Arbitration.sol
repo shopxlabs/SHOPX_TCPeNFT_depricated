@@ -32,6 +32,10 @@ contract Arbitration is Owned {
         require(msg.sender == reporter);
         _;
     }
+    modifier onlyStatus(Statuses _status) {
+        require(_status == status);
+        _;
+    }
 
     constructor(address _assetAddress, bytes12 _arbitrationId, Reasons _reason, address _reporter, uint _stakeAmount) public {
         arbitrationId = _arbitrationId;
@@ -47,7 +51,8 @@ contract Arbitration is Owned {
     }  
     
     //@desc selected arbitrator gets to decide case
-    function setWinner(Winners _winner) public onlyOwner {
+    //Arbitrator can select winner only after reporter 2x
+    function setWinner(Winners _winner) public onlyOwner onlyStatus(Statuses.REPORTER_STAKED_2X) {
         winner = _winner;
         status = Statuses.RESOLVED;
     }    

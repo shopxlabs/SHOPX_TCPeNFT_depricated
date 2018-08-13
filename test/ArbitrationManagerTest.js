@@ -144,6 +144,22 @@ contract('ArbitrationManagerTest general test cases.', function(accounts) {
 
   })
 
+  it('should seller be able to 2x stake on the arbitration contract', async function() {
+    await arbitrationManagerInstance.set2xStakeBySeller(arbitrationAddress, { from: defaultSeller });
+    let status = await arbitrationManagerInstance.getStatus(arbitrationAddress);
+    console.log('arbitration status: ' + status);
+    assert.equal(1,status,"Status is not in 2=SELLER_STAKE_2x as expected!");
+
+  })
+
+ it('should reporter be able to 2x stake on the arbitration contract', async function() {
+    await arbitrationManagerInstance.set2xStakeByReporter(arbitrationAddress, { from: defaultBuyer });
+    let status = await arbitrationManagerInstance.getStatus(arbitrationAddress);
+    console.log('arbitration status: ' + status);
+    assert.equal(2,status,"Status is not in 2=REPORTER_STAKE_2x as expected!");
+
+  })
+
   it('should arbitrator to set the winner to reporter!', async function() {
 
     console.log('arbitrator: ' + defaultArbitrator);
@@ -161,6 +177,7 @@ contract('ArbitrationManagerTest general test cases.', function(accounts) {
 
   })
 
+  
   // it('should defaultBuyer balance be less than 1000 off original balance', async function() {
   //   await create_asset();
 
