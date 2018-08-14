@@ -116,7 +116,8 @@ contract OrderManager is Owned, Events {
         
         uint sellerBalance = splytManager.getBalance(msg.sender);
         uint totalRefundAmount = orderData.getPaidAmount(_orderId);
-      
+        uint quantity = orderData.getQuantity(_orderId);
+
         //make sure seller has enough to refund
         if (sellerBalance < totalRefundAmount) {
             revert();
@@ -129,18 +130,18 @@ contract OrderManager is Owned, Events {
         Asset asset = Asset(assetAddress);
 
         //TODO: check marketplaces have enough balance to refund or error out
-        
+
         (mpRefunds, buyerRefundFromSeller) = calcDistribution(asset.totalCost(), asset.getMarketPlacesLength(), asset.kickbackAmount());
         splytManager.internalContribute(msg.sender, orderData.getBuyer(_orderId), buyerRefundFromSeller);
         
         //refund commission to buyer from marketplaces
         if(mpRefunds > 0) {
             for(uint i = 0; i < asset.getMarketPlacesLength(); i++) {
-                splytManager.internalContribute(asset.getMarketPlaceByIndex(i), orderData.getBuyer(_orderId),mpRefunds);
+                splytManager.internalContribute(asset.getMarketPlaceByIndex(i), orderData.getBuyer(_orderId), mpRefunds);
             }
         }
           
-        splytManager.addInventory(assetAddress, orderData.getQuantity(_orderId)); //update inventory
+        splytManager.addInventory(assetAddress, quantity); //update inventory
         orderData.setStatus(_orderId, OrderData.Statuses.REFUNDED); //save it to the data contract         
 
     }
