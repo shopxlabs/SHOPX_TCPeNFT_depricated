@@ -87,6 +87,10 @@ contract AssetManager is Owned {
     }
 
 
+    function addInventory(address _assetAddress, uint _qty) public onlyOwnerOrSplyt {
+       Asset(_assetAddress).addInventory(_qty);
+    }
+
     function subtractInventory(address _assetAddress, uint _qty) public onlyOwnerOrSplyt {
        Asset(_assetAddress).subtractInventory(_qty);
     }

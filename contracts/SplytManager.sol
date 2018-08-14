@@ -112,6 +112,9 @@ contract SplytManager is Events, Owned {
     function setAssetStatus(address _assetAddress, Asset.Statuses _status) public {
         assetManager.setStatus(_assetAddress, _status);
     }    
-
+    //@desc used to update    
+    function addInventory(address _assetAddress, uint _quantity) public {
+        assetManager.addInventory(_assetAddress, _quantity);
+    }    
 
 }

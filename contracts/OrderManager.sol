@@ -36,7 +36,7 @@ contract OrderManager is Owned, Events {
 
     //@desc middleware to check for certain order statuses to continue
     modifier onlyOrderStatus(uint _orderId, OrderData.Statuses _status) {
-        require(_status == orderData.getStatusByOrderId(_orderId));
+        require(_status == orderData.getStatus(_orderId));
         _;
     }    
 
@@ -67,7 +67,6 @@ contract OrderManager is Owned, Events {
             revert();
         }
 
-
         uint mpGets; //marketplaces commission
         uint sellerGets;
 
@@ -89,6 +88,19 @@ contract OrderManager is Owned, Events {
         return true;
     }
 
+    function setStatus(uint _orderId, OrderData.Statuses _status) public returns (bool) {
+
+        orderData.setStatus(_orderId, _status); //update the status                
+ 
+        return true;
+    }
+
+    function getStatus(uint _orderId) public view returns (OrderData.Statuses) {
+
+        return orderData.getStatus(_orderId);                
+ 
+    }
+
     function calcDistribution(uint _totalCost, uint _length, uint _kickbackAmount) public pure returns (uint, uint) {
         // Asset asset = Asset(_assetAddress);
         // uint length = asset.getMarketPlacesLength();
@@ -99,12 +111,42 @@ contract OrderManager is Owned, Events {
     }
 
 
+    //@desc seller gets refund to buyer and marketplaces
     function approveRefund(uint _orderId) public onlySeller(_orderId) {
-        orderData.updateStatus(_orderId, OrderData.Statuses.REFUNDED); //save it to the data contract                 
+        
+        uint sellerBalance = splytManager.getBalance(msg.sender);
+        uint totalRefundAmount = orderData.getPaidAmount(_orderId);
+      
+        //make sure seller has enough to refund
+        if (sellerBalance < totalRefundAmount) {
+            revert();
+        }
+
+        uint mpRefunds; //marketplaces commission
+        uint buyerRefundFromSeller;
+        address assetAddress = orderData.getAssetAddress(_orderId);
+
+        Asset asset = Asset(assetAddress);
+
+        //TODO: check marketplaces have enough balance to refund or error out
+        
+        (mpRefunds, buyerRefundFromSeller) = calcDistribution(asset.totalCost(), asset.getMarketPlacesLength(), asset.kickbackAmount());
+        splytManager.internalContribute(msg.sender, orderData.getBuyer(_orderId), buyerRefundFromSeller);
+        
+        //refund commission to buyer from marketplaces
+        if(mpRefunds > 0) {
+            for(uint i = 0; i < asset.getMarketPlacesLength(); i++) {
+                splytManager.internalContribute(asset.getMarketPlaceByIndex(i), orderData.getBuyer(_orderId),mpRefunds);
+            }
+        }
+          
+        splytManager.addInventory(assetAddress, orderData.getQuantity(_orderId)); //update inventory
+        orderData.setStatus(_orderId, OrderData.Statuses.REFUNDED); //save it to the data contract         
+
     }
     
     function requestRefund(uint _orderId) public onlyBuyer(_orderId) {
-        orderData.updateStatus(_orderId, OrderData.Statuses.REQUESTED_REFUND); //save it to the data contract        
+        orderData.setStatus(_orderId, OrderData.Statuses.REQUESTED_REFUND); //save it to the data contract        
         //TODO: refund  token process        
     }    
 

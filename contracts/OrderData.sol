@@ -38,13 +38,31 @@ contract OrderData is Owned {
         orders[orderId] = Order(version, orderId, _asset, _buyer, _quantity, _paidAmount, Statuses.PIF, Reasons.NA);
         orderId++;
         return orderId;
-    }  
+    }      
 
-    function updateStatus(uint _orderId, Statuses _status) public onlyOwner returns (bool) {
+    
+    function setStatus(uint _orderId, Statuses _status) public onlyOwner returns (bool) {
         orders[_orderId].status  = _status;
         return true;
     }  
-    
+
+    function getStatus(uint _orderId) public view returns (Statuses) {
+        return orders[_orderId].status;
+    }   
+
+    function getPaidAmount(uint _orderId) public view returns (uint) {
+        return orders[_orderId].paidAmount;
+    } 
+
+    function getAssetAddress(uint _orderId) public view returns (address) {
+        return orders[_orderId].asset;
+    }   
+
+    function getQuantity(uint _orderId) public view returns (uint) {
+        return orders[_orderId].quantity;
+    }   
+
+
     function getBuyer(uint _orderId) public view returns (address) {
         return orders[_orderId].buyer;
     }   
@@ -65,9 +83,13 @@ contract OrderData is Owned {
             orders[_orderId].status);
     }        
 
-    function getStatusByOrderId(uint _orderId) public view returns (Statuses) {
-        return orders[_orderId].status;    
-    }        
+    // function setStatusByOrderId(uint _orderId, Statuses _status) public onlyOwner {
+    //     orders[_orderId].status = _status;
+    // }        
+
+    // function getStatusByOrderId(uint _orderId) public view returns (Statuses) {
+    //     return orders[_orderId].status;    
+    // }        
 
     function setBytesAttribute(uint _orderId, bytes12 _attributeKey, bytes12 _attributeValue) public onlyOwner returns (bool) {
         orders[_orderId].bytesAttributes[_attributeKey] = _attributeValue;

@@ -37,8 +37,8 @@ contract('OrderManagerTest general test cases.', function(accounts) {
 
   async function create_order(_assetAddress = "0x31f2ae92057a7123ef0e490a", _quantity = 1, _amount = defaultPrice) {
 
-    let orderId = await orderManagerInstance.createOrder(_assetAddress, _quantity, _amount, { from: defaultBuyer });
-    console.log('orderId: ' + orderId);
+    await orderManagerInstance.createOrder(_assetAddress, _quantity, _amount, { from: defaultBuyer });
+    // console.log('orderId: ' + orderId);
     // assetInstance = await Asset.at(assetAddress);
 
   }
@@ -90,14 +90,14 @@ contract('OrderManagerTest general test cases.', function(accounts) {
     await create_asset();
     await create_order(assetAddress, 1, 1000);
     let length = await orderManagerInstance.getOrdersLength();
-    console.log('number of orders: ' + length);
+    // console.log('number of orders: ' + length);
     assert.equal(length, 1, "Number of orders is not 1!");
   })
 
   it('should current inventory at 2', async function() {
 
     let currentInventory = await assetInstance.inventoryCount();
-    console.log('current inventory count: ' + currentInventory);
+    // console.log('current inventory count: ' + currentInventory);
     assert.equal(defaultInventoryCount - 1, currentInventory, "Initial inventory count is not expected!");
 
   })
@@ -106,12 +106,12 @@ contract('OrderManagerTest general test cases.', function(accounts) {
     await create_asset();
 
     let initBalance = await satTokenInstance.balanceOf(defaultBuyer);
-    console.log('before purchase balance:' + initBalance);
+    // console.log('before purchase balance:' + initBalance);
 
     await create_order(assetAddress, 1, 1000);
 
     let updatedBalance = await satTokenInstance.balanceOf(defaultBuyer);
-    console.log('after purchase balance:' + updatedBalance);
+    // console.log('after purchase balance:' + updatedBalance);
 
     assert.equal((initBalance - defaultPrice), updatedBalance, "Balance is not -1000 as expected!");
   })
@@ -119,15 +119,35 @@ contract('OrderManagerTest general test cases.', function(accounts) {
   it('should deploy new purchase order contract making total of 3 successfully!', async function() {
     await create_order(assetAddress, 1, defaultPrice);
     let length = await orderManagerInstance.getOrdersLength();
-    console.log('number of orders: ' + length);
+    // console.log('number of orders: ' + length);
     assert.equal(length, 3, "Number of orders is not 2!");
   })
+
+
+  it('should buyer be able to request a refund!', async function() {
+    let status = await orderManagerInstance.getStatus(1);
+    // console.log('current status: ' + status);
+    await orderManagerInstance.requestRefund(1, { from: defaultBuyer });
+    status = await orderManagerInstance.getStatus(1);
+    // console.log('status after requesting a refund: ' + status);
+    assert.equal(status, 2, "status not in 2=REQUESTED_REFUND!");
+  })
+
+  it('should seller be able to approve refund!', async function() {
+    let status = await orderManagerInstance.getStatus(1);
+    console.log('current status: ' + status);
+    await orderManagerInstance.approveRefund(1, { from: defaultSeller });
+    status = await orderManagerInstance.getStatus(1);
+    console.log('status after requesting a refund: ' + status);
+    assert.equal(status, 3, "status not in 3=REFUND_APPROVED!");
+  })
+
 
   it('should current inventory at 0', async function() {
 
     let inventory = await assetInstance.inventoryCount();
 
-    console.log('current inventory count: ' + inventory);
+    // console.log('current inventory count: ' + inventory);
 
     // await create_asset();
     // assert.equal(orderId, , 'No money should be transfered to seller\'s wallet!');
