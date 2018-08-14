@@ -33,7 +33,7 @@ contract Asset is Events, Owned {
     Statuses public status;
     
     address public seller;
-    address[] listOfMarketPlaces;
+    address[] public listOfMarketPlaces;
     bytes12 public assetId;
     uint public term;
     uint public amountFunded = 0;
@@ -139,7 +139,15 @@ contract Asset is Events, Owned {
             return true;
         return false;
     }
-    
+
+    function getMarketPlaceByIndex(uint _index) public view returns (address) {
+        return listOfMarketPlaces[_index];
+    }   
+
+    function getMarketPlacesLength() public view returns (uint) {
+        return listOfMarketPlaces.length;
+    }   
+
     // Handles multi/single contribuitons
     // function contribute(address _marketPlace, address _contributor, uint _contributing) public {
 

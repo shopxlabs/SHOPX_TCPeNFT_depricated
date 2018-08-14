@@ -41,13 +41,13 @@ contract OrderManager is Owned, Events {
     }    
 
     //@desc if buyer sends total amount
-    modifier onlyOrderRequestQualifies(address _assetAddress, uint _qty, uint _tokenAmount) {     
-        uint buyerBalance = splytManager.getBalance(msg.sender);
-        uint totalCost = Asset(_assetAddress).totalCost() * _qty;
-        uint qty = Asset(_assetAddress).inventoryCount();
-        require(_tokenAmount >=totalCost && buyerBalance >= totalCost && _qty <= qty);
-        _;
-    } 
+    // modifier onlyOrderRequestQualifies(address _assetAddress, uint _qty, uint _tokenAmount) {     
+    //     uint buyerBalance = splytManager.getBalance(msg.sender);
+    //     uint totalCost = Asset(_assetAddress).totalCost() * _qty;
+    //     uint qty = Asset(_assetAddress).inventoryCount();
+    //     require(_tokenAmount >=totalCost && buyerBalance >= totalCost && _qty <= qty);
+    //     _;
+    // } 
 
     constructor(address _splytManager) public {
         orderData = new OrderData();
@@ -58,14 +58,46 @@ contract OrderManager is Owned, Events {
     //@desc buyer must pay it in full to create order
     // To succcessfully purchase an asset, buy must purchase the whole amount times the quantity.
     // The asset must be in 'ACTIVE' status.    
-    function createOrder(address _assetAddress, uint _qty, uint _tokenAmount) public onlyAssetStatus(Asset.Statuses.ACTIVE, _assetAddress) onlyOrderRequestQualifies(_assetAddress, _qty, _tokenAmount)  returns (uint) {
-        uint orderId = orderData.orderId();
+    function createOrder(address _assetAddress, uint _qty, uint _tokenAmount) public onlyAssetStatus(Asset.Statuses.ACTIVE, _assetAddress)  returns (bool) {
+
+        uint buyerBalance = splytManager.getBalance(msg.sender);
+        uint totalCost = Asset(_assetAddress).totalCost() * _qty;
+        uint qty = Asset(_assetAddress).inventoryCount();
+        if (_tokenAmount < totalCost || buyerBalance < totalCost || _qty > qty) {
+            revert();
+        }
+
+
+        uint mpGets; //marketplaces commission
+        uint sellerGets;
+
+        Asset asset = Asset(_assetAddress);
+        (mpGets, sellerGets) = calcDistribution(asset.totalCost(), asset.getMarketPlacesLength(), asset.kickbackAmount());
+        splytManager.internalContribute(msg.sender, asset.seller(), sellerGets);
+        
+        //distribute commission to all the market places
+        if(mpGets > 0) {
+            for(uint i = 0; i < asset.getMarketPlacesLength(); i++) {
+                splytManager.internalContribute(msg.sender, asset.getMarketPlaceByIndex(i), mpGets);
+            }
+        }
+
         orderData.save(_assetAddress, msg.sender, _qty, _tokenAmount); //save it to the data contract                
-        splytManager.internalContribute(msg.sender, _assetAddress, _tokenAmount);        
         splytManager.subtractInventory(_assetAddress, _qty); //update inventory
-        emit NewOrder(200, orderId);
-        return orderId;
+    //     emit NewOrder(200, orderId);
+    //     return orderId;
+        return true;
     }
+
+    function calcDistribution(uint _totalCost, uint _length, uint _kickbackAmount) public pure returns (uint, uint) {
+        // Asset asset = Asset(_assetAddress);
+        // uint length = asset.getMarketPlacesLength();
+
+        uint kickbackWitheld = _kickbackAmount / _length;
+        uint sellerGets = _totalCost - kickbackWitheld * _length;
+        return (kickbackWitheld, sellerGets);
+    }
+
 
     function approveRefund(uint _orderId) public onlySeller(_orderId) {
         orderData.updateStatus(_orderId, OrderData.Statuses.REFUNDED); //save it to the data contract                 

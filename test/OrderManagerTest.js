@@ -113,7 +113,6 @@ contract('OrderManagerTest general test cases.', function(accounts) {
     let updatedBalance = await satTokenInstance.balanceOf(defaultBuyer);
     console.log('after purchase balance:' + updatedBalance);
 
-    // assert.equal(orderId, , 'No money should be transfered to seller\'s wallet!');
     assert.equal((initBalance - defaultPrice), updatedBalance, "Balance is not -1000 as expected!");
   })
 
