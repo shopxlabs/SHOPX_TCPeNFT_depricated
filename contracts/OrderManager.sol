@@ -62,8 +62,8 @@ contract OrderManager is Owned, Events {
 
         uint buyerBalance = splytManager.getBalance(msg.sender);
         uint totalCost = Asset(_assetAddress).totalCost() * _qty;
-        uint qty = Asset(_assetAddress).inventoryCount();
-        if (_tokenAmount < totalCost || buyerBalance < totalCost || _qty > qty) {
+        uint inventoryCount = Asset(_assetAddress).inventoryCount();
+        if (_tokenAmount < totalCost || buyerBalance < totalCost || _qty > inventoryCount) {
             revert();
         }
 
