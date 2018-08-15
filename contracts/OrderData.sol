@@ -14,20 +14,23 @@ contract OrderData is Owned {
         Statuses status;        
         
         Reasons reason;
+        uint totalContributions;
+        mapping (address => uint) contributors; //for fractional contributors
 
         mapping (bytes12 => bytes12) bytesAttributes; //for future 
         mapping (bytes12 => uint) intAttributes; //for future
         mapping (bytes12 => address) addressAttributes; //for future
     }
     
-    enum Statuses { PIF, CLOSED, REQUESTED_REFUND, REFUNDED, OTHER }
+    enum Statuses { PIF, CLOSED, REQUESTED_REFUND, REFUNDED, OPEN_CONTRIBUTIONS, CONTRIBUTIONS_FULFILLED, OTHER }
     enum Reasons { NA, DEFECTIVE, NO_REASON, CHANGED_MIND, OTHER }
 
     uint public version = 1;
 
     // mapping (address => uint) public orderIdByAddress;
-    mapping (uint => Order) public orders;
-                                     
+    mapping (uint => Order) public orders;                                    
+    mapping (address => uint) public fractionalOrders;  //will have asset address if it's a fractional asset
+
     uint public orderId; //increments after creating new
 
     constructor() public {
@@ -35,12 +38,11 @@ contract OrderData is Owned {
     }
 
     function save(address _asset, address _buyer, uint _quantity, uint _paidAmount) public onlyOwner returns (uint) {
-        orders[orderId] = Order(version, orderId, _asset, _buyer, _quantity, _paidAmount, Statuses.PIF, Reasons.NA);
+        orders[orderId] = Order(version, orderId, _asset, _buyer, _quantity, _paidAmount, Statuses.PIF, Reasons.NA, 0);
         orderId++;
         return orderId;
     }      
 
-    
     function setStatus(uint _orderId, Statuses _status) public onlyOwner returns (bool) {
         orders[_orderId].status  = _status;
         return true;
@@ -62,6 +64,31 @@ contract OrderData is Owned {
         return orders[_orderId].quantity;
     }   
 
+    function getTotalContributions(uint _orderId) public view returns (uint) {
+        return orders[_orderId].totalContributions;
+    }   
+
+    //create new fractioinal order
+    function saveFractional(address _asset, address _contributor, uint _amount) public onlyOwner returns (uint) {
+        orders[orderId].version = version;
+        orders[orderId].asset = _asset;
+        orders[orderId].status = Statuses.OPEN_CONTRIBUTIONS;    
+        orders[orderId].contributors[_contributor] += _amount;
+        orders[orderId].totalContributions += _amount;
+        fractionalOrders[_asset] = orderId;
+        orderId++;
+    }   
+
+    function updateFractional(uint _orderId, address _contributor, uint _amount) public onlyOwner returns (uint) {
+
+        orders[_orderId].contributors[_contributor] += _amount;
+        orders[_orderId].totalContributions += _amount;
+    }   
+
+
+    function getFractionalOrderIdByAsset(address _assetAddress) public view returns (uint) {
+        return fractionalOrders[_assetAddress];
+    }   
 
     function getBuyer(uint _orderId) public view returns (address) {
         return orders[_orderId].buyer;

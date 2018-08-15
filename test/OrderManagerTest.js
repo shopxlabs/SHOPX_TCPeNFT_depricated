@@ -35,9 +35,9 @@ contract('OrderManagerTest general test cases.', function(accounts) {
 
   }
 
-  async function create_order(_assetAddress = "0x31f2ae92057a7123ef0e490a", _quantity = 1, _amount = defaultPrice) {
+  async function purchase(_assetAddress = "0x31f2ae92057a7123ef0e490a", _quantity = 1, _amount = defaultPrice) {
 
-    await orderManagerInstance.createOrder(_assetAddress, _quantity, _amount, { from: defaultBuyer });
+    await orderManagerInstance.purchase(_assetAddress, _quantity, _amount, { from: defaultBuyer });
     // console.log('orderId: ' + orderId);
     // assetInstance = await Asset.at(assetAddress);
 
@@ -88,7 +88,7 @@ contract('OrderManagerTest general test cases.', function(accounts) {
 
   it('should deploy new order contract successfully!', async function() {
     await create_asset();
-    await create_order(assetAddress, 1, 1000);
+    await purchase(assetAddress, 1, 1000);
     let length = await orderManagerInstance.getOrdersLength();
     // console.log('number of orders: ' + length);
     assert.equal(length, 1, "Number of orders is not 1!");
@@ -108,7 +108,7 @@ contract('OrderManagerTest general test cases.', function(accounts) {
     let initBalance = await satTokenInstance.balanceOf(defaultBuyer);
     // console.log('before purchase balance:' + initBalance);
 
-    await create_order(assetAddress, 1, 1000);
+    await purchase(assetAddress, 1, 1000);
 
     let updatedBalance = await satTokenInstance.balanceOf(defaultBuyer);
     // console.log('after purchase balance:' + updatedBalance);
@@ -117,7 +117,7 @@ contract('OrderManagerTest general test cases.', function(accounts) {
   })
 
   it('should deploy new purchase order contract making total of 3 successfully!', async function() {
-    await create_order(assetAddress, 1, defaultPrice);
+    await purchase(assetAddress, 1, defaultPrice);
     let length = await orderManagerInstance.getOrdersLength();
     // console.log('number of orders: ' + length);
     assert.equal(length, 3, "Number of orders is not 2!");

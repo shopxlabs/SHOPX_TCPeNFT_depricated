@@ -54,9 +54,9 @@ contract('ArbitrationManagerTest general test cases.', function(accounts) {
 
   }
 
-  async function create_order(_assetAddress = assetAddress, _quantity = 1, _amount = defaultPrice) {
+  async function purchase(_assetAddress = assetAddress, _quantity = 1, _amount = defaultPrice) {
 
-    await orderManagerInstance.createOrder(_assetAddress, _quantity, _amount, { from: defaultBuyer });
+    await orderManagerInstance.purchase(_assetAddress, _quantity, _amount, { from: defaultBuyer });
     // assetInstance = await Asset.at(assetAddress);
 
   }
@@ -123,7 +123,7 @@ contract('ArbitrationManagerTest general test cases.', function(accounts) {
   it('should not be able to purchase order a asset in status 2=IN_ARBITRATION!', async function() {
 
     try {
-      await orderManagerInstance.createOrder();
+      await orderManagerInstance.purchase();
       assert.isTrue(false, "Should have error out. Should have not created a order if status is 2=IN_ARBITRATION!");
     } catch (e) {
       // console.log(e)
@@ -177,7 +177,7 @@ contract('ArbitrationManagerTest general test cases.', function(accounts) {
 
   })
 
-  
+
   // it('should defaultBuyer balance be less than 1000 off original balance', async function() {
   //   await create_asset();
 

@@ -58,7 +58,23 @@ contract OrderManager is Owned, Events {
     //@desc buyer must pay it in full to create order
     // To succcessfully purchase an asset, buy must purchase the whole amount times the quantity.
     // The asset must be in 'ACTIVE' status.    
-    function createOrder(address _assetAddress, uint _qty, uint _tokenAmount) public onlyAssetStatus(Asset.Statuses.ACTIVE, _assetAddress)  returns (bool) {
+    function purchase(address _assetAddress, uint _qty, uint _tokenAmount) public onlyAssetStatus(Asset.Statuses.ACTIVE, _assetAddress) returns (bool) {
+
+        Asset asset = Asset(_assetAddress);
+
+        //Regular asset purchase or a fractional purchase
+        if (asset.assetType() == Asset.AssetTypes.NORMAL) {
+            createOrder(_assetAddress, _qty, _tokenAmount);
+        } else {
+            //Fractional ownership
+            contributeOrder(_assetAddress, _tokenAmount);            
+        }
+
+        return true;
+    }
+
+
+    function createOrder(address _assetAddress, uint _qty, uint _tokenAmount) private {
 
         uint buyerBalance = splytManager.getBalance(msg.sender);
         uint totalCost = Asset(_assetAddress).totalCost() * _qty;
@@ -85,8 +101,44 @@ contract OrderManager is Owned, Events {
         splytManager.subtractInventory(_assetAddress, _qty); //update inventory
     //     emit NewOrder(200, orderId);
     //     return orderId;
-        return true;
     }
+
+    //@desc for fractional purchases
+    function contributeOrder(address _assetAddress, uint _tokenAmount) private {
+       
+        uint buyerBalance = splytManager.getBalance(msg.sender);
+        if (buyerBalance < _tokenAmount) {
+            revert();
+        }
+
+        uint orderId = orderData.getFractionalOrderIdByAsset(_assetAddress);
+        //check if theres' existing
+        if (orderId > 0) {
+            uint totalContributions = orderData.getTotalContributions(orderId) + _tokenAmount;
+            if (totalContributions >= Asset(_assetAddress).totalCost()) {
+                splytManager.setAssetStatus(_assetAddress, Asset.Statuses.SOLD_OUT);
+                orderData.setStatus(orderId, OrderData.Statuses.CONTRIBUTIONS_FULFILLED);
+            }
+            orderData.updateFractional(orderId, msg.sender, _tokenAmount);       
+        } else {
+            orderData.saveFractional(_assetAddress, msg.sender, _tokenAmount);                               
+        }
+
+    }
+
+    //@desc for fractional purchases
+    // function isFractional(address _assetAddress, uint _qty, uint _tokenAmount) private {
+
+        // uint orderId = orderData.orderIdByAsset[_assetAddress];
+        // orderData.save(_assetAddress, msg.sender, _qty, _tokenAmount); //save it to the data contract                
+      
+    // function addToContributions(address _contributor, uint _contributing) private {
+    //     amountFunded += _contributing;
+    //     contributions[_contributor] += _contributing;
+    // }
+    
+
+    // }
 
     function setStatus(uint _orderId, OrderData.Statuses _status) public returns (bool) {
 
