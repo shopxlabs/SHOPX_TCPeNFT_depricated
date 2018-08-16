@@ -73,7 +73,7 @@ contract OrderManager is Owned, Events {
         return true;
     }
 
-
+    //@desc for regular normal purchase order
     function createOrder(address _assetAddress, uint _qty, uint _tokenAmount) private {
 
         uint buyerBalance = splytManager.getBalance(msg.sender);
@@ -107,6 +107,7 @@ contract OrderManager is Owned, Events {
     function contributeOrder(address _assetAddress, uint _tokenAmount) private {
        
         uint buyerBalance = splytManager.getBalance(msg.sender);
+        //check if buyer has the amount he proposes to use to contribute
         if (buyerBalance < _tokenAmount) {
             revert();
         }
@@ -202,6 +203,11 @@ contract OrderManager is Owned, Events {
         orderData.setStatus(_orderId, OrderData.Statuses.REQUESTED_REFUND); //save it to the data contract        
         //TODO: refund  token process        
     }    
+
+    function getMyContributions(uint _orderId) public view returns (uint) {
+        return orderData.getMyContributions(_orderId, msg.sender);
+    }
+    
 
     function setSplytManager(address _address) public onlyOwner {
         splytManager = SplytManager(_address);

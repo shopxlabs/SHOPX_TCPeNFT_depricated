@@ -90,6 +90,11 @@ contract OrderData is Owned {
         return fractionalOrders[_assetAddress];
     }   
 
+    function getMyContributions(uint _orderId, address _contributor) public view returns (uint) {
+        return orders[_orderId].contributors[_contributor];
+    }
+    
+
     function getBuyer(uint _orderId) public view returns (address) {
         return orders[_orderId].buyer;
     }   
