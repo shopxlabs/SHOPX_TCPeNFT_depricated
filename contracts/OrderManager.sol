@@ -223,5 +223,10 @@ contract OrderManager is Owned, Events {
     function getOrdersLength() public view returns (uint) {
       return orderData.orderId();
     }       
+
+    //@desc if new data contract is deployed, the creator proposes manager adress then the manager needs to accept
+    function acceptOwnership() public onlyOwner {
+        orderData.acceptOwnership();
+    }    
     
 }

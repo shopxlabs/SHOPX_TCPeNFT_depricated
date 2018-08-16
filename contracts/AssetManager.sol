@@ -108,6 +108,9 @@ contract AssetManager is Owned {
       return assetData.getAssetIdByAddress(_assetAddress);
     }    
 
+    //@desc if new data contract is deployed, the creator proposes manager adress then the manager needs to accept
+    function acceptOwnership() public onlyOwner {
+        assetData.acceptOwnership();
+    }
 
-
-}
+} 

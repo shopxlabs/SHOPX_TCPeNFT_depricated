@@ -149,5 +149,9 @@ contract ArbitrationManager is Owned {
         arbitration.set2xStakeByReporter();
         splytManager.internalContribute(arbitration.reporter(), arbitration.asset(), arbitration.baseStake()); 
     }
-   
+    //@desc if new data contract is deployed, the creator proposes manager adress then the manager needs to accept
+    function acceptOwnership() public onlyOwner {
+        arbitrationData.acceptOwnership();
+    }
+
 }

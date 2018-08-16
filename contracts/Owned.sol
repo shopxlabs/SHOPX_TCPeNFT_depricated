@@ -19,7 +19,7 @@ contract Owned {
         _;
     }
 
-    //proposes new ownership
+    //proposes new manager ownership
     function transferOwnership(address newOwner) public onlyOwner {
         pendingOwner = newOwner;
     }
