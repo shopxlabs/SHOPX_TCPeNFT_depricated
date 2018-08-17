@@ -126,21 +126,7 @@ contract OrderManager is Owned, Events {
         }
 
     }
-
-    //@desc for fractional purchases
-    // function isFractional(address _assetAddress, uint _qty, uint _tokenAmount) private {
-
-        // uint orderId = orderData.orderIdByAsset[_assetAddress];
-        // orderData.save(_assetAddress, msg.sender, _qty, _tokenAmount); //save it to the data contract                
-      
-    // function addToContributions(address _contributor, uint _contributing) private {
-    //     amountFunded += _contributing;
-    //     contributions[_contributor] += _contributing;
-    // }
-    
-
-    // }
-
+ 
     function setStatus(uint _orderId, OrderData.Statuses _status) public returns (bool) {
 
         orderData.setStatus(_orderId, _status); //update the status                
@@ -224,6 +210,10 @@ contract OrderManager is Owned, Events {
     function getDataVersion() public view returns (uint) {
       return orderData.version();
     }    
+
+    function getFractionalOrderIdByAsset(address _assetAddress) public view returns (uint) {
+        return orderData.getFractionalOrderIdByAsset(_assetAddress);
+    }   
 
 
     function getOrdersLength() public view returns (uint) {

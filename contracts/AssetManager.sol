@@ -72,6 +72,11 @@ contract AssetManager is Owned {
     }
 
     //@desc get asset status
+    function getType(address _assetAddress) public view returns (Asset.AssetTypes) {
+        return Asset(_assetAddress).assetType();
+    }
+
+    //@desc get asset status
     function getStatus(address _assetAddress) public view returns (Asset.Statuses) {
         return Asset(_assetAddress).status();
     }

@@ -22,7 +22,7 @@ contract OrderData is Owned {
         mapping (bytes12 => address) addressAttributes; //for future
     }
     
-    enum Statuses { PIF, CLOSED, REQUESTED_REFUND, REFUNDED, OPEN_CONTRIBUTIONS, CONTRIBUTIONS_FULFILLED, OTHER }
+    enum Statuses { NA, PIF, CLOSED, REQUESTED_REFUND, REFUNDED, OPEN_CONTRIBUTIONS, CONTRIBUTIONS_FULFILLED, OTHER }
     enum Reasons { NA, DEFECTIVE, NO_REASON, CHANGED_MIND, OTHER }
 
     uint public version = 1;

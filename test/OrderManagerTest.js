@@ -14,6 +14,8 @@ contract('OrderManagerTest general test cases.', function(accounts) {
   const defaultPrice = 1000;
   const defaultExpDate = (new Date().getTime() / 1000) + 60;
   const defaultAssetId = "0x31f2ae92057a7123ef0e490a";
+  const defaultAssetFractionalId = "0x31f2ae92057a7123ef0e490b";
+
   const defaultInventoryCount = 2;
 
   let satTokenInstance;
@@ -22,6 +24,10 @@ contract('OrderManagerTest general test cases.', function(accounts) {
 
   let splytManagerInstance;
   let assetInstance;
+  let assetAddress;
+
+  let assetFractionalInstance;
+  let assetFractionalAddress;
 
   //Instantiate the contracts
   init();
@@ -35,6 +41,17 @@ contract('OrderManagerTest general test cases.', function(accounts) {
 
   }
 
+  async function create_assetFractional(_assetId = defaultAssetFractionalId, _term = 15, _seller = defaultSeller, _title = "MyTitle",
+      _totalCost = defaultPrice, _expirationDate = defaultExpDate, _mpAddress = defaultMarketPlace, _mpAmount = 2, _inventoryCount = 1) {
+
+    await assetManagerInstance.createAsset(_assetId, _term, _seller, _title, _totalCost, _expirationDate, _mpAddress, _mpAmount, _inventoryCount);
+    assetFractionalAddress = await assetManagerInstance.getAddressById(_assetId);
+    assetFractionalInstance = await Asset.at(assetFractionalAddress);
+
+  }
+
+
+
   async function purchase(_assetAddress = "0x31f2ae92057a7123ef0e490a", _quantity = 1, _amount = defaultPrice) {
 
     await orderManagerInstance.purchase(_assetAddress, _quantity, _amount, { from: defaultBuyer });
@@ -42,6 +59,7 @@ contract('OrderManagerTest general test cases.', function(accounts) {
     // assetInstance = await Asset.at(assetAddress);
 
   }
+
 
   //Instantiate it only once
   async function init() {
@@ -130,51 +148,55 @@ contract('OrderManagerTest general test cases.', function(accounts) {
     await orderManagerInstance.requestRefund(1, { from: defaultBuyer });
     status = await orderManagerInstance.getStatus(1);
     // console.log('status after requesting a refund: ' + status);
-    assert.equal(status, 2, "status not in 2=REQUESTED_REFUND!");
+    assert.equal(status, 3, "status not in 2=REQUESTED_REFUND!");
   })
 
   it('should seller be able to approve refund!', async function() {
     let status = await orderManagerInstance.getStatus(1);
-    console.log('current status: ' + status);
+    // console.log('current status: ' + status);
     await orderManagerInstance.approveRefund(1, { from: defaultSeller });
     status = await orderManagerInstance.getStatus(1);
-    console.log('status after requesting a refund: ' + status);
-    assert.equal(status, 3, "status not in 3=REFUND_APPROVED!");
+    // console.log('status after requesting a refund: ' + status);
+    assert.equal(status, 4, "status not in 4=REFUND_APPROVED!");
   })
 
 
-  it('should current inventory at 0', async function() {
+  //Test for fractional payments
 
-    let inventory = await assetInstance.inventoryCount();
+  it('should create fractional asset', async function() {
 
+    await create_assetFractional();
+
+    // console.log('regular asset address: ' + assetAddress);  
+    // console.log('fractional asset address: ' + assetFractionalAddress);
+
+    let type = await assetManagerInstance.getType(assetFractionalAddress);
+    // console.log('asset type: ' + type);
     // console.log('current inventory count: ' + inventory);
-
-    // await create_asset();
-    // assert.equal(orderId, , 'No money should be transfered to seller\'s wallet!');
-    // let status = await assetInstance.status();
-    // console.log('status: ' + status);
-    // assert.equal(true, false, "Asset status is NOT 1=ACTIVE as expected!");
+    assert.equal(type, 1, "Asset type is not 1 as expected!");
   })
 
-  // it('should status be 2=IN_ARBITRATION', async function() {
-  //   await create_asset();
+ 
+  it('should get status 4=OPEN_CONTRIBUTIONS for fractional asset', async function() {
+    // await purchase(assetFractionalAddress, 0, defaultPrice);
+    let orderId = await orderManagerInstance.getFractionalOrderIdByAsset(assetFractionalAddress);
+    console.log('order id: ' + orderId);
+    let status = await orderManagerInstance.getStatus(orderId);
+    console.log('status of order: ' + status);
+    // console.log('asset type: ' + type);
+    // console.log('current inventory count: ' + inventory);
+    // assert.equal(status, 4, "Asset type is not 4=OPEN_CONTRIBUTIONS as expected!");
+  })
 
-  //   // console.log('asset address: ' + assetAddress);
-  //   await assetManagerInstance.setStatus(assetAddress, 2);
-  //   let status = await assetInstance.status();
-  //   // console.log('status: ' + status);
-  //   assert.equal(status, 2, "Asset status is NOT 2=IN_ARBITRATION as expected!");
-  // })
-
-
-  // it('should status be 3=EXPIRED', async function() {
-  //   await create_asset();
-
-  //   // console.log('asset address: ' + assetAddress);
-  //   await assetManagerInstance.setStatus(assetAddress, 3);
-  //   let status = await assetInstance.status();
-  //   // console.log('status: ' + status);
-  //   assert.equal(status, 3, "Asset status is NOT 3=EXPIRED as expected!");
+  // it('should submit a payment for fractional asset', async function() {
+  //   await purchase(assetFractionalAddress, 0, defaultPrice);
+  //   let orderId = await orderManagerInstance.getFractionalOrderIdByAsset(assetFractionalAddress);
+  //   console.log('order id: ' + orderId);
+  //   let status = await orderManagerInstance.getStatus(orderId);
+  //   console.log('status of order: ' + status);
+  //   // console.log('asset type: ' + type);
+  //   // console.log('current inventory count: ' + inventory);
+  //   assert.equal(status, 4, "Asset type is not 1 as expected!");
   // })
 
   // it('should status be 4=CLOSED', async function() {
