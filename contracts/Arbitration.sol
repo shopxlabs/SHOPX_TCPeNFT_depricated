@@ -16,7 +16,7 @@ contract Arbitration is Owned {
     uint public baseStake;
     uint public reporterStakeTotal;
     uint public sellerStakeTotal;
-    
+
     Winners public winner;
     Statuses public status;
 
@@ -46,8 +46,9 @@ contract Arbitration is Owned {
 
         status = Statuses.REPORTED;
         asset = _assetAddress;
-
         owner = msg.sender;
+
+        sellerStakeTotal += _stakeAmount;
     }  
     
     //@desc selected arbitrator gets to decide case
@@ -77,8 +78,7 @@ contract Arbitration is Owned {
     function set2xStakeBySeller() public onlyOwner {
         sellerStakeTotal += baseStake; //match reported stake by seller
         status = Statuses.SELLER_STAKED_2X;
-        // splytManager.internalContribute (asset.seller(), this, baseStake); 
-        // emit Success(4, address(arbitration)); 
+        sellerStakeTotal += baseStake;
     }      
 
     //@desc report puts in 2x stake
@@ -86,12 +86,14 @@ contract Arbitration is Owned {
         reporterStakeTotal += baseStake;
         //match reported stake by seller
         status = Statuses.REPORTER_STAKED_2X;
-        // splytManager.internalContribute (reporter, this, baseStake); 
-        // emit Success(4, address(arbitration)); 
+        reporterStakeTotal += baseStake;
     }     
     
     function getSeller() public view returns (address) {
         return Asset(asset).seller();
     }  
 
+    function getTotalStake() public view returns (uint) {
+        return (sellerStakeTotal + reporterStakeTotal);
+    }  
 }
