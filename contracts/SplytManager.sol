@@ -75,6 +75,14 @@ contract SplytManager is Events, Owned {
         arbitrationManager = ArbitrationManager(_newAddress);
     }      
  
+    function setTokenContract(address _newAddress) public onlyOwner {
+        satToken = SatToken(_newAddress);
+    }      
+
+    function setStakeContract(address _newAddress) public onlyOwner {
+        stake = Stake(_newAddress);
+    } 
+
     //@desc User for single buy to transfer tokens from buyer address to seller address
     //TODO: add security
     function internalContribute(address _from, address _to, uint _amount) public onlyManagers returns (bool) {
