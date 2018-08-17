@@ -82,9 +82,11 @@ contract OrderManager is Owned, Events {
     //@desc for regular normal purchase order
     function createOrder(address _assetAddress, uint _qty, uint _tokenAmount) private {
 
+        Asset asset = Asset(_assetAddress);
+
         uint buyerBalance = splytManager.getBalance(msg.sender);
-        uint totalCost = Asset(_assetAddress).totalCost() * _qty;
-        uint inventoryCount = Asset(_assetAddress).inventoryCount();
+        uint totalCost = asset.totalCost() * _qty;
+        uint inventoryCount = asset.inventoryCount();
         if (_tokenAmount < totalCost || buyerBalance < totalCost || _qty > inventoryCount) {
             revert();
         }
@@ -92,7 +94,7 @@ contract OrderManager is Owned, Events {
         uint mpGets; //marketplaces commission
         uint sellerGets;
 
-        Asset asset = Asset(_assetAddress);
+        
         (mpGets, sellerGets) = calcDistribution(asset.totalCost(), asset.getMarketPlacesLength(), asset.kickbackAmount());
         splytManager.internalContribute(msg.sender, asset.seller(), sellerGets);
         
