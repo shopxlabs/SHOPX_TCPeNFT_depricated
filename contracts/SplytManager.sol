@@ -48,10 +48,6 @@ contract SplytManager is Events, Owned {
 
     //@desc set all contracts it's interacting with
     constructor(address _tokenAddress, address _stakeAddress) public {
-    // constructor(address _assetManager, address _orderManager, address _arbitrationManager, address _token, address _stake) public {
-        // orderManager = new OrderManager(msg.sender);
-        // assetManager = new AssetManager(msg.sender);
-        // arbitrationManager = new ArbitrationManager(msg.sender);    
         owner = msg.sender; //the wallet used to deploy these contracts
         satToken = SatToken(_tokenAddress);
         stake = Stake(_stakeAddress);            

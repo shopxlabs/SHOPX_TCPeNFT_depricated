@@ -181,13 +181,13 @@ contract('OrderManagerTest general test cases.', function(accounts) {
     await purchase(assetFractionalAddress, 0, 500);
 
     let orderId = await orderManagerInstance.getFractionalOrderIdByAsset(assetFractionalAddress);
-    console.log('order id: ' + orderId);
+    // console.log('order id: ' + orderId);
 
     let status = await orderManagerInstance.getStatus(orderId);
-    console.log('status of order: ' + status);
+    // console.log('status of order: ' + status);
 
     let totalContributions = await orderManagerInstance.getTotalContributions(orderId);
-    console.log('total contributions: ' + totalContributions);
+    // console.log('total contributions: ' + totalContributions);
     
     assert.equal(status, 5, "Order status is not 5=CONTRIBUTIONS_OPEN as expected!");
   })
@@ -196,22 +196,20 @@ contract('OrderManagerTest general test cases.', function(accounts) {
     await purchase(assetFractionalAddress, 0, 500);
 
     let orderId = await orderManagerInstance.getFractionalOrderIdByAsset(assetFractionalAddress);
-    console.log('order id: ' + orderId);
+    // console.log('order id: ' + orderId);
 
     let totalContributions = await orderManagerInstance.getTotalContributions(orderId);
-    console.log('total contributions: ' + totalContributions);
+    // console.log('total contributions: ' + totalContributions);
 
     let status = await orderManagerInstance.getStatus(orderId);
-    console.log('status of order: ' + status);
+    // console.log('status of order: ' + status);
 
     assert.equal(status, 6, "Order status is not 6=CONTRIBUTIONS_FULFILLED as expected!");
   })
 
   it('should return asset status 4=SOLD_OUT after all contributions have been made', async function() {
     let status = await assetFractionalInstance.status();
-    console.log('status of asset: ' + status);
-    // console.log('asset type: ' + type);
-    // console.log('current inventory count: ' + inventory);
+    // console.log('status of asset: ' + status);
     assert.equal(status, 4, "Asset type status not 4=SOLD_OUT as expected!");
   })
 
