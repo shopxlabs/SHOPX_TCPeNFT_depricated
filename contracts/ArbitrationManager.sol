@@ -98,19 +98,6 @@ contract ArbitrationManager is Owned {
        return Arbitration(_arbitrationAddress).status();
     } 
 
-/*
-    function disputeArbitrationBySeller(address _seller) public onlySeller(_seller) onlyHasEnoughFunds(_seller) returns (bool) {
-        
-        arbitration.setDisputedStakeBySeller(initialStakeAmount);
-        
-        //now seller has 2x stake amoount
-        //original stake amount + disputed stake amoount = total stake amount by seller
-        tracker.internalContribute (_seller, this, initialStakeAmount); 
-        emit Success(4, arbitrateAddr);
-        return true;        
-        
-    }  
-*/
 
     //@desc get number of arbitrations
     function getArbitrationsLength() public view returns (uint) {
