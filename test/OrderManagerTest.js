@@ -161,7 +161,7 @@ contract('OrderManagerTest general test cases.', function(accounts) {
   })
 
 
-  //Test for fractional payments
+  //Tests below are for fractional asset payments
 
   it('should create fractional asset', async function() {
 
@@ -177,27 +177,43 @@ contract('OrderManagerTest general test cases.', function(accounts) {
   })
 
  
-  it('should get status 4=OPEN_CONTRIBUTIONS for fractional asset', async function() {
-    // await purchase(assetFractionalAddress, 0, defaultPrice);
+  it('should get status 5=CONTRIBUTIONS_OPEN for fractional asset', async function() {
+    await purchase(assetFractionalAddress, 0, 500);
+
     let orderId = await orderManagerInstance.getFractionalOrderIdByAsset(assetFractionalAddress);
     console.log('order id: ' + orderId);
+
     let status = await orderManagerInstance.getStatus(orderId);
     console.log('status of order: ' + status);
-    // console.log('asset type: ' + type);
-    // console.log('current inventory count: ' + inventory);
-    // assert.equal(status, 4, "Asset type is not 4=OPEN_CONTRIBUTIONS as expected!");
+
+    let totalContributions = await orderManagerInstance.getTotalContributions(orderId);
+    console.log('total contributions: ' + totalContributions);
+    
+    assert.equal(status, 5, "Order status is not 5=CONTRIBUTIONS_OPEN as expected!");
   })
 
-  // it('should submit a payment for fractional asset', async function() {
-  //   await purchase(assetFractionalAddress, 0, defaultPrice);
-  //   let orderId = await orderManagerInstance.getFractionalOrderIdByAsset(assetFractionalAddress);
-  //   console.log('order id: ' + orderId);
-  //   let status = await orderManagerInstance.getStatus(orderId);
-  //   console.log('status of order: ' + status);
-  //   // console.log('asset type: ' + type);
-  //   // console.log('current inventory count: ' + inventory);
-  //   assert.equal(status, 4, "Asset type is not 1 as expected!");
-  // })
+  it('should get status 6=CONTRIBUTIONS_FULFILLED for fractional asset', async function() {
+    await purchase(assetFractionalAddress, 0, 500);
+
+    let orderId = await orderManagerInstance.getFractionalOrderIdByAsset(assetFractionalAddress);
+    console.log('order id: ' + orderId);
+
+    let totalContributions = await orderManagerInstance.getTotalContributions(orderId);
+    console.log('total contributions: ' + totalContributions);
+
+    let status = await orderManagerInstance.getStatus(orderId);
+    console.log('status of order: ' + status);
+
+    assert.equal(status, 6, "Order status is not 6=CONTRIBUTIONS_FULFILLED as expected!");
+  })
+
+  it('should return asset status 4=SOLD_OUT after all contributions have been made', async function() {
+    let status = await assetFractionalInstance.status();
+    console.log('status of asset: ' + status);
+    // console.log('asset type: ' + type);
+    // console.log('current inventory count: ' + inventory);
+    assert.equal(status, 4, "Asset type status not 4=SOLD_OUT as expected!");
+  })
 
   // it('should status be 4=CLOSED', async function() {
   //   await create_asset();

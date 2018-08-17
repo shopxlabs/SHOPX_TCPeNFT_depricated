@@ -22,7 +22,7 @@ contract OrderData is Owned {
         mapping (bytes12 => address) addressAttributes; //for future
     }
     
-    enum Statuses { NA, PIF, CLOSED, REQUESTED_REFUND, REFUNDED, OPEN_CONTRIBUTIONS, CONTRIBUTIONS_FULFILLED, OTHER }
+    enum Statuses { NA, PIF, CLOSED, REQUESTED_REFUND, REFUNDED, CONTRIBUTIONS_OPEN, CONTRIBUTIONS_FULFILLED, OTHER }
     enum Reasons { NA, DEFECTIVE, NO_REASON, CHANGED_MIND, OTHER }
 
     uint public version = 1;
@@ -69,20 +69,22 @@ contract OrderData is Owned {
     }   
 
     //create new fractioinal order
-    function saveFractional(address _asset, address _contributor, uint _amount) public onlyOwner returns (uint) {
+    function saveFractional(address _asset, address _contributor, uint _amount, Statuses _status) public onlyOwner returns (uint) {
         orders[orderId].version = version;
         orders[orderId].asset = _asset;
-        orders[orderId].status = Statuses.OPEN_CONTRIBUTIONS;    
+        orders[orderId].status = _status;    
         orders[orderId].contributors[_contributor] += _amount;
         orders[orderId].totalContributions += _amount;
         fractionalOrders[_asset] = orderId;
+
         orderId++;
     }   
 
-    function updateFractional(uint _orderId, address _contributor, uint _amount) public onlyOwner returns (uint) {
+    function updateFractional(uint _orderId, address _contributor, uint _amount, Statuses _status) public onlyOwner returns (uint) {
 
         orders[_orderId].contributors[_contributor] += _amount;
         orders[_orderId].totalContributions += _amount;
+        orders[_orderId].status = _status;    
     }   
 
 

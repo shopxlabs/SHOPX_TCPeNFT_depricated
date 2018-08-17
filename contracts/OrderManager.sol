@@ -40,6 +40,12 @@ contract OrderManager is Owned, Events {
         _;
     }    
 
+    //@desc middleware to bind functions that should be called by fractional
+    modifier onlyFractionalAsset(address _assetAddress) {
+        require(Asset.AssetTypes.FRACTIONAL == Asset(_assetAddress).assetType());
+        _;
+    }    
+
     //@desc if buyer sends total amount
     // modifier onlyOrderRequestQualifies(address _assetAddress, uint _qty, uint _tokenAmount) {     
     //     uint buyerBalance = splytManager.getBalance(msg.sender);
@@ -113,16 +119,23 @@ contract OrderManager is Owned, Events {
         }
 
         uint orderId = orderData.getFractionalOrderIdByAsset(_assetAddress);
+        OrderData.Statuses currentStatus = getStatus(orderId);
+        
+        OrderData.Statuses updatedStatus;
         //check if theres' existing
-        if (orderId > 0) {
-            uint totalContributions = orderData.getTotalContributions(orderId) + _tokenAmount;
-            if (totalContributions >= Asset(_assetAddress).totalCost()) {
-                splytManager.setAssetStatus(_assetAddress, Asset.Statuses.SOLD_OUT);
-                orderData.setStatus(orderId, OrderData.Statuses.CONTRIBUTIONS_FULFILLED);
-            }
-            orderData.updateFractional(orderId, msg.sender, _tokenAmount);       
+        if (currentStatus == OrderData.Statuses.CONTRIBUTIONS_OPEN) {
+            uint totalContributions = orderData.getTotalContributions(orderId) + _tokenAmount;         
+            updatedStatus = totalContributions >= Asset(_assetAddress).totalCost() ? OrderData.Statuses.CONTRIBUTIONS_FULFILLED : OrderData.Statuses.CONTRIBUTIONS_OPEN;   
+            orderData.updateFractional(orderId, msg.sender, _tokenAmount, updatedStatus);       
         } else {
-            orderData.saveFractional(_assetAddress, msg.sender, _tokenAmount);                               
+            //create new fractional order
+            updatedStatus = _tokenAmount >=  Asset(_assetAddress).totalCost() ? OrderData.Statuses.CONTRIBUTIONS_FULFILLED : OrderData.Statuses.CONTRIBUTIONS_OPEN;          
+            orderData.saveFractional(_assetAddress, msg.sender, _tokenAmount, updatedStatus);                      
+        }
+
+        //updated asset status to PIF once all contributions are in place
+        if (updatedStatus == OrderData.Statuses.CONTRIBUTIONS_FULFILLED) {
+            splytManager.setAssetStatus(_assetAddress, Asset.Statuses.SOLD_OUT);            
         }
 
     }
@@ -186,9 +199,13 @@ contract OrderManager is Owned, Events {
     }
     
     function requestRefund(uint _orderId) public onlyBuyer(_orderId) {
-        orderData.setStatus(_orderId, OrderData.Statuses.REQUESTED_REFUND); //save it to the data contract        
-        //TODO: refund  token process        
+        orderData.setStatus(_orderId, OrderData.Statuses.REQUESTED_REFUND); //save it to the data contract              
     }    
+
+    function getTotalContributions(uint _orderId) public view returns (uint) {
+        return orderData.getTotalContributions(_orderId);
+    }
+    
 
     function getMyContributions(uint _orderId) public view returns (uint) {
         return orderData.getMyContributions(_orderId, msg.sender);
@@ -211,7 +228,8 @@ contract OrderManager is Owned, Events {
       return orderData.version();
     }    
 
-    function getFractionalOrderIdByAsset(address _assetAddress) public view returns (uint) {
+    //@desc will return error if trying to retrieve order id that is not a fractional asset
+    function getFractionalOrderIdByAsset(address _assetAddress) public view onlyFractionalAsset(_assetAddress) returns (uint) {
         return orderData.getFractionalOrderIdByAsset(_assetAddress);
     }   
 
