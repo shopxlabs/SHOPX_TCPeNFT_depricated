@@ -68,7 +68,6 @@ contract ArbitrationManager is Owned {
         if (_winner == Arbitration.Winners.REPORTER) {
             splytManager.setAssetStatus(assetAddress, Asset.Statuses.CLOSED);
             splytManager.internalContribute(assetAddress, arbitration.reporter(), winnerStake);
-             //TODO: gives the stakes to reporter
         }
         if (_winner == Arbitration.Winners.SELLER) {
             splytManager.setAssetStatus(assetAddress, Asset.Statuses.ACTIVE);
