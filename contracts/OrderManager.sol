@@ -128,15 +128,18 @@ contract OrderManager is Owned, Events {
         if (currentStatus == OrderData.Statuses.CONTRIBUTIONS_OPEN) {
             uint totalContributions = orderData.getTotalContributions(orderId) + _tokenAmount;         
             updatedStatus = totalContributions >= Asset(_assetAddress).totalCost() ? OrderData.Statuses.CONTRIBUTIONS_FULFILLED : OrderData.Statuses.CONTRIBUTIONS_OPEN;   
+            splytManager.internalContribute(msg.sender, _assetAddress, _tokenAmount); //transfer contributed amount to asset contract
             orderData.updateFractional(orderId, msg.sender, _tokenAmount, updatedStatus);       
         } else {
             //create new fractional order
             updatedStatus = _tokenAmount >=  Asset(_assetAddress).totalCost() ? OrderData.Statuses.CONTRIBUTIONS_FULFILLED : OrderData.Statuses.CONTRIBUTIONS_OPEN;          
+            splytManager.internalContribute(msg.sender, _assetAddress, _tokenAmount);  //transfer contributed amount to asset contract
             orderData.saveFractional(_assetAddress, msg.sender, _tokenAmount, updatedStatus);                      
         }
 
         //updated asset status to PIF once all contributions are in place
         if (updatedStatus == OrderData.Statuses.CONTRIBUTIONS_FULFILLED) {
+            splytManager.internalContribute(_assetAddress, Asset(_assetAddress).seller(), Asset(_assetAddress).totalCost()); //Once all has been contributed, transfer to seller
             splytManager.setAssetStatus(_assetAddress, Asset.Statuses.SOLD_OUT);            
         }
 
