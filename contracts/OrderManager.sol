@@ -218,6 +218,10 @@ contract OrderManager is Owned, Events {
         splytManager = SplytManager(_address);
     }
 
+    function getDataContractAddress() public view returns (address) {
+       return address(orderData);
+    }
+
     function setDataContract(address _orderData) public onlyOwner {
        orderData = OrderData(_orderData);
     }
@@ -235,7 +239,6 @@ contract OrderManager is Owned, Events {
         return orderData.getFractionalOrderIdByAsset(_assetAddress);
     }   
 
-
     function getOrdersLength() public view returns (uint) {
       return orderData.orderId();
     }       
@@ -245,10 +248,10 @@ contract OrderManager is Owned, Events {
         orderData.transferOwnership(_newAddress);
     }
 
-
     //@desc if new data contract is deployed, the creator proposes manager adress then the manager needs to accept
     function acceptOwnership() public onlyOwner {
         orderData.acceptOwnership();
+
     }    
     
 }

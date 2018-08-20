@@ -25,17 +25,25 @@ Ethereum contracts for split protocol
 ### Schema in Ver 0.2.0. 
 Contracts are modular meaning they can be exchanged for updated contracts and disregard the old EXCEPT the Data contracts.  
 
-** Deploy contracts schema.    
-Remeber only the wallet used to deploy these contracts are the 'owner'. The role gives him/her rights to swap addresses.
--  Deploy 'Data' contracts. Save the address to be used for manager contracts.  
--  Deploy 'Manager' contracts second and insert the 'Data' contract address. For example AssetData.sol is being used with AssetManager.sol. Now go back go the correlating data contract and setManager(manager address). This will set security of what contracts are allowed to perform certain functions.  
--  Deploy the SplyManager contract and pass the addresses of all the managers in the constructor.  
+** Initial Deploy Contracts Schema.    
+Remeber only the wallet used to deploy these contracts are the 'owner'. The role gives him/her rights to swap addresses.  
+-  Deploy the SatToken contract and keep the address in hand.    
+-  Deploy the Stake contract and keep the address in hand.   
+-  Deploy the SplytManager contract and pass the SatToken and Stake addresses as the constructors.   
+-  Deploy the manager contracts with the SplytManager address as the constructor parameter.  
+-  Using the SplytManager contract, call each functions to set the manager i.e. 'setAssetManager(_newAddress)'.   
+** Note: Only manager contracts are authorized to write to the data contracts.     
 
 
-** Updating manager contracts.  
--  All contracts except the data contracts can be abandoned. Thus updated versions of the contract can be bined with the existing data contracts.
--  After updating any of the managerial contracts, you can change ownership to the new managerial contracts in the following steps.
-1.  
+### Updating manager contracts.  
+-  All contracts except the data contracts can be replaced. Thus updated versions of the manager contracts can be bined with the existing data contracts.  
+-  After updating any of the manager contracts, you can change ownership to the new manager contracts in the following steps:  
+1.  Deploy updated manager contract.  After being mined, save the new address. Do it for each manager contract you are updating. 
+2.  Using the new mangager contract call function 'setDataContract(_dataAddress)'. This will be bind the old existing data contract to the new manager contract.  
+3.  Using the old manager contract you are replacing, call function 'transferOwnership(_newAddress)' with the new manager address. This proposes new ownership.  
+4.  Using the new mangager contract call function 'acceptOwnership()'.  Now the updated manager is the owner of the data contract.  
+5.  Using splytManager update the manager contracts, 'set<ManagerContract>(_newAddress)'.  
+
 
 
 

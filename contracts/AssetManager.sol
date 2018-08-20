@@ -66,6 +66,11 @@ contract AssetManager is Owned {
         return (asset.assetId(), asset.term(), asset.inventoryCount());
     }
 
+    function getDataContractAddress() public view returns (address) {
+       return address(assetData);
+    }
+
+
     //@desc update data contract address
     function setDataContract(address _assetData) onlyOwner public {
        assetData = AssetData(_assetData);

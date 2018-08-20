@@ -108,6 +108,10 @@ contract ArbitrationManager is Owned {
        return arbitrationData.getAddressByArbitrationId(_arbitrationId);
     }
 
+    function getDataContractAddress() public view returns (address) {
+       return address(arbitrationData);
+    }
+
     //@desc change data contract
     function setDataContract(address _arbitrationData) public onlyOwner {
        arbitrationData = ArbitrationData(_arbitrationData);
