@@ -37,7 +37,7 @@ Remeber only the wallet used to deploy these contracts are the 'owner'. The role
 
 ### Updating manager contracts.  
 -  All contracts except the data contracts can be replaced. Thus updated versions of the manager contracts can be bined with the existing data contracts.  
--  After updating any of the manager contracts, you can change ownership to the new manager contracts in the following steps:  
+-  After updating any of the manager contracts, you can change ownership of the data contract from the old manager to the new manager contracts in the following steps:  
 1.  Deploy updated manager contract.  After being mined, save the new address. Do it for each manager contract you are updating. 
 2.  Using the new mangager contract call function 'setDataContract(_dataAddress)'. This will be bind the old existing data contract to the new manager contract.  
 3.  Using the old manager contract you are replacing, call function 'transferOwnership(_newAddress)' with the new manager address. This proposes new ownership.  
