@@ -70,23 +70,21 @@ contract OrderManager is Owned, Events {
 
         //Regular asset purchase or a fractional purchase
         if (asset.assetType() == Asset.AssetTypes.NORMAL) {
-            createOrder(_assetAddress, _qty, _tokenAmount);
+            createOrder(asset, _qty, _tokenAmount);
         } else {
             //Fractional ownership
-            contributeOrder(_assetAddress, _tokenAmount);            
+            contributeOrder(asset, _tokenAmount);            
         }
 
         return true;
     }
 
     //@desc for regular normal purchase order
-    function createOrder(address _assetAddress, uint _qty, uint _tokenAmount) private {
-
-        Asset asset = Asset(_assetAddress);
+    function createOrder(Asset _asset, uint _qty, uint _tokenAmount) private {
 
         uint buyerBalance = splytManager.getBalance(msg.sender);
-        uint totalCost = asset.totalCost() * _qty;
-        uint inventoryCount = asset.inventoryCount();
+        uint totalCost = _asset.totalCost() * _qty;
+        uint inventoryCount = _asset.inventoryCount();
         if (_tokenAmount < totalCost || buyerBalance < totalCost || _qty > inventoryCount) {
             revert();
         }
@@ -94,25 +92,24 @@ contract OrderManager is Owned, Events {
         uint mpGets; //marketplaces commission
         uint sellerGets;
 
-        
-        (mpGets, sellerGets) = calcDistribution(asset.totalCost(), asset.getMarketPlacesLength(), asset.kickbackAmount());
-        splytManager.internalContribute(msg.sender, asset.seller(), sellerGets);
+        (mpGets, sellerGets) = calcDistribution(_asset.totalCost(), _asset.getMarketPlacesLength(), _asset.kickbackAmount());
+        splytManager.internalContribute(msg.sender, _asset.seller(), sellerGets);
         
         //distribute commission to all the market places
         if(mpGets > 0) {
-            for(uint i = 0; i < asset.getMarketPlacesLength(); i++) {
-                splytManager.internalContribute(msg.sender, asset.getMarketPlaceByIndex(i), mpGets);
+            for(uint i = 0; i < _asset.getMarketPlacesLength(); i++) {
+                splytManager.internalContribute(msg.sender, _asset.getMarketPlaceByIndex(i), mpGets);
             }
         }
 
-        orderData.save(_assetAddress, msg.sender, _qty, _tokenAmount); //save it to the data contract                
-        splytManager.subtractInventory(_assetAddress, _qty); //update inventory
+        orderData.save(address(_asset), msg.sender, _qty, _tokenAmount); //save it to the data contract                
+        splytManager.subtractInventory(address(_asset), _qty); //update inventory
     //     emit NewOrder(200, orderId);
     //     return orderId;
     }
 
     //@desc for fractional purchases
-    function contributeOrder(address _assetAddress, uint _tokenAmount) private {
+    function contributeOrder(Asset _asset, uint _tokenAmount) private {
        
         uint buyerBalance = splytManager.getBalance(msg.sender);
         //check if buyer has the amount he proposes to use to contribute
@@ -120,27 +117,27 @@ contract OrderManager is Owned, Events {
             revert();
         }
 
-        uint orderId = orderData.getFractionalOrderIdByAsset(_assetAddress);
+        uint orderId = orderData.getFractionalOrderIdByAsset(address(_asset));
         OrderData.Statuses currentStatus = getStatus(orderId);
         
         OrderData.Statuses updatedStatus;
         //check if theres' existing
         if (currentStatus == OrderData.Statuses.CONTRIBUTIONS_OPEN) {
             uint totalContributions = orderData.getTotalContributions(orderId) + _tokenAmount;         
-            updatedStatus = totalContributions >= Asset(_assetAddress).totalCost() ? OrderData.Statuses.CONTRIBUTIONS_FULFILLED : OrderData.Statuses.CONTRIBUTIONS_OPEN;   
-            splytManager.internalContribute(msg.sender, _assetAddress, _tokenAmount); //transfer contributed amount to asset contract
+            updatedStatus = totalContributions >= _asset.totalCost() ? OrderData.Statuses.CONTRIBUTIONS_FULFILLED : OrderData.Statuses.CONTRIBUTIONS_OPEN;   
+            splytManager.internalContribute(msg.sender, address(_asset), _tokenAmount); //transfer contributed amount to asset contract
             orderData.updateFractional(orderId, msg.sender, _tokenAmount, updatedStatus);       
         } else {
             //create new fractional order
-            updatedStatus = _tokenAmount >=  Asset(_assetAddress).totalCost() ? OrderData.Statuses.CONTRIBUTIONS_FULFILLED : OrderData.Statuses.CONTRIBUTIONS_OPEN;          
-            splytManager.internalContribute(msg.sender, _assetAddress, _tokenAmount);  //transfer contributed amount to asset contract
-            orderData.saveFractional(_assetAddress, msg.sender, _tokenAmount, updatedStatus);                      
+            updatedStatus = _tokenAmount >=  _asset.totalCost() ? OrderData.Statuses.CONTRIBUTIONS_FULFILLED : OrderData.Statuses.CONTRIBUTIONS_OPEN;          
+            splytManager.internalContribute(msg.sender, address(_asset), _tokenAmount);  //transfer contributed amount to asset contract
+            orderData.saveFractional(address(_asset), msg.sender, _tokenAmount, updatedStatus);                      
         }
 
         //updated asset status to PIF once all contributions are in place
         if (updatedStatus == OrderData.Statuses.CONTRIBUTIONS_FULFILLED) {
-            splytManager.internalContribute(_assetAddress, Asset(_assetAddress).seller(), Asset(_assetAddress).totalCost()); //Once all has been contributed, transfer to seller
-            splytManager.setAssetStatus(_assetAddress, Asset.Statuses.SOLD_OUT);            
+            splytManager.internalContribute(address(_asset), _asset.seller(), _asset.totalCost()); //Once all has been contributed, transfer to seller
+            splytManager.setAssetStatus(address(_asset), Asset.Statuses.SOLD_OUT);            
         }
 
     }
