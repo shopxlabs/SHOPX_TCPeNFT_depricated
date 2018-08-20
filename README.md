@@ -42,7 +42,7 @@ Remeber only the wallet used to deploy these contracts are the 'owner'. The role
 2.  Using the new mangager contract call function 'setDataContract(_dataAddress)'. This will be bind the old existing data contract to the new manager contract.  
 3.  Using the old manager contract you are replacing, call function 'transferOwnership(_newAddress)' with the new manager address. This proposes new ownership.  
 4.  Using the new mangager contract call function 'acceptOwnership()'.  Now the updated manager is the owner of the data contract.  
-5.  Using splytManager update the manager contracts, 'setManagerContract(_newAddress)'.  
+5.  Using splytManager update the manager contracts, i.e. 'setAssetManager(_newAddress)'.  
 
 
 
