@@ -142,6 +142,12 @@ contract ArbitrationManager is Owned {
         arbitration.set2xStakeByReporter();
         splytManager.internalContribute(arbitration.reporter(), arbitration.asset(), arbitration.baseStake()); 
     }
+   //@desc new manager contract that's going to be replacing this
+   //Old manager call this function and proposes the new address
+    function transferOwnership(address _newAddress) public onlyOwner {
+        arbitrationData.transferOwnership(_newAddress);
+    }
+
     //@desc if new data contract is deployed, the creator proposes manager adress then the manager needs to accept
     function acceptOwnership() public onlyOwner {
         arbitrationData.acceptOwnership();

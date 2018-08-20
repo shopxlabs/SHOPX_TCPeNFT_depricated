@@ -239,6 +239,12 @@ contract OrderManager is Owned, Events {
     function getOrdersLength() public view returns (uint) {
       return orderData.orderId();
     }       
+   //@desc new manager contract that's going to be replacing this
+   //Old manager call this function and proposes the new address
+    function transferOwnership(address _newAddress) public onlyOwner {
+        orderData.transferOwnership(_newAddress);
+    }
+
 
     //@desc if new data contract is deployed, the creator proposes manager adress then the manager needs to accept
     function acceptOwnership() public onlyOwner {

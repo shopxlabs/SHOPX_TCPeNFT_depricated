@@ -32,4 +32,10 @@ Remeber only the wallet used to deploy these contracts are the 'owner'. The role
 -  Deploy the SplyManager contract and pass the addresses of all the managers in the constructor.  
 
 
+** Updating manager contracts.  
+-  All contracts except the data contracts can be abandoned. Thus updated versions of the contract can be bined with the existing data contracts.
+-  After updating any of the managerial contracts, you can change ownership to the new managerial contracts in the following steps.
+1.  
+
+
 

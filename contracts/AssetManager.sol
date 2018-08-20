@@ -105,6 +105,7 @@ contract AssetManager is Owned {
         splytManager = SplytManager(_address);
     }
 
+
     function getAddressById(bytes12 _assetId) public view returns (address) {
       return assetData.getAddressByAssetId(_assetId);
     }
@@ -112,8 +113,15 @@ contract AssetManager is Owned {
     function getIdByAddress(address _assetAddress) public view returns (bytes12) {
       return assetData.getAssetIdByAddress(_assetAddress);
     }    
+   
+   //@desc new manager contract that's going to be replacing this
+   //Old manager call this function and proposes the new address
+    function transferOwnership(address _newAddress) public onlyOwnerOrSplyt {
+        assetData.transferOwnership(_newAddress);
+    }
 
     //@desc if new data contract is deployed, the creator proposes manager adress then the manager needs to accept
+    //The new updated manager contract calls this function
     function acceptOwnership() public onlyOwner {
         assetData.acceptOwnership();
     }
