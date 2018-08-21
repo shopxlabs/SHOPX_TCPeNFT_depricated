@@ -7,6 +7,10 @@ import "./Asset.sol";
 
 // TODO: use interface instead of importing whole contracts after later sprints
 
+contract ManagerHistoryInterface {
+    function isApprovedManager(address) public returns (bool);
+}
+
 contract Asset is Events, Owned {
     
     enum AssetTypes { NORMAL, FRACTIONAL }
@@ -28,12 +32,20 @@ contract Asset is Events, Owned {
     
     uint public initialStakeAmount;
 
+    ManagerHistoryInterface managerHistory; //address of contract that has history of managers
+
     mapping(address => uint) contributions;
     // address arbitrateAddr = 0x0;
     
     address arbitration;
     
     uint public inventoryCount;
+
+    //We need this because when we deploy new managers to replace the old, the old will still be the owner.
+    modifier onlyApprovedManagers() {
+        require(managerHistory.isApprovedManager(msg.sender) == true);
+        _;
+    }
 
     constructor(
         bytes12 _assetId, 
@@ -45,7 +57,8 @@ contract Asset is Events, Owned {
         address _mpAddress, 
         uint _mpAmount,
         uint _inventoryCount,
-        uint _stakeAmount
+        uint _stakeAmount,
+        address _managerHistory
         ) public {
             assetId = _assetId;
             term = _term;
@@ -61,10 +74,10 @@ contract Asset is Events, Owned {
             status = Statuses.ACTIVE;
             assetType =  _term > 0 ? AssetTypes.FRACTIONAL : AssetTypes.NORMAL;
             owner = msg.sender; //assetManager deploys the asset thus the owner
-          
+            managerHistory = ManagerHistoryInterface(_managerHistory);
     }
 
-    function setStatus(Statuses _status) public onlyOwner {
+    function setStatus(Statuses _status) public onlyApprovedManagers {
         status = _status;
     }
 
@@ -77,12 +90,12 @@ contract Asset is Events, Owned {
         return listOfMarketPlaces.length;
     }   
   
-    function addInventory(uint _qty) public onlyOwner {
+    function addInventory(uint _qty) public onlyApprovedManagers {
         inventoryCount += _qty;
     }  
 
     //assetManager is the owner
-     function subtractInventory(uint _qty) public onlyOwner {
+     function subtractInventory(uint _qty) public onlyApprovedManagers {
         inventoryCount -=  _qty;
         if (inventoryCount == 0) {
             status = Statuses.SOLD_OUT;
@@ -90,7 +103,7 @@ contract Asset is Events, Owned {
     }   
 
     //assetManager is the owner
-     function setInventory(uint _count) public onlyOwner {
+     function setInventory(uint _count) public onlyApprovedManagers {
         inventoryCount = _count;
     }   
 

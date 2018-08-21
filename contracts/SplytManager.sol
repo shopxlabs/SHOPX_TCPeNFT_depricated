@@ -3,7 +3,7 @@ pragma solidity ^0.4.24;
 import "./AssetManager.sol";
 import "./OrderManager.sol";
 import "./ArbitrationManager.sol";
-import "./SystemData.sol";
+import "./ManagerHistory.sol";
 
 import "./Events.sol";
 import "./Owned.sol";
@@ -34,7 +34,7 @@ contract SplytManager is Events, Owned {
     OrderManager public orderManager;
     ArbitrationManager public arbitrationManager;
 
-    SystemData systemData;
+    ManagerHistory public managerHistory;
 
     //only these managers are allowed to call these functions
     modifier onlyManagers() {
@@ -50,11 +50,11 @@ contract SplytManager is Events, Owned {
     // event Error(uint _code, string _message);
 
     //@desc set all contracts it's interacting with
-    constructor(address _tokenAddress, address _stakeAddress, address _systemData) public {
+    constructor(address _tokenAddress, address _stakeAddress, address _managerHistoryAddress) public {
         owner = msg.sender; //the wallet used to deploy these contracts
         satToken = SatToken(_tokenAddress);
-        stake = Stake(_stakeAddress);            
-        systemData = SystemData(_systemData);
+        stake = Stake(_stakeAddress);
+        managerHistory = ManagerHistory(_managerHistoryAddress);            
     }
 
     //@desc sets all the managers at once
@@ -67,7 +67,7 @@ contract SplytManager is Events, Owned {
     //@desc used to update contracts
     function setAssetManager(address _newAddress) public onlyOwner {
         assetManager = AssetManager(_newAddress);
-        systemData.addManager(_newAddress);
+        managerHistory.addManager(_newAddress);
     }    
 
     //TODO: add security
@@ -125,5 +125,16 @@ contract SplytManager is Events, Owned {
     function addInventory(address _assetAddress, uint _quantity) public onlyManagers {
         assetManager.addInventory(_assetAddress, _quantity);
     }    
+
+    //@desc set the manager data
+    function setManagerHistory(address _address) public onlyOwner {
+        managerHistory = ManagerHistory(_address);
+    }   
+
+    //@desc used to update    
+    function getManagerHistoryAddress() public view returns (address) {
+        return address(managerHistory);
+    }    
+
 
 }

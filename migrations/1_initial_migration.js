@@ -12,6 +12,8 @@ var AssetData = artifacts.require("./AssetData.sol")
 var ArbitrationManager = artifacts.require("./ArbitrationManager.sol")
 var ArbitrationData = artifacts.require("./ArbitrationData.sol")
 
+var ManagerHistory = artifacts.require("./ManagerHistory.sol")
+
 var Stake = artifacts.require("./Stake.sol")
 var chalk = require('chalk')
 
@@ -48,9 +50,14 @@ module.exports = function(deployer, network, accounts) {
     var stake = await deployer.deploy(Stake, 10000000000000, 2000000000, 100, walletConfig)
     console.log('Stake address: ', stake.address)
 
-    //TODO: splytManager
-    var splytManager = await deployer.deploy(SplytManager, SatToken.address, stake.address, walletConfig)
+    var managerHistory = await deployer.deploy(ManagerHistory, walletConfig)
+    console.log('Manager History address: ', managerHistory.address)
+
+    var splytManager = await deployer.deploy(SplytManager, SatToken.address, stake.address, managerHistory.address, walletConfig)
     console.log('Splyt Manager address: ', splytManager.address)
+
+    //add splyt manager
+    managerHistory.addManager(splytManager.address, walletConfig);
 
     var assetManager = await deployer.deploy(AssetManager, splytManager.address, walletConfig)
     console.log('AssetManager address: ', assetManager.address)
