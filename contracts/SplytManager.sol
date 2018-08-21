@@ -3,6 +3,7 @@ pragma solidity ^0.4.24;
 import "./AssetManager.sol";
 import "./OrderManager.sol";
 import "./ArbitrationManager.sol";
+import "./SystemData.sol";
 
 import "./Events.sol";
 import "./Owned.sol";
@@ -33,6 +34,8 @@ contract SplytManager is Events, Owned {
     OrderManager public orderManager;
     ArbitrationManager public arbitrationManager;
 
+    SystemData systemData;
+
     //only these managers are allowed to call these functions
     modifier onlyManagers() {
         require(msg.sender == address(orderManager) || msg.sender == address(assetManager) || msg.sender == address(arbitrationManager));
@@ -47,10 +50,11 @@ contract SplytManager is Events, Owned {
     // event Error(uint _code, string _message);
 
     //@desc set all contracts it's interacting with
-    constructor(address _tokenAddress, address _stakeAddress) public {
+    constructor(address _tokenAddress, address _stakeAddress, address _systemData) public {
         owner = msg.sender; //the wallet used to deploy these contracts
         satToken = SatToken(_tokenAddress);
         stake = Stake(_stakeAddress);            
+        systemData = SystemData(_systemData);
     }
 
     //@desc sets all the managers at once
@@ -63,6 +67,7 @@ contract SplytManager is Events, Owned {
     //@desc used to update contracts
     function setAssetManager(address _newAddress) public onlyOwner {
         assetManager = AssetManager(_newAddress);
+        systemData.addManager(_newAddress);
     }    
 
     //TODO: add security
