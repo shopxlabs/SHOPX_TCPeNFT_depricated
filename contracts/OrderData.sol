@@ -152,5 +152,4 @@ contract OrderData is Owned {
         return orders[_orderId].addressAttributes[_attributeKey];    
     }       
 
-
 }

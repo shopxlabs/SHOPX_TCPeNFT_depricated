@@ -55,13 +55,18 @@ contract SplytManager is Events, Owned {
         satToken = SatToken(_tokenAddress);
         stake = Stake(_stakeAddress);
         authorizer = Authorizer(_authorizerAddress);            
+
     }
 
     //@desc sets all the managers at once
     function setManagers(address _assetManager, address _orderManager, address _arbitrationManager) public onlyOwner {
         assetManager = AssetManager(_assetManager);
         orderManager = OrderManager(_orderManager);   
-        arbitrationManager = ArbitrationManager(_arbitrationManager);             
+        arbitrationManager = ArbitrationManager(_arbitrationManager);     
+
+        authorizer.add(_assetManager);   
+        authorizer.add(_orderManager);       
+        authorizer.add(_arbitrationManager);                            
     }        
 
     //@desc used to update contracts
@@ -70,14 +75,15 @@ contract SplytManager is Events, Owned {
         authorizer.add(_newAddress);
     }    
 
-    //TODO: add security
     //@desc used to update contracts
     function setOrderManager(address _newAddress) public onlyOwner {
         orderManager = OrderManager(_newAddress);
+        authorizer.add(_newAddress);
     } 
     //@desc used to update contracts
     function setArbitrationManager(address _newAddress) public onlyOwner {
         arbitrationManager = ArbitrationManager(_newAddress);
+        authorizer.add(_newAddress);
     }      
  
     function setTokenContract(address _newAddress) public onlyOwner {
