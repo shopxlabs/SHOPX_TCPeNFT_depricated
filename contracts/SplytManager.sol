@@ -3,7 +3,7 @@ pragma solidity ^0.4.24;
 import "./AssetManager.sol";
 import "./OrderManager.sol";
 import "./ArbitrationManager.sol";
-import "./ManagerHistory.sol";
+import "./Authorizer.sol";
 
 import "./Events.sol";
 import "./Owned.sol";
@@ -34,7 +34,7 @@ contract SplytManager is Events, Owned {
     OrderManager public orderManager;
     ArbitrationManager public arbitrationManager;
 
-    ManagerHistory public managerHistory;
+    Authorizer public authorizer;
 
     //only these managers are allowed to call these functions
     modifier onlyManagers() {
@@ -50,11 +50,11 @@ contract SplytManager is Events, Owned {
     // event Error(uint _code, string _message);
 
     //@desc set all contracts it's interacting with
-    constructor(address _tokenAddress, address _stakeAddress, address _managerHistoryAddress) public {
+    constructor(address _tokenAddress, address _stakeAddress, address _authorizerAddress) public {
         owner = msg.sender; //the wallet used to deploy these contracts
         satToken = SatToken(_tokenAddress);
         stake = Stake(_stakeAddress);
-        managerHistory = ManagerHistory(_managerHistoryAddress);            
+        authorizer = Authorizer(_authorizerAddress);            
     }
 
     //@desc sets all the managers at once
@@ -67,7 +67,7 @@ contract SplytManager is Events, Owned {
     //@desc used to update contracts
     function setAssetManager(address _newAddress) public onlyOwner {
         assetManager = AssetManager(_newAddress);
-        managerHistory.addManager(_newAddress);
+        authorizer.add(_newAddress);
     }    
 
     //TODO: add security
@@ -127,13 +127,13 @@ contract SplytManager is Events, Owned {
     }    
 
     //@desc set the manager data
-    function setManagerHistory(address _address) public onlyOwner {
-        managerHistory = ManagerHistory(_address);
+    function setAuthorizer(address _address) public onlyOwner {
+        authorizer = Authorizer(_address);
     }   
 
     //@desc used to update    
-    function getManagerHistoryAddress() public view returns (address) {
-        return address(managerHistory);
+    function getAuthorizerAddress() public view returns (address) {
+        return address(authorizer);
     }    
 
 

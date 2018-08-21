@@ -45,7 +45,7 @@ contract AssetManager is Owned {
         }
 
         //we need the address contract of history of managers
-        address managerHistoryAddress = splytManager.getManagerHistoryAddress();
+        address authorizerAddress = splytManager.getAuthorizerAddress();
 
          Asset asset = new Asset(
             _assetId, 
@@ -58,7 +58,7 @@ contract AssetManager is Owned {
             _mpAmount,
             _inventoryCount,
             stakeTokens,
-            managerHistoryAddress
+            authorizerAddress
             ); 
 
         splytManager.internalContribute(_seller, asset, stakeTokens);

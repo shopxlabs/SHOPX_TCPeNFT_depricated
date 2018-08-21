@@ -7,8 +7,8 @@ import "./Asset.sol";
 
 // TODO: use interface instead of importing whole contracts after later sprints
 
-contract ManagerHistoryInterface {
-    function isApprovedManager(address) public returns (bool);
+contract AuthorizerInterface {
+    function isAuthorized(address) public returns (bool);
 }
 
 contract Asset is Events, Owned {
@@ -32,7 +32,7 @@ contract Asset is Events, Owned {
     
     uint public initialStakeAmount;
 
-    ManagerHistoryInterface managerHistory; //address of contract that has history of managers
+    AuthorizerInterface authorizer; //address of contract that has history of managers
 
     mapping(address => uint) contributions;
     // address arbitrateAddr = 0x0;
@@ -42,8 +42,8 @@ contract Asset is Events, Owned {
     uint public inventoryCount;
 
     //We need this because when we deploy new managers to replace the old, the old will still be the owner.
-    modifier onlyApprovedManagers() {
-        require(managerHistory.isApprovedManager(msg.sender) == true);
+    modifier onlyAuthorized() {
+        require(authorizer.isAuthorized(msg.sender) == true);
         _;
     }
 
@@ -58,7 +58,7 @@ contract Asset is Events, Owned {
         uint _mpAmount,
         uint _inventoryCount,
         uint _stakeAmount,
-        address _managerHistory
+        address _authorizer
         ) public {
             assetId = _assetId;
             term = _term;
@@ -74,10 +74,10 @@ contract Asset is Events, Owned {
             status = Statuses.ACTIVE;
             assetType =  _term > 0 ? AssetTypes.FRACTIONAL : AssetTypes.NORMAL;
             owner = msg.sender; //assetManager deploys the asset thus the owner
-            managerHistory = ManagerHistoryInterface(_managerHistory);
+            authorizer = AuthorizerInterface(_authorizer);
     }
 
-    function setStatus(Statuses _status) public onlyApprovedManagers {
+    function setStatus(Statuses _status) public onlyAuthorized {
         status = _status;
     }
 
@@ -90,12 +90,12 @@ contract Asset is Events, Owned {
         return listOfMarketPlaces.length;
     }   
   
-    function addInventory(uint _qty) public onlyApprovedManagers {
+    function addInventory(uint _qty) public onlyAuthorized {
         inventoryCount += _qty;
     }  
 
     //assetManager is the owner
-     function subtractInventory(uint _qty) public onlyApprovedManagers {
+     function subtractInventory(uint _qty) public onlyAuthorized {
         inventoryCount -=  _qty;
         if (inventoryCount == 0) {
             status = Statuses.SOLD_OUT;
@@ -103,7 +103,7 @@ contract Asset is Events, Owned {
     }   
 
     //assetManager is the owner
-     function setInventory(uint _count) public onlyApprovedManagers {
+     function setInventory(uint _count) public onlyAuthorized {
         inventoryCount = _count;
     }   
 
