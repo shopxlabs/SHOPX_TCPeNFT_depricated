@@ -7,10 +7,6 @@ import "./Asset.sol";
 
 // TODO: use interface instead of importing whole contracts after later sprints
 
-contract AuthorizerInterface {
-    function isAuthorized(address) public returns (bool);
-}
-
 contract Asset is Events, Owned {
     
     enum AssetTypes { NORMAL, FRACTIONAL }

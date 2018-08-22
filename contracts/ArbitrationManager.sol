@@ -42,7 +42,9 @@ contract ArbitrationManager is Owned {
         
         address reporter = msg.sender;
 
-        Arbitration arbitration = new Arbitration(_assetAddress, _arbitrationId, _reason, reporter, stakeAmount);
+        address authorizer = splytManager.getAuthorizerAddress();
+
+        Arbitration arbitration = new Arbitration(_assetAddress, _arbitrationId, _reason, reporter, stakeAmount, authorizer);
         arbitrationData.save(_arbitrationId, address(arbitration));
 
         //change status so no one can purchase during arbitration
