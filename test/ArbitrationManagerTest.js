@@ -106,7 +106,7 @@ contract('ArbitrationManagerTest general test cases.', function(accounts) {
     await create_arbitration();
 
     let length = await arbitrationManagerInstance.getArbitrationsLength();
-    console.log('number of arbitrations: ' + length);
+    // console.log('number of arbitrations: ' + length);
     assert.equal(length, 1, "Number of arbitrations is not 1!");
   })
 
@@ -115,7 +115,7 @@ contract('ArbitrationManagerTest general test cases.', function(accounts) {
     
     let status = await assetInstance.status();
 
-    console.log('asset status after being reported:: ' + status);
+    // console.log('asset status after being reported:: ' + status);
     assert.equal(status, 2, "Status is not in IN_ARBITRATION!");
   })
 
@@ -127,7 +127,7 @@ contract('ArbitrationManagerTest general test cases.', function(accounts) {
       assert.isTrue(false, "Should have error out. Should have not created a order if status is 2=IN_ARBITRATION!");
     } catch (e) {
       // console.log(e)
-      console.log('yes it errored out as expected since you cannot create a order in status IN_ARBITRATION')
+      // console.log('yes it errored out as expected since you cannot create a order in status IN_ARBITRATION')
       assert.isTrue(true, "should error. Expected outsome so no output!");
     }
 
@@ -137,9 +137,9 @@ contract('ArbitrationManagerTest general test cases.', function(accounts) {
   it('should be able to assign arbitrator in the Arbitration contract!', async function() {
 
     await arbitrationManagerInstance.setArbitrator(arbitrationAddress, defaultArbitrator);
-    console.log('assigning arbitrator: ' + defaultArbitrator);
+    // console.log('assigning arbitrator: ' + defaultArbitrator);
     let arbitrator = await arbitrationManagerInstance.getArbitrator(arbitrationAddress);
-    console.log('returned arbitrator: ' + arbitrator);
+    // console.log('returned arbitrator: ' + arbitrator);
     assert.equal(defaultArbitrator, arbitrator,"Arbitrator did not get assigned!");
 
   })
@@ -147,7 +147,7 @@ contract('ArbitrationManagerTest general test cases.', function(accounts) {
   it('should seller be able to 2x stake on the arbitration contract', async function() {
     await arbitrationManagerInstance.set2xStakeBySeller(arbitrationAddress, { from: defaultSeller });
     let status = await arbitrationManagerInstance.getStatus(arbitrationAddress);
-    console.log('arbitration status: ' + status);
+    // console.log('arbitration status: ' + status);
     assert.equal(1,status,"Status is not in 2=SELLER_STAKE_2x as expected!");
 
   })
@@ -155,7 +155,7 @@ contract('ArbitrationManagerTest general test cases.', function(accounts) {
  it('should reporter be able to 2x stake on the arbitration contract', async function() {
     await arbitrationManagerInstance.set2xStakeByReporter(arbitrationAddress, { from: defaultBuyer });
     let status = await arbitrationManagerInstance.getStatus(arbitrationAddress);
-    console.log('arbitration status: ' + status);
+    // console.log('arbitration status: ' + status);
     assert.equal(2,status,"Status is not in 2=REPORTER_STAKE_2x as expected!");
 
   })
@@ -165,14 +165,14 @@ contract('ArbitrationManagerTest general test cases.', function(accounts) {
     console.log('arbitrator: ' + defaultArbitrator);
     await arbitrationManagerInstance.setWinner(arbitrationAddress, 1, { from: defaultArbitrator });
     let winner = await arbitrationManagerInstance.getWinner(arbitrationAddress);
-    console.log('winner is ' + winner)
+    // console.log('winner is ' + winner)
     assert.equal(1, winner,"Winner is not reporter as expected!");
 
   })
 
   it('should asset status be 5=CLOSED after arbitration sides with reporter!', async function() {
     let status = await assetManagerInstance.getStatus(assetAddress);
-    console.log('status is ' + status);
+    // console.log('status is ' + status);
     assert.equal(5,status,"Status is not in 5=CLOSED as expected!");
 
   })
