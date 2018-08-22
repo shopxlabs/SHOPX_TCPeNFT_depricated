@@ -78,7 +78,11 @@ contract Asset is Events, Owned {
     function getMarketPlacesLength() public view returns (uint) {
         return listOfMarketPlaces.length;
     }   
-  
+
+    function addMarketPlace(address _marketPlace) public onlyAuthorized {
+        listOfMarketPlaces.push(_marketPlace);
+    }  
+
     function addInventory(uint _qty) public onlyAuthorized {
         inventoryCount += _qty;
     }  

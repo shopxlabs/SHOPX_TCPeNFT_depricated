@@ -36,7 +36,6 @@ contract AssetManager is Owned {
         uint sellersBal = splytManager.getBalance(_seller);
         uint stakeTokens = splytManager.calculateStakeTokens(_totalCost);
 
-    
         if(stakeTokens > sellersBal) {
             revert();
         }
@@ -86,6 +85,11 @@ contract AssetManager is Owned {
     //@desc get asset status
     function getStatus(address _assetAddress) public view returns (Asset.Statuses) {
         return Asset(_assetAddress).status();
+    }
+
+    //@desc update data contract address
+    function addMarketPlace(address _assetAddress, address _marketPlace) onlyOwnerOrSplyt public {
+        Asset(_assetAddress).addMarketPlace(_marketPlace);
     }
 
     //@desc update data contract address
