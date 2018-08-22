@@ -58,7 +58,6 @@ contract OrderManager is Owned, Events {
     constructor(address _splytManager) public {
         orderData = new OrderData();
         splytManager = SplytManager(_splytManager); //splytManager address
-        owner = msg.sender;
     }
 
     //@desc buyer must pay it in full to create order

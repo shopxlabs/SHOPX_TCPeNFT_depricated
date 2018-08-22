@@ -1,12 +1,11 @@
 pragma solidity ^0.4.24;
 
-import "./Owned.sol";
 import "./Events.sol";
 import "./Arbitration.sol";
 import "./Asset.sol";
+import "./Owned.sol";
 
 // TODO: use interface instead of importing whole contracts after later sprints
-
 contract Asset is Events, Owned {
     
     enum AssetTypes { NORMAL, FRACTIONAL }
@@ -28,7 +27,7 @@ contract Asset is Events, Owned {
     
     uint public initialStakeAmount;
 
-    AuthorizerInterface authorizer; //address of contract that has history of managers
+    address public creator;
 
     mapping(address => uint) contributions;
     // address arbitrateAddr = 0x0;
@@ -36,12 +35,6 @@ contract Asset is Events, Owned {
     address arbitration;
     
     uint public inventoryCount;
-
-    //We need this because when we deploy new managers to replace the old, the old will still be the owner.
-    modifier onlyAuthorized() {
-        require(authorizer.isAuthorized(msg.sender) == true);
-        _;
-    }
 
     constructor(
         bytes12 _assetId, 
@@ -66,10 +59,10 @@ contract Asset is Events, Owned {
             listOfMarketPlaces.push(_mpAddress);
             initialStakeAmount = _stakeAmount;
             inventoryCount = _inventoryCount;
+            owner = msg.sender;
 
             status = Statuses.ACTIVE;
             assetType =  _term > 0 ? AssetTypes.FRACTIONAL : AssetTypes.NORMAL;
-            owner = msg.sender; //assetManager deploys the asset thus the owner
             authorizer = AuthorizerInterface(_authorizer);
     }
 

@@ -3,11 +3,6 @@ pragma solidity ^0.4.24;
 import './Asset.sol';  //change to interface later
 import './Owned.sol';  //change to interface later
 
-contract AuthorizerInterface {
-    function isAuthorized(address) public returns (bool);
-}
-
-
 contract Arbitration is Owned {
     
     enum Reasons { SPAM, BROKEN, NOTRECIEVED, NOREASON }
@@ -42,13 +37,6 @@ contract Arbitration is Owned {
         _;
     }
 
-    modifier onlyAuthorized() {
-        require(authorizer.isAuthorized(msg.sender) == true);
-        _;
-    }
-
-    AuthorizerInterface authorizer;
-
 
     constructor(address _assetAddress, bytes12 _arbitrationId, Reasons _reason, address _reporter, uint _stakeAmount, address _authorizer) public {
         arbitrationId = _arbitrationId;
@@ -59,8 +47,6 @@ contract Arbitration is Owned {
 
         status = Statuses.REPORTED;
         asset = _assetAddress;
-        owner = msg.sender;
-
         sellerStakeTotal += _stakeAmount;
 
         authorizer = AuthorizerInterface(_authorizer);

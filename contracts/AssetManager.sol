@@ -1,6 +1,5 @@
 pragma solidity ^0.4.24;
 
-
 import "./Owned.sol";
 import "./Asset.sol";
 import "./AssetData.sol";
@@ -10,18 +9,16 @@ contract AssetManager is Owned {
     
     AssetData public assetData;
     SplytManager public splytManager;
-
-
-    constructor(address _splytManager) public {
-        assetData = new AssetData();
-        splytManager = SplytManager(_splytManager);
-        owner = msg.sender; 
-    }
-
+    
     //allow owner or splytManager
     modifier onlyOwnerOrSplyt() {
         require(owner == msg.sender || address(splytManager) == msg.sender);
         _;
+    }
+
+    constructor(address _splytManager) public {
+        assetData = new AssetData();
+        splytManager = SplytManager(_splytManager);
     }
 
     function createAsset(

@@ -11,10 +11,6 @@ contract ArbitrationData is Owned {
     uint public arbitrationId; //increments after creating new
     uint public arbitrationIndex;
 
-    constructor() public {
-        owner = msg.sender; //arbitrationManager is the owner
-    }
-
     function save(bytes12 _arbitrationId, address _arbitrationAddress) public onlyOwner {
         arbitrationIdByAddress[_arbitrationAddress] = _arbitrationId;
         addressByArbitrationId[_arbitrationId] = _arbitrationAddress;

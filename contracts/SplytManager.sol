@@ -51,11 +51,9 @@ contract SplytManager is Events, Owned {
 
     //@desc set all contracts it's interacting with
     constructor(address _tokenAddress, address _stakeAddress, address _authorizerAddress) public {
-        owner = msg.sender; //the wallet used to deploy these contracts
         satToken = SatToken(_tokenAddress);
         stake = Stake(_stakeAddress);
         authorizer = Authorizer(_authorizerAddress);            
-
     }
 
     //@desc sets all the managers at once

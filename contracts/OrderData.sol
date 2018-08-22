@@ -34,10 +34,6 @@ contract OrderData is Owned {
 
     uint public orderId; //increments after creating new
 
-    constructor() public {
-        owner = msg.sender; //orderManager address
-    }
-
     function save(address _asset, address _buyer, uint _quantity, uint _paidAmount) public onlyOwner returns (uint) {
         orders[orderId] = Order(version, orderId, _asset, _buyer, _quantity, _paidAmount, Statuses.PIF, Reasons.NA, 0);
         orderId++;

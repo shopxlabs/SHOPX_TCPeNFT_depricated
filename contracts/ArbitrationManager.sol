@@ -32,7 +32,6 @@ contract ArbitrationManager is Owned {
     constructor(address _splytManager) public {
         splytManager = SplytManager(_splytManager);
         arbitrationData = new ArbitrationData();
-        owner = msg.sender;
     }
 
     function createArbitration(address _assetAddress, bytes12 _arbitrationId, Arbitration.Reasons _reason) public {
