@@ -5,6 +5,7 @@ import "./Owned.sol";
 contract OrderData is Owned {
 
     //Per conversation, we decided to use struct data structure for storing orders instead of individual contracts for gas savings
+    //This means this data file cannot be updated.
     struct Order {
         uint version;
         uint orderId;

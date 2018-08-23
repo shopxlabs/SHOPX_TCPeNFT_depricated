@@ -41,9 +41,7 @@ contract ArbitrationManager is Owned {
         
         address reporter = msg.sender;
 
-        address authorizer = splytManager.getAuthorizerAddress();
-
-        Arbitration arbitration = new Arbitration(_assetAddress, _arbitrationId, _reason, reporter, stakeAmount, authorizer);
+        Arbitration arbitration = new Arbitration(_assetAddress, _arbitrationId, _reason, reporter, stakeAmount);
         arbitrationData.save(_arbitrationId, address(arbitration));
 
         //change status so no one can purchase during arbitration
@@ -147,6 +145,13 @@ contract ArbitrationManager is Owned {
         arbitration.set2xStakeByReporter();
         splytManager.internalContribute(arbitration.reporter(), arbitration.asset(), arbitration.baseStake()); 
     }
+
+    //@desc checks if address is authorized write to the data contracts
+    function isManager(address _address) public view returns (bool) {
+        return splytManager.isManager(_address);
+    }
+   
+       
    //@desc new manager contract that's going to be replacing this
    //Old manager call this function and proposes the new address
     function transferOwnership(address _newAddress) public onlyOwner {

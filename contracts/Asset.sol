@@ -1,12 +1,19 @@
 pragma solidity ^0.4.24;
 
 import "./Events.sol";
+
+//TODO: use interfaces
 import "./Arbitration.sol";
 import "./Asset.sol";
-import "./Owned.sol";
+
 
 // TODO: use interface instead of importing whole contracts after later sprints
-contract Asset is Events, Owned {
+contract ManagerAbstract {
+    function isManager(address) public returns (bool);
+}
+
+
+contract Asset is Events {
     
     enum AssetTypes { NORMAL, FRACTIONAL }
     AssetTypes public assetType;
@@ -27,14 +34,17 @@ contract Asset is Events, Owned {
     
     uint public initialStakeAmount;
 
-    address public creator;
-
     mapping(address => uint) contributions;
     // address arbitrateAddr = 0x0;
     
-    address arbitration;
+    address public arbitration;
     
     uint public inventoryCount;
+
+    modifier onlyManager() {
+        require(ManagerAbstract(msg.sender).isManager(msg.sender) == true);
+        _;
+    }
 
     constructor(
         bytes12 _assetId, 
@@ -46,8 +56,7 @@ contract Asset is Events, Owned {
         address _mpAddress, 
         uint _mpAmount,
         uint _inventoryCount,
-        uint _stakeAmount,
-        address _authorizer
+        uint _stakeAmount
         ) public {
             assetId = _assetId;
             term = _term;
@@ -59,14 +68,12 @@ contract Asset is Events, Owned {
             listOfMarketPlaces.push(_mpAddress);
             initialStakeAmount = _stakeAmount;
             inventoryCount = _inventoryCount;
-            owner = msg.sender;
 
             status = Statuses.ACTIVE;
             assetType =  _term > 0 ? AssetTypes.FRACTIONAL : AssetTypes.NORMAL;
-            authorizer = AuthorizerInterface(_authorizer);
     }
 
-    function setStatus(Statuses _status) public onlyAuthorized {
+    function setStatus(Statuses _status) public onlyManager {
         status = _status;
     }
 
@@ -79,16 +86,16 @@ contract Asset is Events, Owned {
         return listOfMarketPlaces.length;
     }   
 
-    function addMarketPlace(address _marketPlace) public onlyAuthorized {
+    function addMarketPlace(address _marketPlace) public onlyManager {
         listOfMarketPlaces.push(_marketPlace);
     }  
 
-    function addInventory(uint _qty) public onlyAuthorized {
+    function addInventory(uint _qty) public onlyManager {
         inventoryCount += _qty;
     }  
 
     //assetManager is the owner
-     function subtractInventory(uint _qty) public onlyAuthorized {
+     function subtractInventory(uint _qty) public onlyManager {
         inventoryCount -=  _qty;
         if (inventoryCount == 0) {
             status = Statuses.SOLD_OUT;
@@ -96,7 +103,7 @@ contract Asset is Events, Owned {
     }   
 
     //assetManager is the owner
-     function setInventory(uint _count) public onlyAuthorized {
+     function setInventory(uint _count) public onlyManager {
         inventoryCount = _count;
     }   
 

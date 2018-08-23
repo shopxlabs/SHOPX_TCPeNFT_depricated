@@ -18,7 +18,7 @@ contract('AssetManagerTest general test cases.', function(accounts) {
   async function create_asset(_assetId = "0x31f2ae92057a7123ef0e490a", _term = 0, _seller = defaultSeller, _title = "MyTitle",
       _totalCost = 1000, _expirationDate = 10001556712588, _mpAddress = defaultMarketPlace, _mpAmount = 2, _inventoryCount = 2) {
     
-    let authorizerAddress = await splytManagerInstance.getAuthorizerAddress();
+    let managerDataAddress = await splytManagerInstance.getManagerDataAddress();
 
     await assetManagerInstance.createAsset(_assetId, _term, _seller, _title, _totalCost, _expirationDate, _mpAddress, _mpAmount, _inventoryCount);
     assetAddress = await assetManagerInstance.getAddressById(_assetId);
@@ -38,13 +38,13 @@ contract('AssetManagerTest general test cases.', function(accounts) {
 
   })
 
-  it('should get authorizer address successfully!', async function() {
+  it('should get manager data address successfully!', async function() {
     // await create_asset();
     
-    let authorizerAddress = await splytManagerInstance.getAuthorizerAddress();
-    console.log('authorizer address: ' + authorizerAddress);
+    let managerDataAddress = await splytManagerInstance.getManagerDataAddress();
+    console.log('managerData address: ' + managerDataAddress);
     // assert.equal(orderId, , 'No money should be transfered to seller\'s wallet!');
-    assert.notEqual(authorizerAddress, 0x0, "authorizer has not been deployed!");
+    assert.notEqual(managerDataAddress, 0x0, "managerData has not been deployed!");
   })
 
 

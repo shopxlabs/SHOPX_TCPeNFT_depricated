@@ -9,7 +9,7 @@ contract AssetManager is Owned {
     
     AssetData public assetData;
     SplytManager public splytManager;
-    
+
     //allow owner or splytManager
     modifier onlyOwnerOrSplyt() {
         require(owner == msg.sender || address(splytManager) == msg.sender);
@@ -40,9 +40,6 @@ contract AssetManager is Owned {
             revert();
         }
 
-        //we need the address contract of history of managers
-        address authorizerAddress = splytManager.getAuthorizerAddress();
-
          Asset asset = new Asset(
             _assetId, 
             _term, 
@@ -53,8 +50,7 @@ contract AssetManager is Owned {
             _mpAddress, 
             _mpAmount,
             _inventoryCount,
-            stakeTokens,
-            authorizerAddress
+            stakeTokens
             ); 
 
         splytManager.internalContribute(_seller, asset, stakeTokens);
@@ -124,6 +120,11 @@ contract AssetManager is Owned {
     function getIdByAddress(address _assetAddress) public view returns (bytes12) {
       return assetData.getAssetIdByAddress(_assetAddress);
     }    
+
+    //@desc checks if address is authorized write to the data contracts
+    function isManager(address _address) public view returns (bool) {
+        return splytManager.isManager(_address);
+    }
    
    //@desc new manager contract that's going to be replacing this
    //Old manager call this function and proposes the new address

@@ -1,16 +1,9 @@
 pragma solidity ^0.4.24;
 
-contract AuthorizerInterface {
-    function isAuthorized(address) public returns (bool);
-    function add(address) public;
-}
-
-
 contract Owned {
     
     address public owner;
     address public pendingOwner;
-    AuthorizerInterface public authorizer;
 
     modifier onlyOwner {
         require(msg.sender == owner);
@@ -19,11 +12,6 @@ contract Owned {
 
     modifier onlyPendingOwner {
         require(msg.sender == pendingOwner);
-        _;
-    }
-
-    modifier onlyAuthorized {
-        require(authorizer.isAuthorized(msg.sender) == true);
         _;
     }
 
