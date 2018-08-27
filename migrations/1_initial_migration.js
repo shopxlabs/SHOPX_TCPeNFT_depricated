@@ -12,7 +12,7 @@ var AssetData = artifacts.require("./AssetData.sol")
 var ArbitrationManager = artifacts.require("./ArbitrationManager.sol")
 var ArbitrationData = artifacts.require("./ArbitrationData.sol")
 
-var ManagerData = artifacts.require("./ManagerData.sol")
+var ManagerTracker = artifacts.require("./ManagerTracker.sol")
 
 var Stake = artifacts.require("./Stake.sol")
 var chalk = require('chalk')
@@ -32,17 +32,6 @@ module.exports = function(deployer, network, accounts) {
 
   deployer.deploy(Migrations, walletConfig)
 
-  // deployer.deploy(SatToken, name, desc, ver, walletConfig)
-  // .then(async function() {
-  //   console.log('Sat Token address: ', SatToken.address)
-  //   var arbitrationFactory = await deployer.deploy(ArbitrationFactory, walletConfig)
-  //   console.log('Arbitration Factory address: ', arbitrationFactory.address)
-  //   var stake = await deployer.deploy(Stake, 10000000000000, 2000000000, 100, walletConfig)
-  //   console.log('Stake address: ', stake.address)
-  //   var deployed = await deployer.deploy(SplytTracker, ver, name, SatToken.address, arbitrationFactory.address, stake.address, walletConfig)
-  //   console.log('Splyt Tracker address: ', SplytTracker.address)
-  // });
-
   deployer.deploy(SatToken, name, desc, ver, walletConfig)
   .then(async function() {
     console.log('Sat Token address: ', SatToken.address)
@@ -50,14 +39,12 @@ module.exports = function(deployer, network, accounts) {
     var stake = await deployer.deploy(Stake, 10000000000000, 2000000000, 100, walletConfig)
     console.log('Stake address: ', stake.address)
 
-    var managerData = await deployer.deploy(ManagerData, walletConfig)
-    console.log('Manager History address: ', managerData.address)
-
-    var splytManager = await deployer.deploy(SplytManager, SatToken.address, stake.address, managerData.address, walletConfig)
+    var splytManager = await deployer.deploy(SplytManager, SatToken.address, stake.address, walletConfig)
     console.log('Splyt Manager address: ', splytManager.address)
 
-    //add splyt manager
-    managerData.add(splytManager.address, walletConfig);
+    var managerTracker = await deployer.deploy(ManagerTracker, splytManager.address, walletConfig)
+    console.log('ManagerTracker address: ', managerTracker.address)
+    await splytManager.setManagerTracker(managerTracker.address)
 
     var assetManager = await deployer.deploy(AssetManager, splytManager.address, walletConfig)
     console.log('AssetManager address: ', assetManager.address)

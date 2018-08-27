@@ -1,5 +1,7 @@
 const AssetManager = artifacts.require("./AssetManager.sol");
 const SplytManager = artifacts.require("./SplytManager.sol");
+const ManagerTracker = artifacts.require("./ManagerTracker.sol");
+
 const SatToken = artifacts.require("./SatToken.sol");
 const Asset = artifacts.require("./Asset.sol");
 
@@ -18,7 +20,7 @@ contract('AssetManagerTest general test cases.', function(accounts) {
   async function create_asset(_assetId = "0x31f2ae92057a7123ef0e490a", _term = 0, _seller = defaultSeller, _title = "MyTitle",
       _totalCost = 1000, _expirationDate = 10001556712588, _mpAddress = defaultMarketPlace, _mpAmount = 2, _inventoryCount = 2) {
     
-    let managerDataAddress = await splytManagerInstance.getManagerDataAddress();
+    // let managerTrackerAddress = await splytManagerInstance.getManagerTrackerAddress();
 
     await assetManagerInstance.createAsset(_assetId, _term, _seller, _title, _totalCost, _expirationDate, _mpAddress, _mpAmount, _inventoryCount);
     assetAddress = await assetManagerInstance.getAddressById(_assetId);
@@ -31,6 +33,7 @@ contract('AssetManagerTest general test cases.', function(accounts) {
     satTokenInstance = await SatToken.deployed()   
     assetManagerInstance = await AssetManager.deployed();
     splytManagerInstance = await SplytManager.deployed();
+    managerTrackerInstance = await ManagerTracker.deployed();
 
     accounts.forEach(async function(acc) {
       await satTokenInstance.initUser(acc)
@@ -38,13 +41,12 @@ contract('AssetManagerTest general test cases.', function(accounts) {
 
   })
 
-  it('should get manager data address successfully!', async function() {
+  it('should get manager tracker address successfully!', async function() {
     // await create_asset();
-    
-    let managerDataAddress = await splytManagerInstance.getManagerDataAddress();
-    console.log('managerData address: ' + managerDataAddress);
+    let managerTrackerAddress = await splytManagerInstance.getManagerTrackerAddress();
+    console.log('manager tracker address: ' + managerTrackerAddress);
     // assert.equal(orderId, , 'No money should be transfered to seller\'s wallet!');
-    assert.notEqual(managerDataAddress, 0x0, "managerData has not been deployed!");
+    assert.notEqual(managerTrackerAddress, 0x0, "managerTracker has not been deployed!");
   })
 
 

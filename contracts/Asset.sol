@@ -7,7 +7,6 @@ import "./Arbitration.sol";
 import "./Asset.sol";
 
 
-// TODO: use interface instead of importing whole contracts after later sprints
 contract ManagerAbstract {
     function isManager(address) public returns (bool);
 }

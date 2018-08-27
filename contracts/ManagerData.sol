@@ -1,8 +1,10 @@
 pragma solidity ^0.4.24;
 
+import "./Owned.sol";
+
 //@desc This contract will not be updatable. This is used when a contract is deployed, the manager deployer is the owner. But when we update the manager contract, the asset is still owned by the old manager.
 //To get around this, this contract is used to keep track of all the past managers giving the current managers rights to update data contracts.
-contract ManagerData {
+contract ManagerData is Owned {
 
     //List of past and current manager addresses/wallets    
     mapping (address => bool) public managers;
@@ -16,11 +18,11 @@ contract ManagerData {
         _;
     }
 
-    function add(address _address) public onlyManager {
+    function add(address _address) public onlyOwner {
         managers[_address] = true;
     }  
     
-    function disable(address _address) public onlyManager {
+    function disable(address _address) public onlyOwner {
         managers[_address] = false;
     }  
 

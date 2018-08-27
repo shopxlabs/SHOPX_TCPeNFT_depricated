@@ -3,7 +3,7 @@ pragma solidity ^0.4.24;
 import "./AssetManager.sol";
 import "./OrderManager.sol";
 import "./ArbitrationManager.sol";
-import "./ManagerData.sol";
+import "./ManagerTracker.sol";
 
 import "./Events.sol";
 import "./Owned.sol";
@@ -34,7 +34,7 @@ contract SplytManager is Events, Owned {
     OrderManager public orderManager;
     ArbitrationManager public arbitrationManager;
 
-    ManagerData public managerData;
+    ManagerTracker public managerTracker;
 
     //only these managers are allowed to call these functions
     modifier onlyManagers() {
@@ -50,10 +50,9 @@ contract SplytManager is Events, Owned {
     // event Error(uint _code, string _message);
 
     //@desc set all contracts it's interacting with
-    constructor(address _tokenAddress, address _stakeAddress, address _managerDataAddress) public {
+    constructor(address _tokenAddress, address _stakeAddress) public {
         satToken = SatToken(_tokenAddress);
-        stake = Stake(_stakeAddress);
-        managerData = ManagerData(_managerDataAddress);            
+        stake = Stake(_stakeAddress);      
     }
 
     //@desc sets all the managers at once
@@ -63,26 +62,31 @@ contract SplytManager is Events, Owned {
         arbitrationManager = ArbitrationManager(_arbitrationManager);     
 
         //add the managers to give rights to write
-        managerData.add(_assetManager);   
-        managerData.add(_orderManager);       
-        managerData.add(_arbitrationManager);                            
+        managerTracker.add(_assetManager);   
+        managerTracker.add(_orderManager);       
+        managerTracker.add(_arbitrationManager);                            
     }        
+
+    //@desc tracks all the managers deployed
+    function setManagerTracker(address _newAddress) public onlyOwner {
+        managerTracker = ManagerTracker(_newAddress);
+    }    
 
     //@desc used to update contracts
     function setAssetManager(address _newAddress) public onlyOwner {
         assetManager = AssetManager(_newAddress);
-        managerData.add(_newAddress);
+        managerTracker.add(_newAddress);
     }    
 
     //@desc used to update contracts
     function setOrderManager(address _newAddress) public onlyOwner {
         orderManager = OrderManager(_newAddress);
-        managerData.add(_newAddress);
+        managerTracker.add(_newAddress);
     } 
     //@desc used to update contracts
     function setArbitrationManager(address _newAddress) public onlyOwner {
         arbitrationManager = ArbitrationManager(_newAddress);
-        managerData.add(_newAddress);
+        managerTracker.add(_newAddress);
     }      
  
     function setTokenContract(address _newAddress) public onlyOwner {
@@ -131,18 +135,13 @@ contract SplytManager is Events, Owned {
         assetManager.addInventory(_assetAddress, _quantity);
     }    
 
-    //@desc set the manager data
-    function setManagerData(address _address) public onlyOwner {
-        managerData = ManagerData(_address);
-    }   
-
     //@desc used to update    
-    function getManagerDataAddress() public view returns (address) {
-        return address(managerData);
+    function getManagerTrackerAddress() public view returns (address) {
+        return address(managerTracker);
     }    
 
     function isManager(address _address) public view returns (bool) {
-        return managerData.isManager(_address);
+        return managerTracker.isManager(_address);
     }
 
 }
