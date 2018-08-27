@@ -1,5 +1,7 @@
 pragma solidity ^0.4.24;
 
+
+//TODO: use interfaces instead after we plan out what functions should be exposed to this contract.
 import "./AssetManager.sol";
 import "./OrderManager.sol";
 import "./ArbitrationManager.sol";
@@ -98,14 +100,12 @@ contract SplytManager is Events, Owned {
     } 
 
     //@desc User for single buy to transfer tokens from buyer address to seller address
-    //TODO: add security
     function internalContribute(address _from, address _to, uint _amount) public onlyManagers returns (bool) {
         bool result = satToken.transferFrom(_from, _to, _amount);
         return result;
     }
     
     // @desc Used for fractional ownership to transfer tokens from user address to listing address
-    // TODO: add security
     function internalRedeemFunds(address _listingAddress, address _seller, uint _amount) public onlyManagers returns (bool) {
         
         bool result = satToken.transferFrom(_listingAddress, _seller, _amount);
