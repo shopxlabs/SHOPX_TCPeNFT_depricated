@@ -28,7 +28,6 @@ contract Asset is Events {
     uint public totalCost;
     uint public expirationDate;
     uint public kickbackAmount;
-    bool public isContract = true;
     string public title;
     
     uint public initialStakeAmount;
