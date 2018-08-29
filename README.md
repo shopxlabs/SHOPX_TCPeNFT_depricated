@@ -46,4 +46,7 @@ Remeber only the wallet used to deploy these contracts are the 'owner'. The role
 
 
 
+### Tests   
+-  Only the initial test for managers were created.    
+-  The old test files have been left alone.  
 
