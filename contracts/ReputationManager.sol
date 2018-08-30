@@ -32,9 +32,16 @@ contract ReputationManager is Owned {
          } else {
             Reputation(reputationAddress).addReview(_rating, msg.sender);
          }
-
-        
+   
     }
+
+    //@dev get review information
+    function getReviewByWalletAndIndex(address _wallet, uint _index) public view returns (uint, address, uint) {
+
+        Reputation rep = Reputation(reputationData.reputationByWallet(_wallet));
+        return rep.getReviewByIndex(_index);      
+    }  
+        
 
 
     function getDataContractAddress() public view returns (address) {
