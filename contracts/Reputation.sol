@@ -48,7 +48,7 @@ contract Reputation {
         return reviews.length;
     }  
         
-    //@dev get number of reviews
+    //@dev get review information
     function getReviewByIndex(uint _index) public view returns (uint, address, uint) {
         return (reviews[_index].rating, reviews[_index].from, reviews[_index].date);
     }  

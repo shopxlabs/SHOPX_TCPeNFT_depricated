@@ -16,15 +16,4 @@ contract ReputationData is Owned {
         return true;
     }  
     
-    // function getReputationByWallet(address _wallet) public view returns (address) {
-    //     return reputationByWallet[_wallet];
-    // }   
-       
-    // function getReputationByIndex(uint _index) public view returns (address) {
-    //     return reputationByIndex[_index];
-    // }   
-
-    // function getLength() public view returns (uint) {
-    //     return index;
-    // } 
 }

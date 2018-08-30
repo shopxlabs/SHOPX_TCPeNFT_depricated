@@ -18,20 +18,5 @@ contract AssetData is Owned {
         index++;
         return true;
     }  
-    
-    // function getAssetIdByAddress(address _assetAddress) public view returns (bytes12) {
-    //     return assetIdByAddress[_assetAddress];
-    // }   
-     
-    // function getAddressByAssetId(bytes12 _assetId) public view returns (address) {
-    //     return addressByAssetId[_assetId];
-    // }    
-
-    // function getAddressByIndex(uint _index) public view returns (address) {
-    //     return addressByIndex[_index];
-    // }  
-
-    // function getLength() public view returns (uint) {
-    //     return index;
-    // }          
+          
 }

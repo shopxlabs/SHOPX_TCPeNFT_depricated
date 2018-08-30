@@ -16,21 +16,6 @@ contract ArbitrationData is Owned {
         addressByArbitrationId[_arbitrationId] = _arbitrationAddress;
         addressByIndex[index] = _arbitrationAddress;
         index++;
-    }  
-    
-    // function getArbitrationIdByAddress(address _arbitrationAddress) public view returns (bytes12) {
-    //     return arbitrationIdByAddress[_arbitrationAddress];
-    // }    
-    
-    // function getAddressByArbitrationId(bytes12 _arbitrationId) public view returns (address) {
-    //     return addressByArbitrationId[_arbitrationId];
-    // }    
-
-    // function getAddressByIndex(uint _index) public view returns (address) {
-    //     return addressByIndex[_index];
-    // }    
-    // function getLength() public view returns (uint) {
-    //     return index;
-    // }     
+    }   
     
 }
