@@ -21,7 +21,7 @@ contract ReputationManager is Owned {
         splytManager = SplytManager(_splytManager);
     }
 
-    function review(address _wallet, uint _rating) public {
+    function rate(address _wallet, uint _rating) public {
 
          address reputationAddress = reputationData.reputationByWallet(_wallet);
 
