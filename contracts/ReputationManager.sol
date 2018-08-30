@@ -21,7 +21,8 @@ contract ReputationManager is Owned {
         splytManager = SplytManager(_splytManager);
     }
 
-    function rate(address _wallet, uint _rating) public {
+    //@dev only create new reputation when it creates first review
+    function review(address _wallet, uint _rating) public {
 
          address reputationAddress = reputationData.reputationByWallet(_wallet);
 
@@ -29,7 +30,7 @@ contract ReputationManager is Owned {
             Reputation reputation = new Reputation(_rating, msg.sender);
             reputationData.save(_wallet, address(reputation));
          } else {
-            Reputation(reputationAddress).add(_rating, msg.sender);
+            Reputation(reputationAddress).addReview(_rating, msg.sender);
          }
 
         
@@ -68,6 +69,13 @@ contract ReputationManager is Owned {
         return splytManager.isManager(_address);
     }
    
+    //@dev assume 2 decimals
+    function getRating(address _address) public view returns (uint) {
+        Reputation rep = Reputation(_address);
+       return ((rep.totalScore() * 100) / rep.getReviewsLength());
+
+    } 
+
    //@desc new manager contract that's going to be replacing this
    //Old manager call this function and proposes the new address
     function transferOwnership(address _newAddress) public onlyOwnerOrSplyt {

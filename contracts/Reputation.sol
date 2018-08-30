@@ -8,7 +8,7 @@ contract Reputation {
 
     bytes12 public reputationId;
     
-    struct Reporter {
+    struct Review {
         uint rating;
         address from;
         uint date;
@@ -16,31 +16,41 @@ contract Reputation {
 
     Statuses public status;
 
-    Reporter[] reporters;
+    Review[] public reviews;
+    uint public totalScore;
 
     modifier onlyManager() {
         require(ManagerAbstract(msg.sender).isManager(msg.sender) == true);
         _;
     }
 
-    constructor(uint _rating, address _from) public {
+    //@dev only within 1-5
+    modifier onlyWithinRange(uint _rating) {
+        require( _rating > 0 && _rating < 6);
+        _;
+    }
+
+    //@dev only create new reputation when it creates first review
+    constructor(uint _rating, address _from) public onlyWithinRange(_rating){
         status = Statuses.BRONZE;
-        reporters.push(Reporter(_rating, _from, now));        
+        reviews.push(Review(_rating, _from, now));   
+        totalScore += _rating;     
     }  
 
-    function add(uint _rating, address _from) public {
-        reporters.push(Reporter(_rating, _from, now));
+    //@dev only accept 100 to 500 
+    function addReview(uint _rating, address _from) public onlyWithinRange(_rating) {
+        reviews.push(Review(_rating, _from, now));
+        totalScore += _rating;
     }  
     
-    function getRating() public view returns (uint) {
-       
-       uint score;
-
-       for (uint i=0; i < reporters.length; i++) {
-            score += reporters[i].rating; 
-       }
-
-       return (score / reporters.length);
-    } 
-
+    //@dev get number of reviews
+    function getReviewsLength() public view returns (uint) {
+        return reviews.length;
+    }  
+        
+    //@dev get number of reviews
+    function getReviewByIndex(uint _index) public view returns (uint, address, uint) {
+        return (reviews[_index].rating, reviews[_index].from, reviews[_index].date);
+    }  
+        
 }
