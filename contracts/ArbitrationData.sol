@@ -18,19 +18,19 @@ contract ArbitrationData is Owned {
         index++;
     }  
     
-    function getArbitrationIdByAddress(address _arbitrationAddress) public view returns (bytes12) {
-        return arbitrationIdByAddress[_arbitrationAddress];
-    }    
+    // function getArbitrationIdByAddress(address _arbitrationAddress) public view returns (bytes12) {
+    //     return arbitrationIdByAddress[_arbitrationAddress];
+    // }    
     
-    function getAddressByArbitrationId(bytes12 _arbitrationId) public view returns (address) {
-        return addressByArbitrationId[_arbitrationId];
-    }    
+    // function getAddressByArbitrationId(bytes12 _arbitrationId) public view returns (address) {
+    //     return addressByArbitrationId[_arbitrationId];
+    // }    
 
-    function getAddressByIndex(uint _index) public view returns (address) {
-        return addressByIndex[_index];
-    }    
-    function getLength() public view returns (uint) {
-        return index;
-    }     
+    // function getAddressByIndex(uint _index) public view returns (address) {
+    //     return addressByIndex[_index];
+    // }    
+    // function getLength() public view returns (uint) {
+    //     return index;
+    // }     
     
 }

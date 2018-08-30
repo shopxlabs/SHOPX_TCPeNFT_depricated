@@ -114,11 +114,15 @@ contract AssetManager is Owned {
 
 
     function getAddressById(bytes12 _assetId) public view returns (address) {
-      return assetData.getAddressByAssetId(_assetId);
+      return assetData.addressByAssetId(_assetId);
     }
     
     function getIdByAddress(address _assetAddress) public view returns (bytes12) {
-      return assetData.getAssetIdByAddress(_assetAddress);
+      return assetData.assetIdByAddress(_assetAddress);
+    }    
+
+    function getAddressByIndex(uint _index) public view returns (address) {
+      return assetData.addressByIndex(_index);
     }    
 
     //@desc checks if address is authorized write to the data contracts

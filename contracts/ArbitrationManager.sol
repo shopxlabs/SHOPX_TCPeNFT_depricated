@@ -104,7 +104,7 @@ contract ArbitrationManager is Owned {
 
     //@desc  return address or arbitration
     function getAddressById(bytes12 _arbitrationId) public view returns (address) {
-       return arbitrationData.getAddressByArbitrationId(_arbitrationId);
+       return arbitrationData.addressByArbitrationId(_arbitrationId);
     }
 
     function getDataContractAddress() public view returns (address) {
@@ -122,12 +122,17 @@ contract ArbitrationManager is Owned {
     }
 
     function getAddressByArbitrationId(bytes12 _arbitrationId) public view returns (address) {
-      return arbitrationData.getAddressByArbitrationId(_arbitrationId);
+      return arbitrationData.addressByArbitrationId(_arbitrationId);
     }
     
     function getArbitrationIdByAddress(address _arbitrationAddress) public view returns (bytes12) {
-      return arbitrationData.getArbitrationIdByAddress(_arbitrationAddress);
+      return arbitrationData.arbitrationIdByAddress(_arbitrationAddress);
     }   
+
+    function getArbitrationByIndex(uint _index) public view returns (address) {
+      return arbitrationData.addressByIndex(_index);
+    }   
+
 
     //@desc seller disputes reporter by staking initial stake amount
     //@desc initial stake is asset contract

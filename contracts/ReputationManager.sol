@@ -23,7 +23,7 @@ contract ReputationManager is Owned {
 
     function review(address _wallet, uint _rating) public {
 
-         address reputationAddress = reputationData.getReputationByWallet(_wallet);
+         address reputationAddress = reputationData.reputationByWallet(_wallet);
 
          if (reputationAddress == address(0)) {
             Reputation reputation = new Reputation(_rating, msg.sender);
@@ -60,7 +60,7 @@ contract ReputationManager is Owned {
 
 
     function getReputationByWallet(address _wallet) public view returns (address) {
-      return reputationData.getReputationByWallet(_wallet);
+      return reputationData.reputationByWallet(_wallet);
     }  
 
     //@desc checks if address is authorized write to the data contracts

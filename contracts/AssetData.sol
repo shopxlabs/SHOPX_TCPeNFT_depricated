@@ -19,19 +19,19 @@ contract AssetData is Owned {
         return true;
     }  
     
-    function getAssetIdByAddress(address _assetAddress) public view returns (bytes12) {
-        return assetIdByAddress[_assetAddress];
-    }   
+    // function getAssetIdByAddress(address _assetAddress) public view returns (bytes12) {
+    //     return assetIdByAddress[_assetAddress];
+    // }   
      
-    function getAddressByAssetId(bytes12 _assetId) public view returns (address) {
-        return addressByAssetId[_assetId];
-    }    
+    // function getAddressByAssetId(bytes12 _assetId) public view returns (address) {
+    //     return addressByAssetId[_assetId];
+    // }    
 
-    function getAddressByIndex(uint _index) public view returns (address) {
-        return addressByIndex[_index];
-    }  
+    // function getAddressByIndex(uint _index) public view returns (address) {
+    //     return addressByIndex[_index];
+    // }  
 
-    function getLength() public view returns (uint) {
-        return index;
-    }          
+    // function getLength() public view returns (uint) {
+    //     return index;
+    // }          
 }
