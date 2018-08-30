@@ -9,13 +9,13 @@ contract ArbitrationData is Owned {
     mapping (uint => address) public addressByIndex;
     
     uint public arbitrationId; //increments after creating new
-    uint public arbitrationIndex;
+    uint public index;
 
     function save(bytes12 _arbitrationId, address _arbitrationAddress) public onlyOwner {
         arbitrationIdByAddress[_arbitrationAddress] = _arbitrationId;
         addressByArbitrationId[_arbitrationId] = _arbitrationAddress;
-        addressByIndex[arbitrationIndex] = _arbitrationAddress;
-        arbitrationIndex++;
+        addressByIndex[index] = _arbitrationAddress;
+        index++;
     }  
     
     function getArbitrationIdByAddress(address _arbitrationAddress) public view returns (bytes12) {
@@ -29,5 +29,8 @@ contract ArbitrationData is Owned {
     function getAddressByIndex(uint _index) public view returns (address) {
         return addressByIndex[_index];
     }    
+    function getLength() public view returns (uint) {
+        return index;
+    }     
     
 }

@@ -99,7 +99,7 @@ contract ArbitrationManager is Owned {
 
     //@desc get number of arbitrations
     function getArbitrationsLength() public view returns (uint) {
-       return arbitrationData.arbitrationIndex();
+       return arbitrationData.index();
     }
 
     //@desc  return address or arbitration
