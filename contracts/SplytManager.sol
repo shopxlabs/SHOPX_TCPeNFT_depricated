@@ -5,6 +5,8 @@ pragma solidity ^0.4.24;
 import "./AssetManager.sol";
 import "./OrderManager.sol";
 import "./ArbitrationManager.sol";
+import "./ReputationManager.sol";
+
 import "./ManagerTracker.sol";
 
 import "./Events.sol";
@@ -35,8 +37,10 @@ contract SplytManager is Events, Owned {
     AssetManager public assetManager;
     OrderManager public orderManager;
     ArbitrationManager public arbitrationManager;
-
+    ReputationManager public reputationManager;
     ManagerTracker public managerTracker;
+
+
 
     //only these managers are allowed to call these functions
     modifier onlyManagers() {
@@ -91,6 +95,12 @@ contract SplytManager is Events, Owned {
         managerTracker.add(_newAddress);
     }      
  
+    //@dev used to update contracts
+    function setReputationManager(address _newAddress) public onlyOwner {
+        reputationManager = ReputationManager(_newAddress);
+        managerTracker.add(_newAddress);
+    }      
+
     function setTokenContract(address _newAddress) public onlyOwner {
         satToken = SatToken(_newAddress);
     }      

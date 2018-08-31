@@ -1,11 +1,12 @@
 pragma solidity ^0.4.24;
 
 import "./Owned.sol";
+import "./Events.sol";
 import "./Asset.sol";
 import "./AssetData.sol";
 import "./SplytManager.sol";
 
-contract AssetManager is Owned {
+contract AssetManager is Owned, Events {
     
     AssetData public assetData;
     SplytManager public splytManager;
@@ -55,6 +56,7 @@ contract AssetManager is Owned {
 
         splytManager.internalContribute(_seller, asset, stakeTokens);
         assetData.save(_assetId, address(asset));
+        emit Success(1, address(asset));
     }
 
     //@dev update data contract address

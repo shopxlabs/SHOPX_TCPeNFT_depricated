@@ -1,16 +1,18 @@
 pragma solidity ^0.4.24;
 
 import "./Owned.sol";
+import "./Events.sol";
+
 import "./Reputation.sol";
 import "./ReputationData.sol";
 import "./SplytManager.sol";
 
-contract ReputationManager is Owned {
+contract ReputationManager is Owned, Events  {
     
     ReputationData public reputationData;
     SplytManager public splytManager;
 
-    //allow owner or splytManager
+    //@dev allow owner or splytManager
     modifier onlyOwnerOrSplyt() {
         require(owner == msg.sender || address(splytManager) == msg.sender);
         _;
@@ -22,7 +24,7 @@ contract ReputationManager is Owned {
     }
 
     //@dev only create new reputation when it creates first review
-    function review(address _wallet, uint _rating) public {
+    function createReview(address _wallet, uint _rating) public {
 
          address reputationAddress = reputationData.reputationByWallet(_wallet);
 
@@ -32,7 +34,7 @@ contract ReputationManager is Owned {
          } else {
             Reputation(reputationAddress).addReview(_rating, msg.sender);
          }
-
+         emit Success(5, reputationAddress);
         
     }
 

@@ -1,12 +1,13 @@
 pragma solidity ^0.4.24;
 
 import "./Owned.sol";
+import "./Events.sol";
 import "./Arbitration.sol";
 import "./ArbitrationData.sol";
 import "./Asset.sol";
 import "./SplytManager.sol";
 
-contract ArbitrationManager is Owned {
+contract ArbitrationManager is Owned, Events {
 
     SplytManager public splytManager;
     ArbitrationData public arbitrationData;
@@ -48,6 +49,8 @@ contract ArbitrationManager is Owned {
         splytManager.setAssetStatus(_assetAddress, Asset.Statuses.IN_ARBITRATION);
         //set stake for reporter
         splytManager.internalContribute(reporter, asset, stakeAmount);
+        
+        emit Success(3, address(arbitration));
       
     }
 

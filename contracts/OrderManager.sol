@@ -103,8 +103,8 @@ contract OrderManager is Owned, Events {
 
         orderData.save(address(_asset), msg.sender, _qty, _tokenAmount); //save it to the data contract                
         splytManager.subtractInventory(address(_asset), _qty); //update inventory
-    //     emit NewOrder(200, orderId);
-    //     return orderId;
+        emit Success(4, address(_asset));
+
     }
 
     //@dev for fractional purchases
@@ -138,6 +138,8 @@ contract OrderManager is Owned, Events {
             splytManager.internalContribute(address(_asset), _asset.seller(), _asset.totalCost()); //Once all has been contributed, transfer to seller
             splytManager.setAssetStatus(address(_asset), Asset.Statuses.SOLD_OUT);            
         }
+
+        emit Success(2, address(_asset));
 
     }
  
