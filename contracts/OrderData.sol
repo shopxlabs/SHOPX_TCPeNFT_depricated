@@ -29,7 +29,6 @@ contract OrderData is Owned {
 
     uint public version = 1;
 
-    // mapping (address => uint) public orderIdByAddress;
     mapping (uint => Order) public orders;                                    
     mapping (address => uint) public fractionalOrders;  //will have asset address if it's a fractional asset
 
@@ -103,6 +102,7 @@ contract OrderData is Owned {
         return orders[_orderId].asset;
     }   
 
+    //@dev same as index
     function getOrderByOrderId(uint _orderId) public view returns (uint, uint, address, address, uint, uint, Statuses) {
     
         return (
@@ -113,15 +113,7 @@ contract OrderData is Owned {
             orders[_orderId].quantity,
             orders[_orderId].paidAmount,
             orders[_orderId].status);
-    }        
-
-    // function setStatusByOrderId(uint _orderId, Statuses _status) public onlyOwner {
-    //     orders[_orderId].status = _status;
-    // }        
-
-    // function getStatusByOrderId(uint _orderId) public view returns (Statuses) {
-    //     return orders[_orderId].status;    
-    // }        
+    }           
 
     function setBytesAttribute(uint _orderId, bytes12 _attributeKey, bytes12 _attributeValue) public onlyOwner returns (bool) {
         orders[_orderId].bytesAttributes[_attributeKey] = _attributeValue;

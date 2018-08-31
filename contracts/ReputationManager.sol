@@ -42,14 +42,14 @@ contract ReputationManager is Owned {
     }
 
 
-    //@desc update data contract address
+    //@dev update data contract address
     function setDataContract(address _reputationData) onlyOwner public {
        reputationData = ReputationData(_reputationData);
     }
 
-    //@desc get asset status
+    //@dev get asset status
 
-    //@desc get asset status
+    //@dev get asset status
     function getStatus(address _reputationAddress) public view returns (Reputation.Statuses) {
         return Reputation(_reputationAddress).status();
     }
@@ -64,7 +64,7 @@ contract ReputationManager is Owned {
       return reputationData.reputationByWallet(_wallet);
     }  
 
-    //@desc checks if address is authorized write to the data contracts
+    //@dev checks if address is authorized write to the data contracts
     function isManager(address _address) public view returns (bool) {
         return splytManager.isManager(_address);
     }
@@ -76,13 +76,13 @@ contract ReputationManager is Owned {
 
     } 
 
-   //@desc new manager contract that's going to be replacing this
+   //@dev new manager contract that's going to be replacing this
    //Old manager call this function and proposes the new address
     function transferOwnership(address _newAddress) public onlyOwnerOrSplyt {
         reputationData.transferOwnership(_newAddress);
     }
 
-    //@desc if new data contract is deployed, the creator proposes manager adress then the manager needs to accept
+    //@dev if new data contract is deployed, the creator proposes manager adress then the manager needs to accept
     //The new updated manager contract calls this function
     function acceptOwnership() public onlyOwner {
         reputationData.acceptOwnership();

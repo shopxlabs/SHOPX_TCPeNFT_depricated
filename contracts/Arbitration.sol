@@ -54,7 +54,7 @@ contract Arbitration {
 
     }  
     
-    //@desc selected arbitrator gets to decide case
+    //@dev selected arbitrator gets to decide case
     //Arbitrator can select winner only after reporter 2x
     function setWinner(Winners _winner) public onlyManager onlyStatus(Statuses.REPORTER_STAKED_2X) {
         winner = _winner;
@@ -66,25 +66,25 @@ contract Arbitration {
     }    
 
 
-    //@desc set arbitrator so that person resolves this arbitration
+    //@dev set arbitrator so that person resolves this arbitration
     function setArbitrator(address _arbitrator) public onlyManager {
         arbitrator = _arbitrator;
     } 
 
-    //@desc get arbitrator
+    //@dev get arbitrator
     function getArbitrator() public view returns (address) {
        return arbitrator;
     } 
 
-    //@desc seller disputes reporter by staking initial stake amount
-    //@desc initial stake is asset contract
+    //@dev seller disputes reporter by staking initial stake amount
+    //@dev initial stake is asset contract
     function set2xStakeBySeller() public onlyManager {
         sellerStakeTotal += baseStake; //match reported stake by seller
         status = Statuses.SELLER_STAKED_2X;
         sellerStakeTotal += baseStake;
     }      
 
-    //@desc report puts in 2x stake
+    //@dev report puts in 2x stake
     function set2xStakeByReporter() public onlyManager {
         reporterStakeTotal += baseStake;
         //match reported stake by seller

@@ -28,25 +28,25 @@ contract OrderManager is Owned, Events {
         _;
     }
 
-    //@desc middleware to check for certain asset statuses to continue
+    //@dev middleware to check for certain asset statuses to continue
     modifier onlyAssetStatus(Asset.Statuses _status, address _assetAddress) {
         require(_status == Asset(_assetAddress).status());
         _;
     }  
 
-    //@desc middleware to check for certain order statuses to continue
+    //@dev middleware to check for certain order statuses to continue
     modifier onlyOrderStatus(uint _orderId, OrderData.Statuses _status) {
         require(_status == orderData.getStatus(_orderId));
         _;
     }    
 
-    //@desc middleware to bind functions that should be called by fractional
+    //@dev middleware to bind functions that should be called by fractional
     modifier onlyFractionalAsset(address _assetAddress) {
         require(Asset.AssetTypes.FRACTIONAL == Asset(_assetAddress).assetType());
         _;
     }    
 
-    //@desc if buyer sends total amount
+    //@dev if buyer sends total amount
     // modifier onlyOrderRequestQualifies(address _assetAddress, uint _qty, uint _tokenAmount) {     
     //     uint buyerBalance = splytManager.getBalance(msg.sender);
     //     uint totalCost = Asset(_assetAddress).totalCost() * _qty;
@@ -60,7 +60,7 @@ contract OrderManager is Owned, Events {
         splytManager = SplytManager(_splytManager); //splytManager address
     }
 
-    //@desc buyer must pay it in full to create order
+    //@dev buyer must pay it in full to create order
     // To succcessfully purchase an asset, buy must purchase the whole amount times the quantity.
     // The asset must be in 'ACTIVE' status.    
     function purchase(address _assetAddress, uint _qty, uint _tokenAmount) public onlyAssetStatus(Asset.Statuses.ACTIVE, _assetAddress) returns (bool) {
@@ -78,7 +78,7 @@ contract OrderManager is Owned, Events {
         return true;
     }
 
-    //@desc for regular normal purchase order
+    //@dev for regular normal purchase order
     function createOrder(Asset _asset, uint _qty, uint _tokenAmount) private {
 
         uint buyerBalance = splytManager.getBalance(msg.sender);
@@ -107,7 +107,7 @@ contract OrderManager is Owned, Events {
     //     return orderId;
     }
 
-    //@desc for fractional purchases
+    //@dev for fractional purchases
     function contributeOrder(Asset _asset, uint _tokenAmount) private {
        
         uint buyerBalance = splytManager.getBalance(msg.sender);
@@ -164,7 +164,7 @@ contract OrderManager is Owned, Events {
     }
 
 
-    //@desc seller gets refund to buyer and marketplaces
+    //@dev seller gets refund to buyer and marketplaces
     function approveRefund(uint _orderId) public onlySeller(_orderId) {
         
         uint sellerBalance = splytManager.getBalance(msg.sender);
@@ -233,7 +233,7 @@ contract OrderManager is Owned, Events {
       return orderData.version();
     }    
 
-    //@desc will return error if trying to retrieve order id that is not a fractional asset
+    //@dev will return error if trying to retrieve order id that is not a fractional asset
     function getFractionalOrderIdByAsset(address _assetAddress) public view onlyFractionalAsset(_assetAddress) returns (uint) {
         return orderData.getFractionalOrderIdByAsset(_assetAddress);
     }   
@@ -241,13 +241,13 @@ contract OrderManager is Owned, Events {
     function getOrdersLength() public view returns (uint) {
       return orderData.orderId();
     }       
-   //@desc new manager contract that's going to be replacing this
+   //@dev new manager contract that's going to be replacing this
    //Old manager call this function and proposes the new address
     function transferOwnership(address _newAddress) public onlyOwner {
         orderData.transferOwnership(_newAddress);
     }
 
-    //@desc if new data contract is deployed, the creator proposes manager adress then the manager needs to accept
+    //@dev if new data contract is deployed, the creator proposes manager adress then the manager needs to accept
     function acceptOwnership() public onlyOwner {
         orderData.acceptOwnership();
 

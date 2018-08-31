@@ -19,12 +19,12 @@ contract Owned {
         owner = msg.sender;
     }
 
-    //proposes new manager ownership
+    //@dev proposes new manager ownership
     function transferOwnership(address newOwner) public onlyOwner {
         pendingOwner = newOwner;
     }
 
-    //pending owner must accept it to prevent changing to a wallet who lost their key
+    //@dev pending owner must accept it to prevent changing to a wallet who lost their key
     function acceptOwnership() public onlyPendingOwner {
         owner = pendingOwner;
     }

@@ -81,28 +81,28 @@ contract ArbitrationManager is Owned {
     }    
 
 
-    //@desc set arbitrator so that person resolves this arbitration
+    //@dev set arbitrator so that person resolves this arbitration
     function setArbitrator(address _arbitrationAddress, address _arbitrator) public onlyOwner {
         Arbitration(_arbitrationAddress).setArbitrator(_arbitrator);
     } 
 
-    //@desc get arbitrator
+    //@dev get arbitrator
     function getArbitrator(address _arbitrationAddress) public view returns (address) {
        return Arbitration(_arbitrationAddress).arbitrator();
     } 
 
-    //@desc get arbitration status
+    //@dev get arbitration status
     function getStatus(address _arbitrationAddress) public view returns (Arbitration.Statuses) {
        return Arbitration(_arbitrationAddress).status();
     } 
 
 
-    //@desc get number of arbitrations
+    //@dev get number of arbitrations
     function getArbitrationsLength() public view returns (uint) {
        return arbitrationData.index();
     }
 
-    //@desc  return address or arbitration
+    //@dev  return address or arbitration
     function getAddressById(bytes12 _arbitrationId) public view returns (address) {
        return arbitrationData.addressByArbitrationId(_arbitrationId);
     }
@@ -111,12 +111,12 @@ contract ArbitrationManager is Owned {
        return address(arbitrationData);
     }
 
-    //@desc change data contract
+    //@dev change data contract
     function setDataContract(address _arbitrationData) public onlyOwner {
        arbitrationData = ArbitrationData(_arbitrationData);
     }
     
-    //@desc set splytmanager
+    //@dev set splytmanager
     function setSplytManager(address _address) public onlyOwner {
        splytManager = SplytManager(_address);
     }
@@ -134,8 +134,8 @@ contract ArbitrationManager is Owned {
     }   
 
 
-    //@desc seller disputes reporter by staking initial stake amount
-    //@desc initial stake is asset contract
+    //@dev seller disputes reporter by staking initial stake amount
+    //@dev initial stake is asset contract
     function set2xStakeBySeller(address _arbitrationAddress) public onlySeller(_arbitrationAddress) {
         Arbitration arbitration = Arbitration(_arbitrationAddress);
         arbitration.set2xStakeBySeller();
@@ -144,26 +144,26 @@ contract ArbitrationManager is Owned {
         // emit Success(4, address(arbitration)); 
     }      
 
-    //@desc report puts in 2x stake
+    //@dev report puts in 2x stake
     function set2xStakeByReporter(address _arbitrationAddress) public onlyReporter(_arbitrationAddress) {
         Arbitration arbitration = Arbitration(_arbitrationAddress);
         arbitration.set2xStakeByReporter();
         splytManager.internalContribute(arbitration.reporter(), arbitration.asset(), arbitration.baseStake()); 
     }
 
-    //@desc checks if address is authorized write to the data contracts
+    //@dev checks if address is authorized write to the data contracts
     function isManager(address _address) public view returns (bool) {
         return splytManager.isManager(_address);
     }
    
        
-   //@desc new manager contract that's going to be replacing this
+   //@dev new manager contract that's going to be replacing this
    //Old manager call this function and proposes the new address
     function transferOwnership(address _newAddress) public onlyOwner {
         arbitrationData.transferOwnership(_newAddress);
     }
 
-    //@desc if new data contract is deployed, the creator proposes manager adress then the manager needs to accept
+    //@dev if new data contract is deployed, the creator proposes manager adress then the manager needs to accept
     function acceptOwnership() public onlyOwner {
         arbitrationData.acceptOwnership();
     }

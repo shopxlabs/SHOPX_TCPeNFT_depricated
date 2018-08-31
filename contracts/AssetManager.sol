@@ -57,7 +57,7 @@ contract AssetManager is Owned {
         assetData.save(_assetId, address(asset));
     }
 
-    //@desc update data contract address
+    //@dev update data contract address
     function getAssetInfo(address _assetAddress) public view returns (bytes12, uint, uint){
         Asset asset = Asset(_assetAddress);
         return (asset.assetId(), asset.term(), asset.inventoryCount());
@@ -68,32 +68,32 @@ contract AssetManager is Owned {
     }
 
 
-    //@desc update data contract address
+    //@dev update data contract address
     function setDataContract(address _assetData) onlyOwner public {
        assetData = AssetData(_assetData);
     }
 
-    //@desc get asset status
+    //@dev get asset status
     function getType(address _assetAddress) public view returns (Asset.AssetTypes) {
         return Asset(_assetAddress).assetType();
     }
 
-    //@desc get asset status
+    //@dev get asset status
     function getStatus(address _assetAddress) public view returns (Asset.Statuses) {
         return Asset(_assetAddress).status();
     }
 
-    //@desc update data contract address
+    //@dev update data contract address
     function addMarketPlace(address _assetAddress, address _marketPlace) onlyOwnerOrSplyt public {
         Asset(_assetAddress).addMarketPlace(_marketPlace);
     }
 
-    //@desc update data contract address
+    //@dev update data contract address
     function setStatus(address _assetAddress, Asset.Statuses _status) onlyOwnerOrSplyt public {
         Asset(_assetAddress).setStatus(_status);
     }
 
-    //@desc update data contract address
+    //@dev update data contract address
     function setInventory(address _assetAddress, uint _count) onlyOwnerOrSplyt public {
         Asset(_assetAddress).setInventory(_count);
     }
@@ -125,18 +125,18 @@ contract AssetManager is Owned {
       return assetData.addressByIndex(_index);
     }    
 
-    //@desc checks if address is authorized write to the data contracts
+    //@dev checks if address is authorized write to the data contracts
     function isManager(address _address) public view returns (bool) {
         return splytManager.isManager(_address);
     }
    
-   //@desc new manager contract that's going to be replacing this
+   //@dev new manager contract that's going to be replacing this
    //Old manager call this function and proposes the new address
     function transferOwnership(address _newAddress) public onlyOwnerOrSplyt {
         assetData.transferOwnership(_newAddress);
     }
 
-    //@desc if new data contract is deployed, the creator proposes manager adress then the manager needs to accept
+    //@dev if new data contract is deployed, the creator proposes manager adress then the manager needs to accept
     //The new updated manager contract calls this function
     function acceptOwnership() public onlyOwner {
         assetData.acceptOwnership();
