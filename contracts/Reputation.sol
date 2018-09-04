@@ -4,6 +4,7 @@ import './Asset.sol';  //change to interface later
 
 contract Reputation {
     
+    //@dev made up for now. TODO: redo theses
     enum Statuses { NA, BRONZE, SILVER, GOLD, PLATINUM, DIAMOND }
 
     bytes12 public reputationId;
@@ -24,21 +25,16 @@ contract Reputation {
         _;
     }
 
-    //@dev only within 1-5
-    modifier onlyWithinRange(uint _rating) {
-        require( _rating > 0 && _rating < 6);
-        _;
-    }
 
     //@dev only create new reputation when it creates first review
-    constructor(uint _rating, address _from) public onlyWithinRange(_rating){
+    constructor(uint _rating, address _from) public {
         status = Statuses.BRONZE;
         reviews.push(Review(_rating, _from, now));   
         totalScore += _rating;     
     }  
 
     //@dev only accept 100 to 500 
-    function addReview(uint _rating, address _from) public onlyWithinRange(_rating) {
+    function addReview(uint _rating, address _from) public onlyManager {
         reviews.push(Review(_rating, _from, now));
         totalScore += _rating;
     }  

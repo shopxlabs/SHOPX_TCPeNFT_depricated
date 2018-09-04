@@ -18,13 +18,19 @@ contract ReputationManager is Owned, Events  {
         _;
     }
 
+    //@dev only within 1-5
+    modifier onlyValidRange(uint _rating) {
+        require( _rating > 0 && _rating < 6);
+        _;
+    }
+
     constructor(address _splytManager) public {
         reputationData = new ReputationData();
         splytManager = SplytManager(_splytManager);
     }
 
-    //@dev only create new reputation when it creates first review
-    function createReview(address _wallet, uint _rating) public {
+    //@dev only create new review when it creates first review
+    function createReview(address _wallet, uint _rating) public onlyValidRange(_rating) {
 
          address reputationAddress = reputationData.reputationByWallet(_wallet);
 
