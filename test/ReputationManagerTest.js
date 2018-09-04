@@ -67,16 +67,27 @@ contract('ReputationManagerTest general test cases.', function(accounts) {
     assert.notEqual(reputationManagerAddress, 0x0, "ReputationManager manager has not been deployed!");
   })
 
- //  it('should be 1 arbitration contract successfully!', async function() {
-    
- //    await create_asset();
- //    await create_arbitration();
+  it('should be create a successfull 5 star review. Average should be 5!', async function() {
+    await reputationManagerInstance.createReview(defaultSeller, 5);
+    let rating = await reputationManagerInstance.getRatingByWallet(defaultSeller);
+    // console.log('rating: ' + rating);
+    assert.equal(rating, 500, "Rating should be 500(5.00)");
+  })
 
- //    let length = await arbitrationManagerInstance.getArbitrationsLength();
- //    // console.log('number of arbitrations: ' + length);
- //    assert.equal(length, 1, "Number of arbitrations is not 1!");
- //  })
+  it('should be create a successfull 3 star review!. Average should be 4', async function() {
+    await reputationManagerInstance.createReview(defaultSeller, 3);
+    let averageRating = await reputationManagerInstance.getRatingByWallet(defaultSeller);
+    // console.log('rating: ' + averageRating);
+    assert.equal(averageRating, 400, "Rating should be 400(4.00)");
+  })
 
+  
+  it('should be create a successfull 3 star review! Average should be 3.66', async function() {
+    await reputationManagerInstance.createReview(defaultSeller, 3);
+    let averageRating = await reputationManagerInstance.getRatingByWallet(defaultSeller);
+    // console.log('rating: ' + averageRating);
+    assert.equal(averageRating, 366, "Rating should be 366(3.66)");
+  })
 
  //  it('should be status 2=IN_ARBITRATION after reporter creates an arbitration!', async function() {
     

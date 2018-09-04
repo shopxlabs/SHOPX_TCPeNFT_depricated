@@ -78,8 +78,9 @@ contract ReputationManager is Owned, Events  {
     }
    
     //@dev assume 2 decimals
-    function getRating(address _address) public view returns (uint) {
-        Reputation rep = Reputation(_address);
+    function getRatingByWallet(address _wallet) public view returns (uint) {
+        address reputationAddress = reputationData.reputationByWallet(_wallet);
+        Reputation rep = Reputation(reputationAddress);
        return ((rep.totalScore() * 100) / rep.getReviewsLength());
 
     } 
