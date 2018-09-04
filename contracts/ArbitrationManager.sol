@@ -13,18 +13,21 @@ contract ArbitrationManager is Owned, Events {
     ArbitrationData public arbitrationData;
     
     //middlware only arbitrator 
-    modifier onlyArbitrator(address _arbitrationAddress) {
-        require(Arbitration(_arbitrationAddress).arbitrator() == msg.sender);
+    modifier onlyArbitrator(bytes12 _arbitrationId) {
+        address arbitrationAddress = arbitrationData.addressByArbitrationId(_arbitrationId);      
+        require(Arbitration(arbitrationAddress).arbitrator() == msg.sender);
         _;
     }
 
-    modifier onlyReporter(address _arbitrationAddress) {
-        require(Arbitration(_arbitrationAddress).reporter() == msg.sender);        
+    modifier onlyReporter(bytes12 _arbitrationId) {
+         address arbitrationAddress = arbitrationData.addressByArbitrationId(_arbitrationId);
+        require(Arbitration(arbitrationAddress).reporter() == msg.sender);        
         _;
     }
         
-    modifier onlySeller(address _arbitrationAddress) {
-        address assetAddress = Arbitration(_arbitrationAddress).asset();
+    modifier onlySeller(bytes12 _arbitrationId) {
+        address arbitrationAddress = arbitrationData.addressByArbitrationId(_arbitrationId);
+        address assetAddress = Arbitration(arbitrationAddress).asset();
         require(Asset(assetAddress).seller() == msg.sender);        
         _;
     }
@@ -35,14 +38,14 @@ contract ArbitrationManager is Owned, Events {
         arbitrationData = new ArbitrationData();
     }
 
-    function createArbitration(address _assetAddress, bytes12 _arbitrationId, Arbitration.Reasons _reason) public {
+    function createArbitration(bytes12 _arbitrationId, address _assetAddress, Arbitration.Reasons _reason) public {
 
         Asset asset = Asset(_assetAddress);
         uint stakeAmount = asset.initialStakeAmount(); //get initital stake amount
         
         address reporter = msg.sender;
 
-        Arbitration arbitration = new Arbitration(_assetAddress, _arbitrationId, _reason, reporter, stakeAmount);
+        Arbitration arbitration = new Arbitration(_arbitrationId, _assetAddress, _reason, reporter, stakeAmount);
         arbitrationData.save(_arbitrationId, address(arbitration));
 
         //change status so no one can purchase during arbitration
@@ -55,9 +58,10 @@ contract ArbitrationManager is Owned, Events {
     }
 
     //TODO: write test to see if tokens gets distributed correctly to winner and arbitrator
-    function setWinner(address _arbitrationAddress, Arbitration.Winners _winner) public onlyArbitrator(_arbitrationAddress) {
+    function setWinner(bytes12 _arbitrationId, Arbitration.Winners _winner) public onlyArbitrator(_arbitrationId) {
         
-        Arbitration arbitration = Arbitration(_arbitrationAddress);
+        address arbitrationAddress = arbitrationData.addressByArbitrationId(_arbitrationId);
+        Arbitration arbitration = Arbitration(arbitrationAddress);
         address assetAddress = arbitration.asset();
         
         arbitration.setWinner(_winner);
@@ -78,25 +82,28 @@ contract ArbitrationManager is Owned, Events {
         splytManager.internalContribute(assetAddress, arbitration.arbitrator(), arbitratorReward); 
     }    
 
-    function getWinner(address _arbitrationAddress) public view returns (Arbitration.Winners){
-        
-        return Arbitration(_arbitrationAddress).winner();
+    function getWinner(bytes12 _arbitrationId) public view returns (Arbitration.Winners){
+        address arbitrationAddress = arbitrationData.addressByArbitrationId(_arbitrationId);           
+        return Arbitration(arbitrationAddress).winner();
     }    
 
 
     //@dev set arbitrator so that person resolves this arbitration
-    function setArbitrator(address _arbitrationAddress, address _arbitrator) public onlyOwner {
-        Arbitration(_arbitrationAddress).setArbitrator(_arbitrator);
+    function setArbitrator(bytes12 _arbitrationId, address _arbitrator) public onlyOwner {
+        address arbitrationAddress = arbitrationData.addressByArbitrationId(_arbitrationId);   
+        Arbitration(arbitrationAddress).setArbitrator(_arbitrator);
     } 
 
     //@dev get arbitrator
-    function getArbitrator(address _arbitrationAddress) public view returns (address) {
-       return Arbitration(_arbitrationAddress).arbitrator();
+    function getArbitrator(bytes12 _arbitrationId) public view returns (address) {
+        address arbitrationAddress = arbitrationData.addressByArbitrationId(_arbitrationId);   
+       return Arbitration(arbitrationAddress).arbitrator();
     } 
 
     //@dev get arbitration status
-    function getStatus(address _arbitrationAddress) public view returns (Arbitration.Statuses) {
-       return Arbitration(_arbitrationAddress).status();
+    function getStatus(bytes12 _arbitrationId) public view returns (Arbitration.Statuses) {
+        address arbitrationAddress = arbitrationData.addressByArbitrationId(_arbitrationId);  
+       return Arbitration(arbitrationAddress).status();
     } 
 
 
@@ -139,8 +146,9 @@ contract ArbitrationManager is Owned, Events {
 
     //@dev seller disputes reporter by staking initial stake amount
     //@dev initial stake is asset contract
-    function set2xStakeBySeller(address _arbitrationAddress) public onlySeller(_arbitrationAddress) {
-        Arbitration arbitration = Arbitration(_arbitrationAddress);
+    function set2xStakeBySeller(bytes12 _arbitrationId) public onlySeller(_arbitrationId) {
+        address arbitrationAddress = arbitrationData.addressByArbitrationId(_arbitrationId);           
+        Arbitration arbitration = Arbitration(arbitrationAddress);
         arbitration.set2xStakeBySeller();
 
         splytManager.internalContribute(arbitration.getSeller(), arbitration.asset(), arbitration.baseStake()); 
@@ -148,8 +156,9 @@ contract ArbitrationManager is Owned, Events {
     }      
 
     //@dev report puts in 2x stake
-    function set2xStakeByReporter(address _arbitrationAddress) public onlyReporter(_arbitrationAddress) {
-        Arbitration arbitration = Arbitration(_arbitrationAddress);
+    function set2xStakeByReporter(bytes12 _arbitrationId) public onlyReporter(_arbitrationId) {
+        address arbitrationAddress = arbitrationData.addressByArbitrationId(_arbitrationId);   
+        Arbitration arbitration = Arbitration(arbitrationAddress);
         arbitration.set2xStakeByReporter();
         splytManager.internalContribute(arbitration.reporter(), arbitration.asset(), arbitration.baseStake()); 
     }

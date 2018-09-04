@@ -5,7 +5,7 @@ import './Asset.sol';  //change to interface later
 contract Reputation {
     
     //@dev made up for now. TODO: redo theses
-    enum Statuses { NA, BRONZE, SILVER, GOLD, PLATINUM, DIAMOND }
+    // enum Statuses { NA, BRONZE, SILVER, GOLD, PLATINUM, DIAMOND }
 
     bytes12 public reputationId;
     
@@ -15,7 +15,7 @@ contract Reputation {
         uint date;
     }
 
-    Statuses public status;
+    // Statuses public status;
 
     Review[] public reviews;
     uint public totalScore;
@@ -28,7 +28,6 @@ contract Reputation {
 
     //@dev only create new reputation when it creates first review
     constructor(uint _rating, address _from) public {
-        status = Statuses.BRONZE;
         reviews.push(Review(_rating, _from, now));   
         totalScore += _rating;     
     }  

@@ -16,13 +16,13 @@ contract OrderManager is Owned, Events {
     OrderData public orderData;
     SplytManager public splytManager;
 
-    modifier onlyBuyer(uint _orderId) {
+    modifier onlyBuyer(bytes12 _orderId) {
         address buyer = orderData.getBuyer(_orderId);  
         require(buyer == msg.sender);
         _;
     }
     
-    modifier onlySeller(uint _orderId) {
+    modifier onlySeller(bytes12 _orderId) {
         address seller = Asset(orderData.getAsset(_orderId)).seller();          
         require(seller == msg.sender);
         _;
@@ -35,7 +35,7 @@ contract OrderManager is Owned, Events {
     }  
 
     //@dev middleware to check for certain order statuses to continue
-    modifier onlyOrderStatus(uint _orderId, OrderData.Statuses _status) {
+    modifier onlyOrderStatus(bytes12 _orderId, OrderData.Statuses _status) {
         require(_status == orderData.getStatus(_orderId));
         _;
     }    
@@ -63,23 +63,23 @@ contract OrderManager is Owned, Events {
     //@dev buyer must pay it in full to create order
     // To succcessfully purchase an asset, buy must purchase the whole amount times the quantity.
     // The asset must be in 'ACTIVE' status.    
-    function purchase(address _assetAddress, uint _qty, uint _tokenAmount) public onlyAssetStatus(Asset.Statuses.ACTIVE, _assetAddress) returns (bool) {
+    function purchase(bytes12 _orderId, address _assetAddress, uint _qty, uint _tokenAmount) public onlyAssetStatus(Asset.Statuses.ACTIVE, _assetAddress) returns (bool) {
 
         Asset asset = Asset(_assetAddress);
 
         //Regular asset purchase or a fractional purchase
         if (asset.assetType() == Asset.AssetTypes.NORMAL) {
-            createOrder(asset, _qty, _tokenAmount);
+            createOrder(_orderId, asset, _qty, _tokenAmount);
         } else {
             //Fractional ownership
-            contributeOrder(asset, _tokenAmount);            
+            contributeOrder(_orderId, asset, _tokenAmount);            
         }
 
         return true;
     }
 
     //@dev for regular normal purchase order
-    function createOrder(Asset _asset, uint _qty, uint _tokenAmount) private {
+    function createOrder(bytes12 _orderId, Asset _asset, uint _qty, uint _tokenAmount) private {
 
         uint buyerBalance = splytManager.getBalance(msg.sender);
         uint totalCost = _asset.totalCost() * _qty;
@@ -101,14 +101,14 @@ contract OrderManager is Owned, Events {
             }
         }
 
-        orderData.save(address(_asset), msg.sender, _qty, _tokenAmount); //save it to the data contract                
+        orderData.save(_orderId, address(_asset), msg.sender, _qty, _tokenAmount); //save it to the data contract                
         splytManager.subtractInventory(address(_asset), _qty); //update inventory
         emit Success(4, address(_asset));
 
     }
 
     //@dev for fractional purchases
-    function contributeOrder(Asset _asset, uint _tokenAmount) private {
+    function contributeOrder(bytes12 _orderId, Asset _asset, uint _tokenAmount) private {
        
         uint buyerBalance = splytManager.getBalance(msg.sender);
         //check if buyer has the amount he proposes to use to contribute
@@ -116,21 +116,21 @@ contract OrderManager is Owned, Events {
             revert();
         }
 
-        uint orderId = orderData.getFractionalOrderIdByAsset(address(_asset));
-        OrderData.Statuses currentStatus = getStatus(orderId);
+        // uint orderId = orderData.getFractionalOrderIdByAsset(address(_asset));
+        OrderData.Statuses currentStatus = getStatus(_orderId);
         
         OrderData.Statuses updatedStatus;
         //check if theres' existing
         if (currentStatus == OrderData.Statuses.CONTRIBUTIONS_OPEN) {
-            uint totalContributions = orderData.getTotalContributions(orderId) + _tokenAmount;         
+            uint totalContributions = orderData.getTotalContributions(_orderId) + _tokenAmount;         
             updatedStatus = totalContributions >= _asset.totalCost() ? OrderData.Statuses.CONTRIBUTIONS_FULFILLED : OrderData.Statuses.CONTRIBUTIONS_OPEN;   
             splytManager.internalContribute(msg.sender, address(_asset), _tokenAmount); //transfer contributed amount to asset contract
-            orderData.updateFractional(orderId, msg.sender, _tokenAmount, updatedStatus);       
+            orderData.updateFractional(_orderId, msg.sender, _tokenAmount, updatedStatus);       
         } else {
             //create new fractional order
             updatedStatus = _tokenAmount >=  _asset.totalCost() ? OrderData.Statuses.CONTRIBUTIONS_FULFILLED : OrderData.Statuses.CONTRIBUTIONS_OPEN;          
             splytManager.internalContribute(msg.sender, address(_asset), _tokenAmount);  //transfer contributed amount to asset contract
-            orderData.saveFractional(address(_asset), msg.sender, _tokenAmount, updatedStatus);                      
+            orderData.saveFractional(_orderId, address(_asset), msg.sender, _tokenAmount, updatedStatus);                      
         }
 
         //updated asset status to PIF once all contributions are in place
@@ -143,14 +143,14 @@ contract OrderManager is Owned, Events {
 
     }
  
-    function setStatus(uint _orderId, OrderData.Statuses _status) public returns (bool) {
+    function setStatus(bytes12 _orderId, OrderData.Statuses _status) public returns (bool) {
 
         orderData.setStatus(_orderId, _status); //update the status                
  
         return true;
     }
 
-    function getStatus(uint _orderId) public view returns (OrderData.Statuses) {
+    function getStatus(bytes12 _orderId) public view returns (OrderData.Statuses) {
 
         return orderData.getStatus(_orderId);                
  
@@ -167,7 +167,7 @@ contract OrderManager is Owned, Events {
 
 
     //@dev seller gets refund to buyer and marketplaces
-    function approveRefund(uint _orderId) public onlySeller(_orderId) {
+    function approveRefund(bytes12 _orderId) public onlySeller(_orderId) {
         
         uint sellerBalance = splytManager.getBalance(msg.sender);
         uint totalRefundAmount = orderData.getPaidAmount(_orderId);
@@ -201,16 +201,16 @@ contract OrderManager is Owned, Events {
 
     }
     
-    function requestRefund(uint _orderId) public onlyBuyer(_orderId) {
+    function requestRefund(bytes12 _orderId) public onlyBuyer(_orderId) {
         orderData.setStatus(_orderId, OrderData.Statuses.REQUESTED_REFUND); //save it to the data contract              
     }    
 
-    function getTotalContributions(uint _orderId) public view returns (uint) {
+    function getTotalContributions(bytes12 _orderId) public view returns (uint) {
         return orderData.getTotalContributions(_orderId);
     }
     
 
-    function getMyContributions(uint _orderId) public view returns (uint) {
+    function getMyContributions(bytes12 _orderId) public view returns (uint) {
         return orderData.getMyContributions(_orderId, msg.sender);
     }
     
@@ -227,7 +227,7 @@ contract OrderManager is Owned, Events {
        orderData = OrderData(_orderData);
     }
 
-    function getOrderByOrderId(uint _orderId) public view returns (uint, uint, address, address, uint, uint, OrderData.Statuses) {
+    function getOrderByOrderId(bytes12 _orderId) public view returns (uint, bytes12, address, address, uint, uint, OrderData.Statuses) {
       return orderData.getOrderByOrderId(_orderId);
     }    
 
@@ -236,12 +236,12 @@ contract OrderManager is Owned, Events {
     }    
 
     //@dev will return error if trying to retrieve order id that is not a fractional asset
-    function getFractionalOrderIdByAsset(address _assetAddress) public view onlyFractionalAsset(_assetAddress) returns (uint) {
+    function getFractionalOrderIdByAsset(address _assetAddress) public view onlyFractionalAsset(_assetAddress) returns (bytes12) {
         return orderData.getFractionalOrderIdByAsset(_assetAddress);
     }   
 
     function getOrdersLength() public view returns (uint) {
-      return orderData.orderId();
+      return orderData.index();
     }       
    //@dev new manager contract that's going to be replacing this
    //Old manager call this function and proposes the new address

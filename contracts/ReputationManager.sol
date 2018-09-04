@@ -55,13 +55,7 @@ contract ReputationManager is Owned, Events  {
        reputationData = ReputationData(_reputationData);
     }
 
-    //@dev get asset status
-
-    //@dev get asset status
-    function getStatus(address _reputationAddress) public view returns (Reputation.Statuses) {
-        return Reputation(_reputationAddress).status();
-    }
-   
+    //@dev get asset stat
 
     function setSplytManager(address _address) public onlyOwnerOrSplyt {
         splytManager = SplytManager(_address);
@@ -82,6 +76,13 @@ contract ReputationManager is Owned, Events  {
         address reputationAddress = reputationData.reputationByWallet(_wallet);
         Reputation rep = Reputation(reputationAddress);
        return ((rep.totalScore() * 100) / rep.getReviewsLength());
+
+    } 
+    //@dev get total ratings
+    function getTotalRatingByWallet(address _wallet) public view returns (uint) {
+        address reputationAddress = reputationData.reputationByWallet(_wallet);
+        Reputation rep = Reputation(reputationAddress);
+       return rep.totalScore();
 
     } 
 
