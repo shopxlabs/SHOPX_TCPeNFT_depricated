@@ -6,10 +6,10 @@ const Asset = artifacts.require("./Asset.sol");
 
 contract('ReputationManagerTest general test cases.', function(accounts) {
 
-  const defaultBuyer = accounts[0];
-  const defaultSeller = accounts[1];
-  const defaultMarketPlace = accounts[2];
-  const defaultArbitrator = accounts[3];
+  const defaultSeller = accounts[0];
+  const defaultRater1 = accounts[1];
+  const defaultRater2 = accounts[2];
+  const defaultRater3 = accounts[3];
   
   const defaultPrice = 1000;
   const defaultExpDate = (new Date().getTime() / 1000) + 60;
@@ -36,9 +36,9 @@ contract('ReputationManagerTest general test cases.', function(accounts) {
   //Instantiate it only once
   async function init() {
     
-    console.log('defaultBuyer wallet: ' + defaultBuyer);
-    console.log('defaulSeller wallet: ' + defaultSeller);
-    console.log('defaultMarketPlace wallet: ' + defaultMarketPlace);
+    // console.log('defaultBuyer wallet: ' + defaultBuyer);
+    // console.log('defaulSeller wallet: ' + defaultSeller);
+    // console.log('defaultMarketPlace wallet: ' + defaultMarketPlace);
 
     reputationManagerInstance = await ReputationManager.deployed()    
   }
@@ -68,14 +68,14 @@ contract('ReputationManagerTest general test cases.', function(accounts) {
   })
 
   it('should be create a successfull 5 star review. Average should be 5!', async function() {
-    await reputationManagerInstance.createReview(defaultSeller, 5);
+    await reputationManagerInstance.createRate(defaultSeller, 5);
     let rating = await reputationManagerInstance.getAverageRatingByWallet(defaultSeller);
     // console.log('rating: ' + rating);
     assert.equal(rating, 500, "Rating should be 500(5.00)");
   })
 
   it('should be create a successfull 3 star review!. Average should be 4', async function() {
-    await reputationManagerInstance.createReview(defaultSeller, 3, { from : defaultBuyer });
+    await reputationManagerInstance.createRate(defaultSeller, 3, { from : defaultRater1 });
     let averageRating = await reputationManagerInstance.getAverageRatingByWallet(defaultSeller);
     console.log('rating: ' + averageRating);
     assert.equal(averageRating, 400, "Rating should be 400(4.00)");
@@ -83,33 +83,18 @@ contract('ReputationManagerTest general test cases.', function(accounts) {
 
   
   it('should be create a successfull 3 star review! Average should be 3.66', async function() {
-    await reputationManagerInstance.createReview(defaultSeller, 3, { from : defaultMarketPlace });
+    await reputationManagerInstance.createRate(defaultSeller, 3, { from : defaultRater2 });
     let averageRating = await reputationManagerInstance.getAverageRatingByWallet(defaultSeller);
     console.log('rating: ' + averageRating);
-    // assert.equal(averageRating, 366, "Rating should be 366(3.66)");
+    assert.equal(averageRating, 366, "Rating should be 366(3.66)");
   })
 
   it('should return total rating of 11!', async function() {
     
     let totalRating = await reputationManagerInstance.getTotalRatingByWallet(defaultSeller);
     console.log('total rating: ' + totalRating);
-    // assert.equal(totalRating, 11, "Total rating is not 11!");
+    assert.equal(totalRating, 11, "Total rating is not 11!");
   })
-
-
- //  it('should not be able to purchase order a asset in status 2=IN_ARBITRATION!', async function() {
-
- //    try {
- //      await orderManagerInstance.purchase();
- //      assert.isTrue(false, "Should have error out. Should have not created a order if status is 2=IN_ARBITRATION!");
- //    } catch (e) {
- //      // console.log(e)
- //      // console.log('yes it errored out as expected since you cannot create a order in status IN_ARBITRATION')
- //      assert.isTrue(true, "should error. Expected outsome so no output!");
- //    }
-
- //  })
-
 
 
 })
