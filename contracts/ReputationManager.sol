@@ -30,7 +30,7 @@ contract ReputationManager is Owned, Events  {
     }
 
     //@dev only create new review when it creates first review
-    function createReview(address _wallet, uint _rating) public onlyValidRange(_rating) {
+    function createRate(address _wallet, uint _rating) public onlyValidRange(_rating) {
 
          address reputationAddress = reputationData.reputationByWallet(_wallet);
 
@@ -38,12 +38,22 @@ contract ReputationManager is Owned, Events  {
             Reputation reputation = new Reputation(_rating, msg.sender);
             reputationData.save(_wallet, address(reputation));
          } else {
-            Reputation(reputationAddress).addReview(_rating, msg.sender);
+            Reputation rep = Reputation(reputationAddress);
+            //@if found,update else create new
+            bool found = false;
+            for (uint i =0; i < rep.getRatesLength(); i++) {
+                if (msg.sender == rep.getRaterByIndex(i)) {
+                    rep.updateRate(i, _rating);
+                    found = true;
+                }              
+            }
+            if (!found) {
+                rep.addRate(_rating, msg.sender);
+            }
          }
          emit Success(5, reputationAddress);
         
     }
-
 
     function getDataContractAddress() public view returns (address) {
        return address(reputationData);
@@ -72,19 +82,38 @@ contract ReputationManager is Owned, Events  {
     }
    
     //@dev assume 2 decimals
-    function getRatingByWallet(address _wallet) public view returns (uint) {
+    function getAverageRatingByWallet(address _wallet) public view returns (uint) {
         address reputationAddress = reputationData.reputationByWallet(_wallet);
         Reputation rep = Reputation(reputationAddress);
-       return ((rep.totalScore() * 100) / rep.getReviewsLength());
+        uint totalScore = 0;
+        for (uint i =0; i < rep.getRatesLength(); i++) {
+            totalScore += rep.getRatingByIndex(i);
+        }
+       return ((totalScore * 100) / rep.getRatesLength());
 
     } 
     //@dev get total ratings
     function getTotalRatingByWallet(address _wallet) public view returns (uint) {
         address reputationAddress = reputationData.reputationByWallet(_wallet);
         Reputation rep = Reputation(reputationAddress);
-       return rep.totalScore();
+        uint totalScore = 0;
+        for (uint i =0; i < rep.getRatesLength(); i++) {
+            totalScore += rep.getRatingByIndex(i);
+        }
+       return totalScore;
 
     } 
+    //@dev get total ratings
+    // function getTotalScore(Reputation _rep) public view returns (uint) {
+    //     address reputationAddress = reputationData.reputationByWallet(_wallet);
+    //     Reputation rep = Reputation(reputationAddress);
+    //     uint totalScore = 0;
+    //     for (uint i =0; i < rep.getReviewsLength(); i++) {
+    //         totalScore += rep.reviews[i];
+    //     }
+    //    return totolScore;
+
+    // } 
 
    //@dev new manager contract that's going to be replacing this
    //Old manager call this function and proposes the new address

@@ -69,33 +69,32 @@ contract('ReputationManagerTest general test cases.', function(accounts) {
 
   it('should be create a successfull 5 star review. Average should be 5!', async function() {
     await reputationManagerInstance.createReview(defaultSeller, 5);
-    let rating = await reputationManagerInstance.getRatingByWallet(defaultSeller);
+    let rating = await reputationManagerInstance.getAverageRatingByWallet(defaultSeller);
     // console.log('rating: ' + rating);
     assert.equal(rating, 500, "Rating should be 500(5.00)");
   })
 
   it('should be create a successfull 3 star review!. Average should be 4', async function() {
-    await reputationManagerInstance.createReview(defaultSeller, 3);
-    let averageRating = await reputationManagerInstance.getRatingByWallet(defaultSeller);
-    // console.log('rating: ' + averageRating);
+    await reputationManagerInstance.createReview(defaultSeller, 3, { from : defaultBuyer });
+    let averageRating = await reputationManagerInstance.getAverageRatingByWallet(defaultSeller);
+    console.log('rating: ' + averageRating);
     assert.equal(averageRating, 400, "Rating should be 400(4.00)");
   })
 
   
   it('should be create a successfull 3 star review! Average should be 3.66', async function() {
-    await reputationManagerInstance.createReview(defaultSeller, 3);
-    let averageRating = await reputationManagerInstance.getRatingByWallet(defaultSeller);
-    // console.log('rating: ' + averageRating);
-    assert.equal(averageRating, 366, "Rating should be 366(3.66)");
+    await reputationManagerInstance.createReview(defaultSeller, 3, { from : defaultMarketPlace });
+    let averageRating = await reputationManagerInstance.getAverageRatingByWallet(defaultSeller);
+    console.log('rating: ' + averageRating);
+    // assert.equal(averageRating, 366, "Rating should be 366(3.66)");
   })
 
- //  it('should be status 2=IN_ARBITRATION after reporter creates an arbitration!', async function() {
+  it('should return total rating of 11!', async function() {
     
- //    let status = await assetInstance.status();
-
- //    // console.log('asset status after being reported:: ' + status);
- //    assert.equal(status, 2, "Status is not in IN_ARBITRATION!");
- //  })
+    let totalRating = await reputationManagerInstance.getTotalRatingByWallet(defaultSeller);
+    console.log('total rating: ' + totalRating);
+    // assert.equal(totalRating, 11, "Total rating is not 11!");
+  })
 
 
  //  it('should not be able to purchase order a asset in status 2=IN_ARBITRATION!', async function() {
@@ -112,51 +111,5 @@ contract('ReputationManagerTest general test cases.', function(accounts) {
  //  })
 
 
- //  it('should be able to assign arbitrator in the Arbitration contract!', async function() {
 
- //    await arbitrationManagerInstance.setArbitrator(arbitrationAddress, defaultArbitrator);
- //    // console.log('assigning arbitrator: ' + defaultArbitrator);
- //    let arbitrator = await arbitrationManagerInstance.getArbitrator(arbitrationAddress);
- //    // console.log('returned arbitrator: ' + arbitrator);
- //    assert.equal(defaultArbitrator, arbitrator,"Arbitrator did not get assigned!");
-
- //  })
-
- //  it('should seller be able to 2x stake on the arbitration contract', async function() {
- //    await arbitrationManagerInstance.set2xStakeBySeller(arbitrationAddress, { from: defaultSeller });
- //    let status = await arbitrationManagerInstance.getStatus(arbitrationAddress);
- //    // console.log('arbitration status: ' + status);
- //    assert.equal(1,status,"Status is not in 2=SELLER_STAKE_2x as expected!");
-
- //  })
-
- // it('should reporter be able to 2x stake on the arbitration contract', async function() {
- //    await arbitrationManagerInstance.set2xStakeByReporter(arbitrationAddress, { from: defaultBuyer });
- //    let status = await arbitrationManagerInstance.getStatus(arbitrationAddress);
- //    // console.log('arbitration status: ' + status);
- //    assert.equal(2,status,"Status is not in 2=REPORTER_STAKE_2x as expected!");
-
- //  })
-
- //  it('should arbitrator to set the winner to reporter!', async function() {
-
- //    console.log('arbitrator: ' + defaultArbitrator);
- //    await arbitrationManagerInstance.setWinner(arbitrationAddress, 1, { from: defaultArbitrator });
- //    let winner = await arbitrationManagerInstance.getWinner(arbitrationAddress);
- //    // console.log('winner is ' + winner)
- //    assert.equal(1, winner,"Winner is not reporter as expected!");
-
- //  })
-
- //  it('should asset status be 5=CLOSED after arbitration sides with reporter!', async function() {
- //    let status = await assetManagerInstance.getStatus(assetAddress);
- //    // console.log('status is ' + status);
- //    assert.equal(5,status,"Status is not in 5=CLOSED as expected!");
-
- //  })
-
-
-  async function sleep(milliseconds) {
-    return new Promise(resolve => setTimeout(resolve, milliseconds));
-  }
 })
