@@ -143,6 +143,12 @@ contract ArbitrationManager is Owned, Events {
       return arbitrationData.addressByIndex(_index);
     }   
 
+    function getArbitrationInfoByIndex(uint _index) public view returns (bytes12, Arbitration.Reasons, address, Arbitration.Winners, Arbitration.Statuses, address, address) {
+      Arbitration a = Arbitration(arbitrationData.addressByIndex(_index));
+
+      return (a.arbitrationId(), a.reason(), a.reporter(), a.winner(), a.status(), a.asset(), a.arbitrator());
+    }   
+
 
     //@dev seller disputes reporter by staking initial stake amount
     //@dev initial stake is asset contract

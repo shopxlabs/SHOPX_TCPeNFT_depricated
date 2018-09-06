@@ -133,6 +133,19 @@ contract('AssetManagerTest general test cases.', function(accounts) {
     assert.equal(count, 2, "Asset inventory is different than expected!");
   })
 
+  it('should interate through list of assets', async function() {
+    let index = await assetManagerInstance.getAssetsLength();
+    for (let i = 0; i < index; i++) {
+      console.log('index: ' + i)
+      let fields = await assetManagerInstance.getAssetInfoByIndex(i)
+      console.log('asset info: ' + fields);      
+    }
+
+    // console.log('asset inventory: ' + count);
+    // assert.equal(count, 2, "Asset inventory is different than expected!");
+  })
+
+
 
   async function sleep(milliseconds) {
     return new Promise(resolve => setTimeout(resolve, milliseconds));

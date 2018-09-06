@@ -59,10 +59,21 @@ contract AssetManager is Owned, Events {
         emit Success(1, address(asset));
     }
 
-    //@dev update data contract address
-    function getAssetInfo(address _assetAddress) public view returns (bytes12, uint, uint){
+    //@dev get asset info by address
+    function getAssetInfo(address _assetAddress) public view returns (bytes12, uint, uint, address){
         Asset asset = Asset(_assetAddress);
-        return (asset.assetId(), asset.term(), asset.inventoryCount());
+        return (asset.assetId(), asset.term(), asset.inventoryCount(), asset.seller());
+    }
+
+    //@dev get asset info by index
+    function getAssetInfoByIndex(uint _index) public view returns (bytes12, uint, uint, address){
+        Asset asset = Asset(assetData.addressByIndex(_index));
+        return (asset.assetId(), asset.term(), asset.inventoryCount(), asset.seller());
+    }
+
+    //@dev get asset info by index
+    function getAssetsLength() public view returns (uint){
+        return (assetData.index());
     }
 
     function getDataContractAddress() public view returns (address) {

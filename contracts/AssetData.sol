@@ -8,7 +8,6 @@ contract AssetData is Owned {
     mapping (bytes12 => address) public addressByAssetId;
     mapping (uint => address) public addressByIndex;
 
-    uint public assetId; //increments after creating new
     uint public index;
 
     function save(bytes12 _assetId, address _assetAddress) public onlyOwner returns (bool) {

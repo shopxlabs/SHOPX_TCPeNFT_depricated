@@ -231,6 +231,10 @@ contract OrderManager is Owned, Events {
       return orderData.getOrderByOrderId(_orderId);
     }    
 
+    function getOrderInfoByIndex(uint _index) public view returns (uint, bytes12, address, address, uint, uint, OrderData.Statuses) {
+      return orderData.getOrderByOrderId(orderData.orderIdByIndex(_index));
+    }    
+
     function getDataVersion() public view returns (uint) {
       return orderData.version();
     }    

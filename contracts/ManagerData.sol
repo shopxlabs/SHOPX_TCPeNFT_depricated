@@ -8,6 +8,9 @@ contract ManagerData is Owned {
 
     //List of past and current manager addresses/wallets    
     mapping (address => bool) public managers;
+    mapping (uint => address) public addressByIndex;
+
+    uint public index;
 
     constructor() public {
         managers[msg.sender] = true;   //add creator
@@ -20,6 +23,7 @@ contract ManagerData is Owned {
 
     function add(address _address) public onlyOwner {
         managers[_address] = true;
+        index++;
     }  
     
     function disable(address _address) public onlyOwner {
