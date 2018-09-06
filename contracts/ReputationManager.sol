@@ -63,7 +63,7 @@ contract ReputationManager is Owned, Events  {
     }  
 
     //@dev get review information
-    function getRateInfoByAndIndex(uint _index) public view returns (address, uint, uint) {
+    function getReputionInfoByAndIndex(uint _index) public view returns (address, uint, uint) {
 
         Reputation rep = Reputation(reputationData.reputationByIndex(_index));
         uint length = rep.getRatesLength();
