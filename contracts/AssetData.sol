@@ -10,6 +10,7 @@ contract AssetData is Owned {
 
     uint public index;
 
+    //TODO: add modifier t only let new
     function save(bytes12 _assetId, address _assetAddress) public onlyOwner returns (bool) {
         assetIdByAddress[_assetAddress] = _assetId;
         addressByAssetId[_assetId] = _assetAddress;

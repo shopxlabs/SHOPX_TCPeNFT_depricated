@@ -20,7 +20,7 @@ contract ManagerData is Owned {
         require(managers[msg.sender] == true);
         _;
     }
-
+    //TODO: add modifier t only let new
     function add(address _address) public onlyOwner {
         managers[_address] = true;
         index++;

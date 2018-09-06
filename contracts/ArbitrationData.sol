@@ -9,7 +9,7 @@ contract ArbitrationData is Owned {
     mapping (uint => address) public addressByIndex;
     
     uint public index;
-
+    //TODO: add modifier t only let new
     function save(bytes12 _arbitrationId, address _arbitrationAddress) public onlyOwner {
         arbitrationIdByAddress[_arbitrationAddress] = _arbitrationId;
         addressByArbitrationId[_arbitrationId] = _arbitrationAddress;

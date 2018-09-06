@@ -34,7 +34,7 @@ contract OrderData is Owned {
     mapping (uint =>  bytes12) public orderIdByIndex;
 
     uint public index;
-
+    //TODO: add modifier t only let new
     function save(bytes12 _orderId, address _asset, address _buyer, uint _quantity, uint _paidAmount) public onlyOwner returns (bool) {
         orders[_orderId] = Order(version, _orderId, _asset, _buyer, _quantity, _paidAmount, Statuses.PIF, Reasons.NA, 0);
         orderIdByIndex[index] = _orderId;
