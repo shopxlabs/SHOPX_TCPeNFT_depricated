@@ -1,18 +1,26 @@
 pragma solidity ^0.4.24;
 
 import "./Owned.sol";
+import "./Events.sol";
+
 import "./Reputation.sol";
 import "./ReputationData.sol";
 import "./SplytManager.sol";
 
-contract ReputationManager is Owned {
+contract ReputationManager is Owned, Events  {
     
     ReputationData public reputationData;
     SplytManager public splytManager;
 
-    //allow owner or splytManager
+    //@dev allow owner or splytManager
     modifier onlyOwnerOrSplyt() {
         require(owner == msg.sender || address(splytManager) == msg.sender);
+        _;
+    }
+
+    //@dev only within 1-5
+    modifier onlyValidRange(uint _rating) {
+        require( _rating > 0 && _rating < 6);
         _;
     }
 
@@ -21,8 +29,8 @@ contract ReputationManager is Owned {
         splytManager = SplytManager(_splytManager);
     }
 
-    //@dev only create new reputation when it creates first review
-    function review(address _wallet, uint _rating) public {
+    //@dev only create new review when it creates first review
+    function createRate(address _wallet, uint _rating) public onlyValidRange(_rating) {
 
          address reputationAddress = reputationData.reputationByWallet(_wallet);
 
@@ -30,37 +38,41 @@ contract ReputationManager is Owned {
             Reputation reputation = new Reputation(_rating, msg.sender);
             reputationData.save(_wallet, address(reputation));
          } else {
-            Reputation(reputationAddress).addReview(_rating, msg.sender);
+            Reputation rep = Reputation(reputationAddress);
+            //@if found,update else create new
+            bool found = false;
+            for (uint i =0; i < rep.getRatesLength(); i++) {
+                if (msg.sender == rep.getRaterByIndex(i)) {
+                    rep.updateRate(i, _rating);
+                    found = true;
+                }              
+            }
+            if (!found) {
+                rep.addRate(_rating, msg.sender);
+            }
          }
-   
+
+         emit Success(5, reputationAddress);   
     }
 
     //@dev get review information
     function getReviewByWalletAndIndex(address _wallet, uint _index) public view returns (uint, address, uint) {
 
         Reputation rep = Reputation(reputationData.reputationByWallet(_wallet));
-        return rep.getReviewByIndex(_index);      
+        return rep.rates(_index);      
     }  
-        
-
 
     function getDataContractAddress() public view returns (address) {
        return address(reputationData);
     }
 
 
-    //@desc update data contract address
+    //@dev update data contract address
     function setDataContract(address _reputationData) onlyOwner public {
        reputationData = ReputationData(_reputationData);
     }
 
-    //@desc get asset status
-
-    //@desc get asset status
-    function getStatus(address _reputationAddress) public view returns (Reputation.Statuses) {
-        return Reputation(_reputationAddress).status();
-    }
-   
+    //@dev get asset stat
 
     function setSplytManager(address _address) public onlyOwnerOrSplyt {
         splytManager = SplytManager(_address);
@@ -71,25 +83,41 @@ contract ReputationManager is Owned {
       return reputationData.reputationByWallet(_wallet);
     }  
 
-    //@desc checks if address is authorized write to the data contracts
+    //@dev checks if address is authorized write to the data contracts
     function isManager(address _address) public view returns (bool) {
         return splytManager.isManager(_address);
     }
    
     //@dev assume 2 decimals
-    function getRating(address _address) public view returns (uint) {
-        Reputation rep = Reputation(_address);
-       return ((rep.totalScore() * 100) / rep.getReviewsLength());
+    function getAverageRatingByWallet(address _wallet) public view returns (uint) {
+        address reputationAddress = reputationData.reputationByWallet(_wallet);
+        Reputation rep = Reputation(reputationAddress);
+        uint totalScore = 0;
+        for (uint i =0; i < rep.getRatesLength(); i++) {
+            totalScore += rep.getRatingByIndex(i);
+        }
+       return ((totalScore * 100) / rep.getRatesLength());
 
     } 
+    //@dev get total ratings
+    function getTotalRatingByWallet(address _wallet) public view returns (uint) {
+        address reputationAddress = reputationData.reputationByWallet(_wallet);
+        Reputation rep = Reputation(reputationAddress);
+        uint totalScore = 0;
+        for (uint i =0; i < rep.getRatesLength(); i++) {
+            totalScore += rep.getRatingByIndex(i);
+        }
+       return totalScore;
 
-   //@desc new manager contract that's going to be replacing this
+    } 
+    
+   //@dev new manager contract that's going to be replacing this
    //Old manager call this function and proposes the new address
     function transferOwnership(address _newAddress) public onlyOwnerOrSplyt {
         reputationData.transferOwnership(_newAddress);
     }
 
-    //@desc if new data contract is deployed, the creator proposes manager adress then the manager needs to accept
+    //@dev if new data contract is deployed, the creator proposes manager adress then the manager needs to accept
     //The new updated manager contract calls this function
     function acceptOwnership() public onlyOwner {
         reputationData.acceptOwnership();

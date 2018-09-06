@@ -4,7 +4,7 @@ import "./Owned.sol";
 import "./ManagerData.sol";
 import "./SplytManager.sol";
 
-//@desc this contract keeps history of all the managers. This contract is used when a contract is owned by a previous manager contract. 
+//@dev this contract keeps history of all the managers. This contract is used when a contract is owned by a previous manager contract. 
 //This contract allows current managers access to write old contracts owned by depracated managers.
 contract ManagerTracker is Owned {
     
@@ -30,7 +30,7 @@ contract ManagerTracker is Owned {
        return address(managerData);
     }
 
-    //@desc update data contract address
+    //@dev update data contract address
     function setDataContract(address _dataAddress) onlyOwner public {
        managerData = ManagerData(_dataAddress);
     }

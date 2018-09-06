@@ -48,15 +48,15 @@ contract('ArbitrationManagerTest general test cases.', function(accounts) {
 
   async function create_arbitration(_assetAddress = assetAddress, _arbitrationId = "0x31f2ae92057a7123ef0e490a", _reason = 1) {
 
-    await arbitrationManagerInstance.createArbitration(assetAddress, _arbitrationId, _reason, { from: defaultBuyer });
+    await arbitrationManagerInstance.createArbitration(_arbitrationId, assetAddress, _reason, { from: defaultBuyer });
     arbitrationAddress = await arbitrationManagerInstance.getAddressById(_arbitrationId);
     arbitrationInstance = Arbitration.at(arbitrationAddress);
 
   }
 
-  async function purchase(_assetAddress = assetAddress, _quantity = 1, _amount = defaultPrice) {
+  async function purchase(_orderId = "0x3031", _assetAddress = assetAddress, _quantity = 1, _amount = defaultPrice) {
 
-    await orderManagerInstance.purchase(_assetAddress, _quantity, _amount, { from: defaultBuyer });
+    await orderManagerInstance.purchase(_orderId, _assetAddress, _quantity, _amount, { from: defaultBuyer });
     // assetInstance = await Asset.at(assetAddress);
 
   }
@@ -136,25 +136,25 @@ contract('ArbitrationManagerTest general test cases.', function(accounts) {
 
   it('should be able to assign arbitrator in the Arbitration contract!', async function() {
 
-    await arbitrationManagerInstance.setArbitrator(arbitrationAddress, defaultArbitrator);
+    await arbitrationManagerInstance.setArbitrator("0x31f2ae92057a7123ef0e490a", defaultArbitrator);
     // console.log('assigning arbitrator: ' + defaultArbitrator);
-    let arbitrator = await arbitrationManagerInstance.getArbitrator(arbitrationAddress);
+    let arbitrator = await arbitrationManagerInstance.getArbitrator("0x31f2ae92057a7123ef0e490a");
     // console.log('returned arbitrator: ' + arbitrator);
     assert.equal(defaultArbitrator, arbitrator,"Arbitrator did not get assigned!");
 
   })
 
   it('should seller be able to 2x stake on the arbitration contract', async function() {
-    await arbitrationManagerInstance.set2xStakeBySeller(arbitrationAddress, { from: defaultSeller });
-    let status = await arbitrationManagerInstance.getStatus(arbitrationAddress);
+    await arbitrationManagerInstance.set2xStakeBySeller("0x31f2ae92057a7123ef0e490a", { from: defaultSeller });
+    let status = await arbitrationManagerInstance.getStatus("0x31f2ae92057a7123ef0e490a");
     // console.log('arbitration status: ' + status);
     assert.equal(1,status,"Status is not in 2=SELLER_STAKE_2x as expected!");
 
   })
 
  it('should reporter be able to 2x stake on the arbitration contract', async function() {
-    await arbitrationManagerInstance.set2xStakeByReporter(arbitrationAddress, { from: defaultBuyer });
-    let status = await arbitrationManagerInstance.getStatus(arbitrationAddress);
+    await arbitrationManagerInstance.set2xStakeByReporter("0x31f2ae92057a7123ef0e490a", { from: defaultBuyer });
+    let status = await arbitrationManagerInstance.getStatus("0x31f2ae92057a7123ef0e490a");
     // console.log('arbitration status: ' + status);
     assert.equal(2,status,"Status is not in 2=REPORTER_STAKE_2x as expected!");
 
@@ -163,8 +163,8 @@ contract('ArbitrationManagerTest general test cases.', function(accounts) {
   it('should arbitrator to set the winner to reporter!', async function() {
 
     console.log('arbitrator: ' + defaultArbitrator);
-    await arbitrationManagerInstance.setWinner(arbitrationAddress, 1, { from: defaultArbitrator });
-    let winner = await arbitrationManagerInstance.getWinner(arbitrationAddress);
+    await arbitrationManagerInstance.setWinner("0x31f2ae92057a7123ef0e490a", 1, { from: defaultArbitrator });
+    let winner = await arbitrationManagerInstance.getWinner("0x31f2ae92057a7123ef0e490a");
     // console.log('winner is ' + winner)
     assert.equal(1, winner,"Winner is not reporter as expected!");
 

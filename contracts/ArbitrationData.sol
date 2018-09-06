@@ -8,7 +8,6 @@ contract ArbitrationData is Owned {
     mapping (bytes12 => address) public addressByArbitrationId;
     mapping (uint => address) public addressByIndex;
     
-    uint public arbitrationId; //increments after creating new
     uint public index;
 
     function save(bytes12 _arbitrationId, address _arbitrationAddress) public onlyOwner {

@@ -52,9 +52,9 @@ contract('OrderManagerTest general test cases.', function(accounts) {
 
 
 
-  async function purchase(_assetAddress = "0x31f2ae92057a7123ef0e490a", _quantity = 1, _amount = defaultPrice) {
+  async function purchase(_orderId = "0x31f2ae92057a7123ef0e490c" , _assetAddress = "0x31f2ae92057a7123ef0e490a", _quantity = 1, _amount = defaultPrice) {
 
-    await orderManagerInstance.purchase(_assetAddress, _quantity, _amount, { from: defaultBuyer });
+    await orderManagerInstance.purchase(_orderId, _assetAddress, _quantity, _amount, { from: defaultBuyer });
     // console.log('orderId: ' + orderId);
     // assetInstance = await Asset.at(assetAddress);
 
@@ -106,7 +106,7 @@ contract('OrderManagerTest general test cases.', function(accounts) {
 
   it('should deploy new order contract successfully!', async function() {
     await create_asset();
-    await purchase(assetAddress, 1, 1000);
+    await purchase("0x31", assetAddress, 1, 1000);
     let length = await orderManagerInstance.getOrdersLength();
     // console.log('number of orders: ' + length);
     assert.equal(length, 1, "Number of orders is not 1!");
@@ -126,7 +126,7 @@ contract('OrderManagerTest general test cases.', function(accounts) {
     let initBalance = await satTokenInstance.balanceOf(defaultBuyer);
     // console.log('before purchase balance:' + initBalance);
 
-    await purchase(assetAddress, 1, 1000);
+    await purchase("0x32", assetAddress, 1, 1000);
 
     let updatedBalance = await satTokenInstance.balanceOf(defaultBuyer);
     // console.log('after purchase balance:' + updatedBalance);
@@ -135,7 +135,7 @@ contract('OrderManagerTest general test cases.', function(accounts) {
   })
 
   it('should deploy new purchase order contract making total of 3 successfully!', async function() {
-    await purchase(assetAddress, 1, defaultPrice);
+    await purchase("0x33", assetAddress, 1, defaultPrice);
     let length = await orderManagerInstance.getOrdersLength();
     // console.log('number of orders: ' + length);
     assert.equal(length, 3, "Number of orders is not 2!");
@@ -145,17 +145,17 @@ contract('OrderManagerTest general test cases.', function(accounts) {
   it('should buyer be able to request a refund!', async function() {
     let status = await orderManagerInstance.getStatus(1);
     // console.log('current status: ' + status);
-    await orderManagerInstance.requestRefund(1, { from: defaultBuyer });
-    status = await orderManagerInstance.getStatus(1);
+    await orderManagerInstance.requestRefund("0x31", { from: defaultBuyer });
+    status = await orderManagerInstance.getStatus("0x31");
     // console.log('status after requesting a refund: ' + status);
     assert.equal(status, 3, "status not in 2=REQUESTED_REFUND!");
   })
 
   it('should seller be able to approve refund!', async function() {
-    let status = await orderManagerInstance.getStatus(1);
+    let status = await orderManagerInstance.getStatus("0x31");
     // console.log('current status: ' + status);
-    await orderManagerInstance.approveRefund(1, { from: defaultSeller });
-    status = await orderManagerInstance.getStatus(1);
+    await orderManagerInstance.approveRefund("0x31", { from: defaultSeller });
+    status = await orderManagerInstance.getStatus("0x31");
     // console.log('status after requesting a refund: ' + status);
     assert.equal(status, 4, "status not in 4=REFUND_APPROVED!");
   })
@@ -178,7 +178,7 @@ contract('OrderManagerTest general test cases.', function(accounts) {
 
  
   it('should get status 5=CONTRIBUTIONS_OPEN for fractional asset', async function() {
-    await purchase(assetFractionalAddress, 0, 500);
+    await purchase("0x3130", assetFractionalAddress, 0, 500);
 
     let orderId = await orderManagerInstance.getFractionalOrderIdByAsset(assetFractionalAddress);
     // console.log('order id: ' + orderId);
@@ -193,7 +193,7 @@ contract('OrderManagerTest general test cases.', function(accounts) {
   })
 
   it('should get status 6=CONTRIBUTIONS_FULFILLED for fractional asset', async function() {
-    await purchase(assetFractionalAddress, 0, 500);
+    await purchase("0x3130", assetFractionalAddress, 0, 500);
 
     let orderId = await orderManagerInstance.getFractionalOrderIdByAsset(assetFractionalAddress);
     // console.log('order id: ' + orderId);
@@ -213,7 +213,5 @@ contract('OrderManagerTest general test cases.', function(accounts) {
     assert.equal(status, 4, "Asset type status not 4=SOLD_OUT as expected!");
   })
 
-  async function sleep(milliseconds) {
-    return new Promise(resolve => setTimeout(resolve, milliseconds));
-  }
+
 })

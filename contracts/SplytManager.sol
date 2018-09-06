@@ -5,6 +5,8 @@ pragma solidity ^0.4.24;
 import "./AssetManager.sol";
 import "./OrderManager.sol";
 import "./ArbitrationManager.sol";
+import "./ReputationManager.sol";
+
 import "./ManagerTracker.sol";
 
 import "./Events.sol";
@@ -35,8 +37,10 @@ contract SplytManager is Events, Owned {
     AssetManager public assetManager;
     OrderManager public orderManager;
     ArbitrationManager public arbitrationManager;
-
+    ReputationManager public reputationManager;
     ManagerTracker public managerTracker;
+
+
 
     //only these managers are allowed to call these functions
     modifier onlyManagers() {
@@ -51,13 +55,13 @@ contract SplytManager is Events, Owned {
     // event Success(uint _code, address _assetAddress);
     // event Error(uint _code, string _message);
 
-    //@desc set all contracts it's interacting with
+    //@dev set all contracts it's interacting with
     constructor(address _tokenAddress, address _stakeAddress) public {
         satToken = SatToken(_tokenAddress);
         stake = Stake(_stakeAddress);      
     }
 
-    //@desc sets all the managers at once
+    //@dev sets all the managers at once
     function setManagers(address _assetManager, address _orderManager, address _arbitrationManager) public onlyOwner {
         assetManager = AssetManager(_assetManager);
         orderManager = OrderManager(_orderManager);   
@@ -69,28 +73,34 @@ contract SplytManager is Events, Owned {
         managerTracker.add(_arbitrationManager);                            
     }        
 
-    //@desc tracks all the managers deployed
+    //@dev tracks all the managers deployed
     function setManagerTracker(address _newAddress) public onlyOwner {
         managerTracker = ManagerTracker(_newAddress);
     }    
 
-    //@desc used to update contracts
+    //@dev used to update contracts
     function setAssetManager(address _newAddress) public onlyOwner {
         assetManager = AssetManager(_newAddress);
         managerTracker.add(_newAddress);
     }    
 
-    //@desc used to update contracts
+    //@dev used to update contracts
     function setOrderManager(address _newAddress) public onlyOwner {
         orderManager = OrderManager(_newAddress);
         managerTracker.add(_newAddress);
     } 
-    //@desc used to update contracts
+    //@dev used to update contracts
     function setArbitrationManager(address _newAddress) public onlyOwner {
         arbitrationManager = ArbitrationManager(_newAddress);
         managerTracker.add(_newAddress);
     }      
  
+    //@dev used to update contracts
+    function setReputationManager(address _newAddress) public onlyOwner {
+        reputationManager = ReputationManager(_newAddress);
+        managerTracker.add(_newAddress);
+    }      
+
     function setTokenContract(address _newAddress) public onlyOwner {
         satToken = SatToken(_newAddress);
     }      
@@ -99,25 +109,25 @@ contract SplytManager is Events, Owned {
         stake = Stake(_newAddress);
     } 
 
-    //@desc User for single buy to transfer tokens from buyer address to seller address
+    //@dev User for single buy to transfer tokens from buyer address to seller address
     function internalContribute(address _from, address _to, uint _amount) public onlyManagers returns (bool) {
         bool result = satToken.transferFrom(_from, _to, _amount);
         return result;
     }
     
-    // @desc Used for fractional ownership to transfer tokens from user address to listing address
+    // @dev Used for fractional ownership to transfer tokens from user address to listing address
     function internalRedeemFunds(address _listingAddress, address _seller, uint _amount) public onlyManagers returns (bool) {
         
         bool result = satToken.transferFrom(_listingAddress, _seller, _amount);
         return result;
     }
 
-    //@desc Getter function. returns token contract address
+    //@dev Getter function. returns token contract address
     function getBalance(address _wallet) public view returns (uint) {
         return satToken.balanceOf(_wallet);
     }
 
-    //@desc calculate stake
+    //@dev calculate stake
     function calculateStakeTokens(uint _amount) public view returns (uint) {
         return stake.calculateStakeTokens(_amount); 
     }
@@ -126,16 +136,16 @@ contract SplytManager is Events, Owned {
         assetManager.subtractInventory(_assetAddress, _qty); 
     }    
 
-    //@desc used to update    
+    //@dev used to update    
     function setAssetStatus(address _assetAddress, Asset.Statuses _status) public onlyManagers {
         assetManager.setStatus(_assetAddress, _status);
     }    
-    //@desc used to update    
+    //@dev used to update    
     function addInventory(address _assetAddress, uint _quantity) public onlyManagers {
         assetManager.addInventory(_assetAddress, _quantity);
     }    
 
-    //@desc used to update    
+    //@dev used to update    
     function getManagerTrackerAddress() public view returns (address) {
         return address(managerTracker);
     }    

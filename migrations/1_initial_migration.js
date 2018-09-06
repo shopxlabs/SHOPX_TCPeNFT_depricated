@@ -12,6 +12,9 @@ var AssetData = artifacts.require("./AssetData.sol")
 var ArbitrationManager = artifacts.require("./ArbitrationManager.sol")
 var ArbitrationData = artifacts.require("./ArbitrationData.sol")
 
+var ReputationManager = artifacts.require("./ReputationManager.sol")
+var ReputationData = artifacts.require("./ReputationData.sol")
+
 var ManagerTracker = artifacts.require("./ManagerTracker.sol")
 
 var Stake = artifacts.require("./Stake.sol")
@@ -33,11 +36,16 @@ module.exports = function(deployer, network, accounts) {
   deployer.deploy(Migrations, walletConfig)
 
   deployer.deploy(SatToken, name, desc, ver, walletConfig)
-  .then(async function() {
+  .then(async function(satToken) {
     console.log('Sat Token address: ', SatToken.address)
+
+    //give accounts 1 default tokens
+    satToken.initUser(accounts[0])
 
     var stake = await deployer.deploy(Stake, 10000000000000, 2000000000, 100, walletConfig)
     console.log('Stake address: ', stake.address)
+
+
 
     var splytManager = await deployer.deploy(SplytManager, SatToken.address, stake.address, walletConfig)
     console.log('Splyt Manager address: ', splytManager.address)
@@ -57,6 +65,10 @@ module.exports = function(deployer, network, accounts) {
     var arbitrationManager = await deployer.deploy(ArbitrationManager, splytManager.address, walletConfig)
     console.log('ArbitrationManager address: ', arbitrationManager.address)
     await splytManager.setArbitrationManager(arbitrationManager.address)
+    
+    var reputationManager = await deployer.deploy(ReputationManager, splytManager.address, walletConfig)
+    console.log('ReputationManager address: ', reputationManager.address)
+    await splytManager.setReputationManager(reputationManager.address)
 
   });
   

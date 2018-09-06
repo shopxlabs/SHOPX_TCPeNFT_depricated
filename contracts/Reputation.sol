@@ -4,53 +4,60 @@ import './Asset.sol';  //change to interface later
 
 contract Reputation {
     
-    enum Statuses { NA, BRONZE, SILVER, GOLD, PLATINUM, DIAMOND }
+    //@dev made up for now. TODO: redo theses
+    // enum Statuses { NA, BRONZE, SILVER, GOLD, PLATINUM, DIAMOND }
 
     bytes12 public reputationId;
     
-    struct Review {
+    struct Rate {
         uint rating;
         address from;
         uint date;
     }
 
-    Statuses public status;
-
-    Review[] public reviews;
-    uint public totalScore;
+    // Statuses public status;
+    Rate[] public rates;
 
     modifier onlyManager() {
         require(ManagerAbstract(msg.sender).isManager(msg.sender) == true);
         _;
     }
 
-    //@dev only within 1-5
-    modifier onlyWithinRange(uint _rating) {
-        require( _rating > 0 && _rating < 6);
-        _;
-    }
-
-    //@dev only create new reputation when it creates first review
-    constructor(uint _rating, address _from) public onlyWithinRange(_rating){
-        status = Statuses.BRONZE;
-        reviews.push(Review(_rating, _from, now));   
-        totalScore += _rating;     
+    //@dev only create new reputation when it creates first rate
+    constructor(uint _rating, address _from) public {
+        rates.push(Rate(_rating, _from, now));    
     }  
 
     //@dev only accept 100 to 500 
-    function addReview(uint _rating, address _from) public onlyWithinRange(_rating) {
-        reviews.push(Review(_rating, _from, now));
-        totalScore += _rating;
+    function addRate(uint _rating, address _from) public onlyManager {
+        rates.push(Rate(_rating, _from, now));
     }  
-    
-    //@dev get number of reviews
-    function getReviewsLength() public view returns (uint) {
-        return reviews.length;
+
+    //@dev update rate
+    function updateRate(uint _index, uint _rating) public onlyManager {
+        rates[_index].rating = _rating;
+        rates[_index].date = now;
+    }  
+
+    //@dev get number of rates
+    function getRatesLength() public view returns (uint) {
+        return rates.length;
     }  
         
     //@dev get review information
-    function getReviewByIndex(uint _index) public view returns (uint, address, uint) {
-        return (reviews[_index].rating, reviews[_index].from, reviews[_index].date);
+    // function getRateByIndex(uint _index) public view returns (uint, address, uint) {
+    //     return (rates[_index].rating, rates[_index].from, rates[_index].date);
+    // } 
+    //@dev get date
+    function getDateByIndex(uint _index) public view returns (uint) {
+        return rates[_index].date;
+    }       
+    //@dev get reviewer
+    function getRaterByIndex(uint _index) public view returns (address) {
+        return rates[_index].from;
     }  
-        
+    //@dev get reviewer
+    function getRatingByIndex(uint _index) public view returns (uint) {
+        return rates[_index].rating;
+    }  
 }

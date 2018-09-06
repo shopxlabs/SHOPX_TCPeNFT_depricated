@@ -8,7 +8,7 @@ contract OrderData is Owned {
     //This means this data file cannot be updated.
     struct Order {
         uint version;
-        uint orderId;
+        bytes12 orderId;
         address asset;
         address buyer;
         uint quantity;
@@ -29,56 +29,56 @@ contract OrderData is Owned {
 
     uint public version = 1;
 
-    // mapping (address => uint) public orderIdByAddress;
-    mapping (uint => Order) public orders;                                    
-    mapping (address => uint) public fractionalOrders;  //will have asset address if it's a fractional asset
+    mapping (bytes12 => Order) public orders;                                    
+    mapping (address => bytes12) public fractionalOrders;  //will have asset address if it's a fractional asset
+    mapping (uint =>  bytes12) public orderIdByIndex;
 
-    uint public orderId; //increments after creating new
+    uint public index;
 
-    function save(address _asset, address _buyer, uint _quantity, uint _paidAmount) public onlyOwner returns (uint) {
-        orders[orderId] = Order(version, orderId, _asset, _buyer, _quantity, _paidAmount, Statuses.PIF, Reasons.NA, 0);
-        orderId++;
-        return orderId;
+    function save(bytes12 _orderId, address _asset, address _buyer, uint _quantity, uint _paidAmount) public onlyOwner returns (bool) {
+        orders[_orderId] = Order(version, _orderId, _asset, _buyer, _quantity, _paidAmount, Statuses.PIF, Reasons.NA, 0);
+        orderIdByIndex[index] = _orderId;
+        index++;
+        return true;
     }      
 
-    function setStatus(uint _orderId, Statuses _status) public onlyOwner returns (bool) {
+    function setStatus(bytes12 _orderId, Statuses _status) public onlyOwner returns (bool) {
         orders[_orderId].status  = _status;
         return true;
     }  
 
-    function getStatus(uint _orderId) public view returns (Statuses) {
+    function getStatus(bytes12 _orderId) public view returns (Statuses) {
         return orders[_orderId].status;
     }   
 
-    function getPaidAmount(uint _orderId) public view returns (uint) {
+    function getPaidAmount(bytes12 _orderId) public view returns (uint) {
         return orders[_orderId].paidAmount;
     } 
 
-    function getAssetAddress(uint _orderId) public view returns (address) {
+    function getAssetAddress(bytes12 _orderId) public view returns (address) {
         return orders[_orderId].asset;
     }   
 
-    function getQuantity(uint _orderId) public view returns (uint) {
+    function getQuantity(bytes12 _orderId) public view returns (uint) {
         return orders[_orderId].quantity;
     }   
 
-    function getTotalContributions(uint _orderId) public view returns (uint) {
+    function getTotalContributions(bytes12 _orderId) public view returns (uint) {
         return orders[_orderId].totalContributions;
     }   
 
     //create new fractioinal order
-    function saveFractional(address _asset, address _contributor, uint _amount, Statuses _status) public onlyOwner returns (uint) {
-        orders[orderId].version = version;
-        orders[orderId].asset = _asset;
-        orders[orderId].status = _status;    
-        orders[orderId].contributors[_contributor] += _amount;
-        orders[orderId].totalContributions += _amount;
-        fractionalOrders[_asset] = orderId;
+    function saveFractional(bytes12 _orderId, address _asset, address _contributor, uint _amount, Statuses _status) public onlyOwner returns (uint) {
+        orders[_orderId].version = version;
+        orders[_orderId].asset = _asset;
+        orders[_orderId].status = _status;    
+        orders[_orderId].contributors[_contributor] += _amount;
+        orders[_orderId].totalContributions += _amount;
+        fractionalOrders[_asset] = _orderId;
 
-        orderId++;
     }   
 
-    function updateFractional(uint _orderId, address _contributor, uint _amount, Statuses _status) public onlyOwner returns (uint) {
+    function updateFractional(bytes12 _orderId, address _contributor, uint _amount, Statuses _status) public onlyOwner returns (uint) {
 
         orders[_orderId].contributors[_contributor] += _amount;
         orders[_orderId].totalContributions += _amount;
@@ -86,24 +86,25 @@ contract OrderData is Owned {
     }   
 
 
-    function getFractionalOrderIdByAsset(address _assetAddress) public view returns (uint) {
+    function getFractionalOrderIdByAsset(address _assetAddress) public view returns (bytes12) {
         return fractionalOrders[_assetAddress];
     }   
 
-    function getMyContributions(uint _orderId, address _contributor) public view returns (uint) {
+    function getMyContributions(bytes12 _orderId, address _contributor) public view returns (uint) {
         return orders[_orderId].contributors[_contributor];
     }
     
 
-    function getBuyer(uint _orderId) public view returns (address) {
+    function getBuyer(bytes12 _orderId) public view returns (address) {
         return orders[_orderId].buyer;
     }   
 
-    function getAsset(uint _orderId) public view returns (address) {
+    function getAsset(bytes12 _orderId) public view returns (address) {
         return orders[_orderId].asset;
     }   
 
-    function getOrderByOrderId(uint _orderId) public view returns (uint, uint, address, address, uint, uint, Statuses) {
+    //@dev same as index
+    function getOrderByOrderId(bytes12 _orderId) public view returns (uint, bytes12, address, address, uint, uint, Statuses) {
     
         return (
             orders[_orderId].version,    
@@ -113,40 +114,32 @@ contract OrderData is Owned {
             orders[_orderId].quantity,
             orders[_orderId].paidAmount,
             orders[_orderId].status);
-    }        
+    }           
 
-    // function setStatusByOrderId(uint _orderId, Statuses _status) public onlyOwner {
-    //     orders[_orderId].status = _status;
-    // }        
-
-    // function getStatusByOrderId(uint _orderId) public view returns (Statuses) {
-    //     return orders[_orderId].status;    
-    // }        
-
-    function setBytesAttribute(uint _orderId, bytes12 _attributeKey, bytes12 _attributeValue) public onlyOwner returns (bool) {
+    function setBytesAttribute(bytes12 _orderId, bytes12 _attributeKey, bytes12 _attributeValue) public onlyOwner returns (bool) {
         orders[_orderId].bytesAttributes[_attributeKey] = _attributeValue;
         return true;
     }  
 
-    function getBytesAttribute(uint _orderId, bytes12 _attributeKey) public view returns (bytes12) {
+    function getBytesAttribute(bytes12 _orderId, bytes12 _attributeKey) public view returns (bytes12) {
         return orders[_orderId].bytesAttributes[_attributeKey];    
     }
 
-    function setIntAttribute(uint _orderId, bytes12 _attributeKey, uint _attributeValue) public onlyOwner returns (bool) {
+    function setIntAttribute(bytes12 _orderId, bytes12 _attributeKey, uint _attributeValue) public onlyOwner returns (bool) {
         orders[_orderId].intAttributes[_attributeKey] = _attributeValue;
         return true;
     }  
 
-    function getIntAttribute(uint _orderId, bytes12 _attributeKey) public view returns (uint) {
+    function getIntAttribute(bytes12 _orderId, bytes12 _attributeKey) public view returns (uint) {
         return orders[_orderId].intAttributes[_attributeKey];    
     }           
 
-    function setAddressAttribute(uint _orderId, bytes12 _attributeKey, address _attributeValue) public onlyOwner returns (bool) {
+    function setAddressAttribute(bytes12 _orderId, bytes12 _attributeKey, address _attributeValue) public onlyOwner returns (bool) {
         orders[_orderId].addressAttributes[_attributeKey] = _attributeValue;
         return true;
     }  
 
-    function getAddressAttribute(uint _orderId, bytes12 _attributeKey) public view returns (address) {
+    function getAddressAttribute(bytes12 _orderId, bytes12 _attributeKey) public view returns (address) {
         return orders[_orderId].addressAttributes[_attributeKey];    
     }       
 
