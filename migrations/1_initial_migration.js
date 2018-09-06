@@ -36,11 +36,16 @@ module.exports = function(deployer, network, accounts) {
   deployer.deploy(Migrations, walletConfig)
 
   deployer.deploy(SatToken, name, desc, ver, walletConfig)
-  .then(async function() {
+  .then(async function(satToken) {
     console.log('Sat Token address: ', SatToken.address)
+
+    //give accounts 1 default tokens
+    satToken.initUser(accounts[0])
 
     var stake = await deployer.deploy(Stake, 10000000000000, 2000000000, 100, walletConfig)
     console.log('Stake address: ', stake.address)
+
+
 
     var splytManager = await deployer.deploy(SplytManager, SatToken.address, stake.address, walletConfig)
     console.log('Splyt Manager address: ', splytManager.address)
