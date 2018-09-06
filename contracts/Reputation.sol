@@ -7,7 +7,7 @@ contract Reputation {
     //@dev made up for now. TODO: redo theses
     // enum Statuses { NA, BRONZE, SILVER, GOLD, PLATINUM, DIAMOND }
 
-    bytes12 public reputationId;
+    address public wallet;
     
     struct Rate {
         uint rating;
@@ -24,7 +24,8 @@ contract Reputation {
     }
 
     //@dev only create new reputation when it creates first rate
-    constructor(uint _rating, address _from) public {
+    constructor(address _wallet, uint _rating, address _from) public {
+        wallet = _wallet;
         rates.push(Rate(_rating, _from, now));    
     }  
 

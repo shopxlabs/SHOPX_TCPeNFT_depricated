@@ -35,7 +35,7 @@ contract ReputationManager is Owned, Events  {
          address reputationAddress = reputationData.reputationByWallet(_wallet);
 
          if (reputationAddress == address(0)) {
-            Reputation reputation = new Reputation(_rating, msg.sender);
+            Reputation reputation = new Reputation(_wallet, _rating, msg.sender);
             reputationData.save(_wallet, address(reputation));
          } else {
             Reputation rep = Reputation(reputationAddress);
@@ -56,11 +56,22 @@ contract ReputationManager is Owned, Events  {
     }
 
     //@dev get review information
-    function getReviewByWalletAndIndex(address _wallet, uint _index) public view returns (uint, address, uint) {
+    function getRateByWalletAndIndex(address _wallet, uint _index) public view returns (uint) {
 
         Reputation rep = Reputation(reputationData.reputationByWallet(_wallet));
-        return rep.rates(_index);      
+        return rep.getRatingByIndex(_index);      
     }  
+
+    //@dev get review information
+    function getRateInfoByAndIndex(uint _index) public view returns (address, uint, uint) {
+
+        Reputation rep = Reputation(reputationData.reputationByIndex(_index));
+        uint length = rep.getRatesLength();
+        uint average = getAverageRatingByWallet(rep.wallet());
+
+        return (rep.wallet(), average, length);      
+    }  
+
 
     function getDataContractAddress() public view returns (address) {
        return address(reputationData);
