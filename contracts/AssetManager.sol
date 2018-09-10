@@ -59,19 +59,22 @@ contract AssetManager is Owned, Events {
         emit Success(1, address(asset));
     }
 
-    //@dev get asset info by address
-    function getAssetInfo(address _assetAddress) public view returns (bytes12, uint, uint, address){
+    function getAssetInfoByAssetId(bytes12 _assetId) public view returns (address, bytes12, Asset.Statuses, uint, uint, address, uint) {
+        Asset asset = Asset(assetData.addressByAssetId(_assetId));  
+        return (address(asset), asset.assetId(), asset.status(), asset.term(), asset.inventoryCount(), asset.seller(), asset.totalCost());
+    }
+
+    function getAssetInfoByAddress(address _assetAddress) public view returns (address, bytes12, Asset.Statuses, uint, uint, address, uint) {
         Asset asset = Asset(_assetAddress);
-        return (asset.assetId(), asset.term(), asset.inventoryCount(), asset.seller());
+        return (address(asset), asset.assetId(), asset.status(), asset.term(), asset.inventoryCount(), asset.seller(), asset.totalCost());        
     }
 
-    //@dev get asset info by index
-    function getAssetInfoByIndex(uint _index) public view returns (bytes12, uint, uint, address){
+    function getAssetInfoByIndex(uint _index) public view returns (address, bytes12, Asset.Statuses, uint, uint, address, uint){
         Asset asset = Asset(assetData.addressByIndex(_index));
-        return (asset.assetId(), asset.term(), asset.inventoryCount(), asset.seller());
+        return (address(asset), asset.assetId(), asset.status(), asset.term(), asset.inventoryCount(), asset.seller(), asset.totalCost());                   
     }
 
-    //@dev get asset info by index
+
     function getAssetsLength() public view returns (uint){
         return (assetData.index());
     }

@@ -46,7 +46,6 @@ module.exports = function(deployer, network, accounts) {
     console.log('Stake address: ', stake.address)
 
 
-
     var splytManager = await deployer.deploy(SplytManager, SatToken.address, stake.address, walletConfig)
     console.log('Splyt Manager address: ', splytManager.address)
 
