@@ -108,11 +108,11 @@ contract('AssetManagerTest general test cases.', function(accounts) {
     await create_asset();
 
     // console.log('asset address: ' + assetAddress);
-    let assetInfos = await assetManagerInstance.getAssetInfo(assetAddress);
-    // console.log('asset id: ' + assetInfos[0]);
+    let assetInfos = await assetManagerInstance.getAssetInfoByAddress(assetAddress);
+    console.log('asset id: ' + assetInfos[1]);
     // console.log('asset term: ' + assetInfos[1]);
     // console.log('assset inventory: ' + assetInfos[2]);
-    assert.equal(assetInfos[0], "0x31f2ae92057a7123ef0e490a", "Asset id is different than expected!");
+    assert.equal(assetInfos[1], "0x31f2ae92057a7123ef0e490a", "Asset id is different than expected!");
   })
 
   it('should return title MyTitle', async function() {
@@ -138,9 +138,8 @@ contract('AssetManagerTest general test cases.', function(accounts) {
     for (let i = 0; i < index; i++) {
       console.log('index: ' + i)
       let fields = await assetManagerInstance.getAssetInfoByIndex(i)
-      console.log('asset info: ' + fields);      
+      // console.log('asset info: ' + fields);      
     }
-
     // console.log('asset inventory: ' + count);
     // assert.equal(count, 2, "Asset inventory is different than expected!");
   })
