@@ -111,6 +111,16 @@ contract('ArbitrationManagerTest general test cases.', function(accounts) {
   })
 
 
+
+  it('should return arbitration info by 0=index', async function() {
+    
+    let fields = await arbitrationManagerInstance.getArbitrationInfoByIndex(0);
+    console.log('arbitration infos:')
+    console.log(fields);
+    // assert.equal(status, 2, "Status is not in IN_ARBITRATION!");
+  })
+
+
   it('should be status 2=IN_ARBITRATION after reporter creates an arbitration!', async function() {
     
     let status = await assetInstance.status();
