@@ -112,6 +112,24 @@ contract('OrderManagerTest general test cases.', function(accounts) {
     assert.equal(length, 1, "Number of orders is not 1!");
   })
 
+  it('should retrireve order info by orderId', async function() {
+
+    let infos = await orderManagerInstance.getOrderByOrderId("0x31");
+    // console.log(infos)
+    // console.log('current inventory count: ' + currentInventory);
+    assert.equal(infos[1], "0x310000000000000000000000", "orderId is not matching as expected");
+
+  })
+
+  it('should retrireve order info by index', async function() {
+
+    let infos = await orderManagerInstance.getOrderInfoByIndex(0);
+    console.log(infos)
+    // console.log('current inventory count: ' + currentInventory);
+    assert.equal(infos[1], "0x310000000000000000000000", "orderId is not matching as expected");
+
+  })
+
   it('should current inventory at 2', async function() {
 
     let currentInventory = await assetInstance.inventoryCount();
@@ -137,7 +155,7 @@ contract('OrderManagerTest general test cases.', function(accounts) {
   it('should deploy new purchase order contract making total of 3 successfully!', async function() {
     await purchase("0x33", assetAddress, 1, defaultPrice);
     let length = await orderManagerInstance.getOrdersLength();
-    // console.log('number of orders: ' + length);
+    console.log('number of orders: ' + length);
     assert.equal(length, 3, "Number of orders is not 2!");
   })
 
