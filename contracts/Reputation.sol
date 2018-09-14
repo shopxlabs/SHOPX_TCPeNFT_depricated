@@ -45,6 +45,10 @@ contract Reputation {
         return rates.length;
     }  
         
+    function getRateInfoByIndex(uint _index) public view returns (uint, address, uint) {
+        return (rates[_index].rating, rates[_index].from, rates[_index].date);
+    }  
+
     //@dev get review information
     // function getRateByIndex(uint _index) public view returns (uint, address, uint) {
     //     return (rates[_index].rating, rates[_index].from, rates[_index].date);

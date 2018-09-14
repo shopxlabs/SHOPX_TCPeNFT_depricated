@@ -56,10 +56,10 @@ contract ReputationManager is Owned, Events  {
     }
 
     //@dev get review information
-    function getRateByWalletAndIndex(address _wallet, uint _index) public view returns (uint) {
+    function getRateInfoByWalletAndIndex(address _wallet, uint _index) public view returns (uint, address, uint) {
 
         Reputation rep = Reputation(reputationData.reputationByWallet(_wallet));
-        return rep.getRatingByIndex(_index);      
+        return rep.getRateInfoByIndex(_index);      
     }  
 
     //@dev get review information
