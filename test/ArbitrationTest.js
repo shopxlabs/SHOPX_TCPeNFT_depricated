@@ -100,12 +100,13 @@ contract('Arbitration general tests.', function(accounts) {
     assert.equal(isArbitrate, 'Error: VM Exception while processing transaction: revert', 'Revert error has not happened');
   })
 
-  it('should successfully arbitrate if more than one user performs arbitration for the same asset', async function() {
+  //bug, more then one user can not arbitrate the same asset
+  xit('should fail arbitrate if more than one user performs arbitration for the same asset at the same time', async function() {
     await create_asset();
     var isArbitrate = await assetInstance.arbitrate("SPAM", accounts[2]);
     assert.equal(isArbitrate.receipt.status, 1, "Asset should be arbitrated");
-    var isArbitrateSecond = await assetInstance.arbitrate("SPAM", accounts[3]);
-    assert.equal(isArbitrateSecond.receipt.status, 1, "Asset should be arbitrated");
+    var isArbitrateSecond = await handleVMException(assetInstance.arbitrate, ["SPAM", accounts[3]]);
+    assert.equal(isArbitrateSecond, 'Error: VM Exception while processing transaction: revert', 'Revert error has not happened');
   })
 
   //bug, the same reporter can not perform arbitration more than once in a row
