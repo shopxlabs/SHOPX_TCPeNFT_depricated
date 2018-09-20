@@ -69,9 +69,9 @@ contract AssetManager is Owned, Events {
         return (address(asset), asset.assetId(), asset.status(), asset.assetType(), asset.term(), asset.inventoryCount(), asset.seller(), asset.totalCost());        
     }
 
-    function getAssetInfoByIndex(uint _index) public view returns (address, bytes12, Asset.Statuses, uint, uint, address, uint){
+    function getAssetInfoByIndex(uint _index) public view returns (address, bytes12, Asset.Statuses, Asset.AssetTypes, uint, uint, address, uint){
         Asset asset = Asset(assetData.addressByIndex(_index));
-        return (address(asset), asset.assetId(), asset.status(), asset.term(), asset.inventoryCount(), asset.seller(), asset.totalCost());                   
+        return (address(asset), asset.assetId(), asset.status(), asset.assetType(), asset.term(), asset.inventoryCount(), asset.seller(), asset.totalCost());                   
     }
 
 
