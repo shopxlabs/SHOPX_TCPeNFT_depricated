@@ -227,7 +227,7 @@ contract OrderManager is Owned, Events {
        orderData = OrderData(_orderData);
     }
 
-    function getOrderByOrderId(bytes12 _orderId) public view returns (uint, bytes12, address, address, uint, uint, OrderData.Statuses) {
+    function getOrderInfoByOrderId(bytes12 _orderId) public view returns (uint, bytes12, address, address, uint, uint, OrderData.Statuses) {
       return orderData.getOrderByOrderId(_orderId);
     }    
 

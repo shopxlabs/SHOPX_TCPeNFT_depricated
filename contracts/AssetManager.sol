@@ -59,14 +59,14 @@ contract AssetManager is Owned, Events {
         emit Success(1, address(asset));
     }
 
-    function getAssetInfoByAssetId(bytes12 _assetId) public view returns (address, bytes12, Asset.Statuses, uint, uint, address, uint) {
+    function getAssetInfoByAssetId(bytes12 _assetId) public view returns (address, bytes12, Asset.Statuses, Asset.AssetTypes, uint, uint, address, uint) {
         Asset asset = Asset(assetData.addressByAssetId(_assetId));  
-        return (address(asset), asset.assetId(), asset.status(), asset.term(), asset.inventoryCount(), asset.seller(), asset.totalCost());
+        return (address(asset), asset.assetId(), asset.status(), asset.assetType(), asset.term(), asset.inventoryCount(), asset.seller(), asset.totalCost());
     }
 
-    function getAssetInfoByAddress(address _assetAddress) public view returns (address, bytes12, Asset.Statuses, uint, uint, address, uint) {
+    function getAssetInfoByAddress(address _assetAddress) public view returns (address, bytes12, Asset.Statuses, Asset.AssetTypes, uint, uint, address, uint) {
         Asset asset = Asset(_assetAddress);
-        return (address(asset), asset.assetId(), asset.status(), asset.term(), asset.inventoryCount(), asset.seller(), asset.totalCost());        
+        return (address(asset), asset.assetId(), asset.status(), asset.assetType(), asset.term(), asset.inventoryCount(), asset.seller(), asset.totalCost());        
     }
 
     function getAssetInfoByIndex(uint _index) public view returns (address, bytes12, Asset.Statuses, uint, uint, address, uint){

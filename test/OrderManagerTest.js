@@ -114,7 +114,7 @@ contract('OrderManagerTest general test cases.', function(accounts) {
 
   it('should retrireve order info by orderId', async function() {
 
-    let infos = await orderManagerInstance.getOrderByOrderId("0x31");
+    let infos = await orderManagerInstance.getOrderInfoByOrderId("0x31");
     // console.log(infos)
     // console.log('current inventory count: ' + currentInventory);
     assert.equal(infos[1], "0x310000000000000000000000", "orderId is not matching as expected");
