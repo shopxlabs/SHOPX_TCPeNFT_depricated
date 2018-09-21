@@ -1,6 +1,7 @@
 const Asset = artifacts.require("./Asset.sol");
 const SplytTracker = artifacts.require("./SplytTracker.sol")
 const SatToken = artifacts.require("./SatToken.sol")
+const Stake = artifacts.require("./Stake.sol")
 
 
 contract('AssetTest general test cases.', function(accounts) {
@@ -8,9 +9,10 @@ contract('AssetTest general test cases.', function(accounts) {
   let assetAddress;
   let splytTrackerInstance;
   let assetInstance;
+  let stakeInstance;
   const assetCost = 1000;
   let satTokenInstance;
-  const defaultTokenAmount = 20500;
+  const defaultTokenAmount = 205000000;
 
   async function create_asset(_assetId = "0x31f2ae92057a7123ef0e490a", _term = 1, _seller = accounts[1], _title = "MyTitle",
       _totalCost = 1000, _expirationDate = 10001556712588, _mpAddress = accounts[2], _mpAmount = 2){
@@ -18,14 +20,17 @@ contract('AssetTest general test cases.', function(accounts) {
     await splytTrackerInstance.createAsset(_assetId, _term, _seller, _title, _totalCost, _expirationDate, _mpAddress, _mpAmount);
     assetAddress = await splytTrackerInstance.getAddressById(_assetId);
     assetInstance = await Asset.at(assetAddress);
+    stakeInstance = await Stake.deployed();
   }
 
   // This function gets ran before every test cases in this file.
   beforeEach('Deploying asset contract. ', async function() {
-    // reset all account's token balance to 20500 before running each test
+    // reset all account's token balance to 20500 before running each test except account[5]
     satTokenInstance = await SatToken.deployed()
     accounts.forEach(async function(acc) {
-      await satTokenInstance.initUser(acc)
+      if(acc != accounts[5]){
+        await satTokenInstance.initUser(acc)
+      }
     })
   })
 
@@ -240,6 +245,69 @@ contract('AssetTest general test cases.', function(accounts) {
     var calc = await assetInstance.calcDistribution();
     assert.equal(calc[0].valueOf(), 2, 'Should be equal = _mpAmount / listOfMarketPlaces.length');
     assert.equal(calc[1].valueOf(), 998, 'Should be equal = totalCost - (_mpAmount / listOfMarketPlaces.length)');
+  })
+
+  it('stack tokens after asset creation, asset is fractional', async function() {
+    await create_asset();
+    var isFractional = await assetInstance.isFractional();
+    assert.equal(isFractional, true, 'Asset should be fractional');
+    var getBal = await splytTrackerInstance.getBalance.call(accounts[1]);
+    var stakeTokens = await stakeInstance.calculateStakeTokens(assetCost);
+    assert.equal(getBal, defaultTokenAmount - stakeTokens, 'Should stack tokens according to percentage');
+  })
+
+  it('stack tokens after asset creation, asset is NOT fractional', async function() {
+    await create_asset("0x31f2ae92057a7123ef0e490a", 0, accounts[1], "MyTitle", 1000, 10001556712588, accounts[2], 2);
+    var isFractional = await assetInstance.isFractional();
+    assert.equal(isFractional, false, 'Asset should be fractional');
+    var getBal = await splytTrackerInstance.getBalance.call(accounts[1]);
+    var stakeTokens = await stakeInstance.calculateStakeTokens(assetCost);
+    assert.equal(getBal, defaultTokenAmount - stakeTokens, 'Should stack tokens according to percentage');
+  })
+
+  it('stack 0 tokens if assetCost = 0', async function() {
+    await create_asset("0x31f2ae92057a7123ef0e490a", 1, accounts[1], "MyTitle", 0, 10001556712588, accounts[2], 0);
+    var getBal = await splytTrackerInstance.getBalance.call(accounts[1]);
+    assert.equal(getBal, defaultTokenAmount, 'Should not stack tokens');
+  })
+
+  it('should revert asset creation && stack if seller does not have a money', async function(){
+    var error;
+    try {
+      await create_asset("0x31f2ae92057a7123ef0e490a", 1, accounts[5], "MyTitle", 1000, 10001556712588, accounts[2], 1);
+    } catch(err) {
+      error = err;
+    }
+    assert.equal(error, 'Error: VM Exception while processing transaction: revert', 'Revert error has not happened!');
+    var getBal = await splytTrackerInstance.getBalance.call(accounts[5]);
+    assert.equal(getBal, 0, 'Should not stack tokens');
+  })
+
+  it('should revert asset creation && not stack money if assetCost is negative', async function(){
+    var error;
+    try {
+      await create_asset("0x31f2ae92057a7123ef0e490a", 1, accounts[1], "MyTitle", -1000, 10001556712588, accounts[2], 1);
+    } catch(err) {
+      error = err;
+    }
+    assert.equal(error, 'Error: VM Exception while processing transaction: revert', 'Revert error has not happened!');
+    var getBal = await splytTrackerInstance.getBalance.call(accounts[1]);
+    assert.equal(getBal, defaultTokenAmount, 'Should not stack tokens');
+  })
+
+  it('should revert asset creation if stakeTokens > sellersBal', async function(){
+    await create_asset("0x31f2ae92057a7123ef0e490a", 1, accounts[1], "MyTitle", 10, 10001556712588, accounts[5], 10);
+    await assetInstance.contribute(accounts[5], accounts[2], 10);
+    var getBal5 = await splytTrackerInstance.getBalance.call(accounts[5]);
+    var stakeTokens = await stakeInstance.calculateStakeTokens(assetCost);
+    assert.equal(stakeTokens > getBal5, true, 'stakeTokens should be more than balance');
+    var error;
+    try {
+      await create_asset("0x31f2ae92057a7123ef0e490a", 1, accounts[5], "MyTitle", assetCost, 10001556712588, accounts[1], 1);
+    } catch(err) {
+      error = err;
+    }
+    assert.equal(error, 'Error: VM Exception while processing transaction: revert', 'Revert error has not happened!');
   })
 
   // if('should give correct kickback amounts to marketplaces', async () => {

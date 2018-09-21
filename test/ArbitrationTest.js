@@ -10,6 +10,7 @@ contract('Arbitration general tests.', function(accounts) {
   let satTokenInstance;
   let stakeInstance;
   let totalCost = 100;
+  const defaultTokenAmount = 205000000;
 
 
   async function create_asset(_assetId = "0x31f2ae92057a7123ef0e490a", _term = 1, _seller = accounts[1], _title = "MyTitle",
@@ -191,6 +192,48 @@ contract('Arbitration general tests.', function(accounts) {
     var getBalAfter = await splytTrackerInstance.getBalance.call(accounts[1]);
     var stakeTokens = await stakeInstance.calculateStakeTokens(totalCost);
     assert.equal(getBalBefore - getBalAfter, stakeTokens, "Money should be charged from seller");
+  })
+
+  it('should stack 0 from reporter after arbitration if totalCost == 0', async function() {
+    var totalCost = 0;
+    await create_asset("0x31f2ae92057a7123ef0e490a", 1, accounts[1], "MyTitle", totalCost, 10001556712588, accounts[2], 1);
+    await assetInstance.arbitrate("SPAM", accounts[2]);
+    var getBal = await splytTrackerInstance.getBalance.call(accounts[2]);
+    assert.equal(getBal, defaultTokenAmount, "Money should not be charged");
+    var stakeTokens = await stakeInstance.calculateStakeTokens(totalCost);
+    assert.equal(stakeTokens, 0, "Should stack 0 SAT tokens");
+  })
+
+   it('should stack 0 from seller after disputing if totalCost == 0', async function() {
+    var totalCost = 0;
+    await create_asset("0x31f2ae92057a7123ef0e490a", 1, accounts[1], "MyTitle", totalCost, 10001556712588, accounts[2], 1);
+    await assetInstance.arbitrate("SPAM", accounts[2]);
+    await assetInstance.disputeReportedSpam(accounts[1]);
+    var getBal = await splytTrackerInstance.getBalance.call(accounts[1]);
+    assert.equal(getBal, defaultTokenAmount, "Money should not be charged");
+    var stakeTokens = await stakeInstance.calculateStakeTokens(totalCost);
+    assert.equal(stakeTokens, 0, "Should stack 0 SAT tokens");
+  })
+
+  it('should successfully if seller dispute NOT fractional asset', async function() {
+    await create_asset("0x31f2ae92057a7123ef0e490a", 0, accounts[1], "MyTitle", 100, 10001556712588, accounts[2], 2);
+    var isFractional = await assetInstance.isFractional();
+    assert.equal(isFractional, false, "Asset should not be fractional");
+    await assetInstance.arbitrate("SPAM", accounts[2]);
+    var isDispute = await assetInstance.disputeReportedSpam(accounts[1]);
+    assert.equal(isDispute.receipt.status, 1, "Asset should be disputed");
+  })
+
+  it('should successfully dispute if balance == 0  and  initialStakeAmount == 0', async function() {
+    var totalCost = 1;
+    await create_asset("0x31f2ae92057a7123ef0e490a", 1, accounts[4], "MyTitle", totalCost, 10001556712588, accounts[1], 2);
+    await assetInstance.arbitrate("SPAM", accounts[1]);
+    var getBal4 = await splytTrackerInstance.getBalance.call(accounts[4]);
+    assert.equal(getBal4, 0, "Balance should be equal 0");
+    var initialStakeAmount = await stakeInstance.calculateStakeTokens(totalCost);
+    assert.equal(initialStakeAmount, 0, "Initial stake amount should equal 0");
+    var isDispute = await assetInstance.disputeReportedSpam(accounts[4]);
+    assert.equal(isDispute.receipt.status, 1, "Asset should be disputed");
   })
 
   async function handleVMException(method, inputs) {
