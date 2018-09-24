@@ -83,6 +83,16 @@ contract AssetManager is Owned, Events {
        return address(assetData);
     }
 
+    function getMarketPlacesLengthByAssetId(bytes12 _assetId) public view returns (uint) {
+        Asset asset = Asset(assetData.addressByAssetId(_assetId));          
+        return (asset.getMarketPlacesLength());
+    }
+    
+    function getMarketPlaceByAssetIdAndIndex(bytes12 _assetId, uint _index) public view returns (address) {
+        Asset asset = Asset(assetData.addressByAssetId(_assetId));
+
+        return (asset.listOfMarketPlaces(_index));
+    }
 
     //@dev update data contract address
     function setDataContract(address _assetData) onlyOwner public {
@@ -99,10 +109,16 @@ contract AssetManager is Owned, Events {
         return Asset(_assetAddress).status();
     }
 
-    //@dev update data contract address
-    function addMarketPlace(address _assetAddress, address _marketPlace) onlyOwnerOrSplyt public {
-        Asset(_assetAddress).addMarketPlace(_marketPlace);
+    //@dev add marketplace to asset
+    function addMarketPlaceByAssetAddress(address _assetAddress) public {
+        Asset(_assetAddress).addMarketPlace(msg.sender);
     }
+
+    //@dev add marketplace to asset
+    function addMarketPlaceByAssetId(bytes12 _assetId) public {
+        Asset(assetData.addressByAssetId(_assetId)).addMarketPlace(msg.sender);
+    }
+
 
     //@dev update data contract address
     function setStatus(address _assetAddress, Asset.Statuses _status) onlyOwnerOrSplyt public {
