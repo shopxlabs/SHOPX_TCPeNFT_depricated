@@ -27,11 +27,15 @@ module.exports = function(deployer, network, accounts) {
   var ver  = 3
   var walletConfig = {}
 
-  if(network === 'testnet')
-    walletConfig = { from: "0xd9e5e4bde24faa2b277ab2be78c95b9ae24259a8" }
-                                                                                   
-   else
+  if(network === 'testnet') {
+    walletConfig = { from: "0xf606a61e2fbc2db9b0b74f26c45469509dfb33ac" }
+  } else {                                                      
     walletConfig = { from: accounts[0] }
+  }
+
+  console.log('using main wallet: ')
+  console.log(walletConfig)
+
 
   deployer.deploy(Migrations, walletConfig)
 
@@ -40,7 +44,7 @@ module.exports = function(deployer, network, accounts) {
     console.log('Sat Token address: ', SatToken.address)
 
     //give accounts 1 default tokens
-    satToken.initUser(accounts[0])
+    await satToken.initUser(accounts[0], walletConfig)
 
     var stake = await deployer.deploy(Stake, 10000000000000, 2000000000, 100, walletConfig)
     console.log('Stake address: ', stake.address)
@@ -51,23 +55,23 @@ module.exports = function(deployer, network, accounts) {
 
     var managerTracker = await deployer.deploy(ManagerTracker, splytManager.address, walletConfig)
     console.log('ManagerTracker address: ', managerTracker.address)
-    await splytManager.setManagerTracker(managerTracker.address)
+    await splytManager.setManagerTracker(managerTracker.address, walletConfig)
 
     var assetManager = await deployer.deploy(AssetManager, splytManager.address, walletConfig)
     console.log('AssetManager address: ', assetManager.address)
-    await splytManager.setAssetManager(assetManager.address)
+    await splytManager.setAssetManager(assetManager.address, walletConfig)
 
     var orderManager = await deployer.deploy(OrderManager, splytManager.address, walletConfig)
     console.log('OrderManager address: ', orderManager.address)
-    await splytManager.setOrderManager(orderManager.address)
+    await splytManager.setOrderManager(orderManager.address, walletConfig)
 
     var arbitrationManager = await deployer.deploy(ArbitrationManager, splytManager.address, walletConfig)
     console.log('ArbitrationManager address: ', arbitrationManager.address)
-    await splytManager.setArbitrationManager(arbitrationManager.address)
+    await splytManager.setArbitrationManager(arbitrationManager.address, walletConfig)
     
     var reputationManager = await deployer.deploy(ReputationManager, splytManager.address, walletConfig)
     console.log('ReputationManager address: ', reputationManager.address)
-    await splytManager.setReputationManager(reputationManager.address)
+    await splytManager.setReputationManager(reputationManager.address, walletConfig)
 
   });
   

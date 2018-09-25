@@ -7,7 +7,7 @@ module.exports = {
       port: 8545,
       network_id: '*'    
     },
-    staging: {
+    testnet: {
       host: '13.58.147.177',
       port: 8555,
       network_id: '*'
