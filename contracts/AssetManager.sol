@@ -110,8 +110,8 @@ contract AssetManager is Owned, Events {
     }
 
     //@dev add marketplace to asset
-    function addMarketPlaceByAssetAddress(address _assetAddress) public {
-        Asset(_assetAddress).addMarketPlace(msg.sender);
+    function addMarketPlaceByAssetAddress(address _assetAddress, address _marketPlace) public {
+        Asset(_assetAddress).addMarketPlace(_marketPlace);
     }
 
     //@dev add marketplace to asset
