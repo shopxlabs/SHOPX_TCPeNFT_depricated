@@ -2,10 +2,10 @@ var SatToken = artifacts.require("./SatToken.sol");
 
 contract('SatToken', function(accounts) {
 
-  it('should give any user 20500 tokens', function() {
+  it('should give any user 205000000 tokens', function() {
     return SatToken.deployed().then(function(instance) {
       instance.balanceOf(accounts[0]).then(function(balance) {
-        assert.equal(balance.valueOf(), 20500, '20500 wasn\'t in the first account');
+        assert.equal(balance.valueOf(), 205000000, '205000000 wasn\'t in the first account');
       })
     })
   })
