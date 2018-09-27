@@ -70,12 +70,12 @@ contract SplytTracker is Events {
     }
 
     // Getter function. returns asset contract address given asset UUID
-    function getAddressById(bytes12 _listingId) public constant returns (address) {
+    function getAddressById(bytes12 _listingId) public view returns (address) {
         return addressByassetId[_listingId];
     }
 
     // Getter function. returns asset's UUID given asset's contract address
-    function getIdByAddress(address _contractAddr) public constant returns (bytes12) {
+    function getIdByAddress(address _contractAddr) public view returns (bytes12) {
         return assetIdByAddress[_contractAddr];
     }
     

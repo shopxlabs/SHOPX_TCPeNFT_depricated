@@ -20,7 +20,7 @@ contract Stake {
         eqVar3 = _eqVar3;
     }
     
-    function calcStakePercentage(uint _itemCost) public constant returns (uint percentage) {
+    function calcStakePercentage(uint _itemCost) public view returns (uint percentage) {
         uint axe = eqVar3 * _itemCost;
         uint denom = axe + eqVar2;
         percentage = eqVar1 / denom;
@@ -28,7 +28,7 @@ contract Stake {
         return percentage;
     }
     
-    function calculateStakeTokens(uint _itemCost) public constant returns(uint _stakeTokens) {
+    function calculateStakeTokens(uint _itemCost) public view returns(uint _stakeTokens) {
         return (_itemCost * calcStakePercentage(_itemCost)) / 100000;
     }
 }

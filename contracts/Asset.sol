@@ -80,7 +80,7 @@ contract Asset is Events {
             
     }
 
-    function getAssetConfig() public constant returns(
+    function getAssetConfig() public view returns(
         bytes32, 
         uint, 
         address, 
@@ -107,13 +107,13 @@ contract Asset is Events {
     }
 
     // Getter function. returns a users's total contributions so far for this asset.
-    function getMyContributions(address _contributor) public constant returns (uint) {
+    function getMyContributions(address _contributor) public view returns (uint) {
         return contributions[_contributor];
     }
     
     // Checks to see if asset is open for contributions or not
     // Based on expired or not, and if incoming contribution will overflow the asset or not
-    function isOpenForContribution(uint _contributing) public constant returns (bool) {
+    function isOpenForContribution(uint _contributing) public view returns (bool) {
         if(arbitrateAddr != 0x0)
             return false;
         if (isExpired())
@@ -127,17 +127,17 @@ contract Asset is Events {
     }
     
     // Getter function. returns if asset is fully funded or not
-    function isFunded() public constant returns (bool) {
+    function isFunded() public view returns (bool) {
         return amountFunded >= totalCost;
     }
     
     // Getter function. returns if listing is expired or not
-    function isExpired() public constant returns (bool) {
+    function isExpired() public view returns (bool) {
         return expirationDate <= now;
     }
     
     // Getter function. returns if asset is fractional or not based on term
-    function isFractional() public constant returns (bool) {
+    function isFractional() public view returns (bool) {
         if (term > 0)
             return true;
         return false;
@@ -175,7 +175,7 @@ contract Asset is Events {
     }
     
     // Calculate how much seller gets after kickbacks taken out
-    function calcDistribution() public constant returns (uint, uint) {
+    function calcDistribution() public view returns (uint, uint) {
         
         uint kickbackWitheld = kickbackAmount / listOfMarketPlaces.length;
         uint sellerGets = totalCost - kickbackWitheld * listOfMarketPlaces.length;

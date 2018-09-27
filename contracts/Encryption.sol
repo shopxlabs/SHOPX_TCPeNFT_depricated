@@ -17,7 +17,7 @@ contract Encryption {
         publicKey = _publicKey;
     }
     
-    function getLastMessage() public constant returns (string) {
+    function getLastMessage() public view returns (string) {
         return chats[chats.length - 1];
     }
     
@@ -39,7 +39,7 @@ contract Encryption {
         encryptionTestInterface.saveFriendPublicKey(publicKey);
     }
     
-    function returnMyPublicKey() public constant returns (string) {
+    function returnMyPublicKey() public view returns (string) {
         return publicKey;
     }
     
