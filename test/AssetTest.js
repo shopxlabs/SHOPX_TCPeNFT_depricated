@@ -25,7 +25,7 @@ contract('AssetTest general test cases.', function(accounts) {
 
   // This function gets ran before every test cases in this file.
   beforeEach('Deploying asset contract. ', async function() {
-    // reset all account's token balance to 20500 before running each test except account[5]
+    // reset all account's token balance to 205000000 before running each test except account[5]
     satTokenInstance = await SatToken.deployed()
     accounts.forEach(async function(acc) {
       if(acc != accounts[5]){
@@ -36,38 +36,40 @@ contract('AssetTest general test cases.', function(accounts) {
 
   it('should NOT release funds to seller if asset is NOT fully funded and the asset is NOT expired .', async function() {
     await create_asset("0x31f2ae92057a7123ef0e490a", 1, accounts[1], "MyTitle", 1000, 10001556712588, accounts[2], 2);
-
+    var stakeTokens = await stakeInstance.calculateStakeTokens(1000);
     await assetInstance.contribute(accounts[2], accounts[0], 100);
     await assetInstance.releaseFunds();
     var getBal0 = await splytTrackerInstance.getBalance.call(accounts[1]);
-    assert.equal(getBal0.valueOf(), defaultTokenAmount, 'No money should be transfered to seller\'s wallet!');
+    assert.equal(getBal0.valueOf(), defaultTokenAmount - stakeTokens, 'No money should be transfered to seller\'s wallet!');
   })
 
   it('should NOT release funds to seller if asset is NOT fully funded and the asset is expired .', async function() {
     var time = Date.now()/1000 | 0;
     await create_asset("0x31f2ae92057a7123ef0e490a", 1, accounts[1], "MyTitle", 1000, time+5, accounts[2], 2);
+    var stakeTokens = await stakeInstance.calculateStakeTokens(1000);
     await assetInstance.contribute(accounts[2], accounts[0], 100);
     await sleep(10*1000);
     await assetInstance.releaseFunds();
     var getBal0 = await splytTrackerInstance.getBalance.call(accounts[1]);
-    assert.equal(getBal0.valueOf(), defaultTokenAmount, 'No money should be transfered to seller\'s wallet!');
+    assert.equal(getBal0.valueOf(), defaultTokenAmount - stakeTokens, 'No money should be transfered to seller\'s wallet!');
   })
 
   it('should NOT release funds to seller if asset is fully funded && the asset is expired .', async function() {
     var time = Date.now()/1000 | 0;
     await create_asset("0x31f2ae92057a7123ef0e490a", 1, accounts[1], "MyTitle", 1000, time+1, accounts[2], 2);
+    var stakeTokens = await stakeInstance.calculateStakeTokens(1000);
     await assetInstance.contribute(accounts[2], accounts[0], 100);
     await sleep(5*1000);
     await assetInstance.releaseFunds();
     var getBal0 = await splytTrackerInstance.getBalance.call(accounts[1]);
-    assert.equal(getBal0.valueOf(), defaultTokenAmount, 'No money should be transfered to seller\'s wallet!');
+    assert.equal(getBal0.valueOf(), defaultTokenAmount - stakeTokens, 'No money should be transfered to seller\'s wallet!');
   })
 
   it('should release funds to seller if asset is fully funded and the asset is expired .', async function() {
     var time = Date.now()/1000 | 0;
     var kickbackAmount = 2;
-    var sellerBefore = await splytTrackerInstance.getBalance.call(accounts[4]);
     await create_asset("0x31f2ae92057a7123ef0e490a", 1, accounts[4], "MyTitle", 1000, time+5, accounts[0], kickbackAmount);
+    var sellerBefore = await splytTrackerInstance.getBalance.call(accounts[4]);
     await assetInstance.contribute(accounts[0], accounts[2], 1000);
     await sleep(10*1000);
     await assetInstance.releaseFunds();

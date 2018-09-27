@@ -24,7 +24,7 @@ contract('Arbitration general tests.', function(accounts) {
 
   // This function gets ran before every test cases in this file.
     beforeEach('Deploying asset contract. ', async function() {
-      // reset all account's token balance to 20500 before running each test except account[4]
+      // reset all account's token balance to 205000000 before running each test except account[4]
        satTokenInstance = await SatToken.deployed()
        accounts.forEach(async function(acc) {
          if(acc != accounts[4]){
