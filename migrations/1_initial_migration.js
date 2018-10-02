@@ -55,23 +55,23 @@ module.exports = function(deployer, network, accounts) {
 
     var managerTracker = await deployer.deploy(ManagerTracker, splytManager.address, walletConfig)
     console.log('ManagerTracker address: ', managerTracker.address)
-    await splytManager.setManagerTracker(managerTracker.address, walletConfig)
+    splytManager.setManagerTracker(managerTracker.address, walletConfig)
 
     var assetManager = await deployer.deploy(AssetManager, splytManager.address, walletConfig)
     console.log('AssetManager address: ', assetManager.address)
-    await splytManager.setAssetManager(assetManager.address, walletConfig)
+    splytManager.setAssetManager(assetManager.address, walletConfig)
 
     var orderManager = await deployer.deploy(OrderManager, splytManager.address, walletConfig)
     console.log('OrderManager address: ', orderManager.address)
-    await splytManager.setOrderManager(orderManager.address, walletConfig)
+    splytManager.setOrderManager(orderManager.address, walletConfig)
 
     var arbitrationManager = await deployer.deploy(ArbitrationManager, splytManager.address, walletConfig)
     console.log('ArbitrationManager address: ', arbitrationManager.address)
-    await splytManager.setArbitrationManager(arbitrationManager.address, walletConfig)
+    splytManager.setArbitrationManager(arbitrationManager.address, walletConfig)
     
     var reputationManager = await deployer.deploy(ReputationManager, splytManager.address, walletConfig)
     console.log('ReputationManager address: ', reputationManager.address)
-    await splytManager.setReputationManager(reputationManager.address, walletConfig)
+    splytManager.setReputationManager(reputationManager.address, walletConfig)
 
   });
   
