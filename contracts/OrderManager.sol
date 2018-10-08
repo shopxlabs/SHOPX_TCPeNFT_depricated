@@ -92,7 +92,7 @@ contract OrderManager is Owned, Events {
         uint mpGets; //marketplaces commission
         uint sellerGets;
 
-        (mpGets, sellerGets) = calcDistribution(_asset.totalCost(), _asset.getMarketPlacesLength(), _asset.kickbackAmount());
+        (mpGets, sellerGets) = calcDistribution(totalCost, _asset.getMarketPlacesLength(), _asset.kickbackAmount());
         splytManager.internalContribute(msg.sender, _asset.seller(), sellerGets);
         
         //distribute commission to all the market places
