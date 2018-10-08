@@ -16,7 +16,7 @@ contract('OrderManagerTest general test cases.', function(accounts) {
   const defaultAssetId = "0x31f2ae92057a7123ef0e490a";
   const defaultAssetFractionalId = "0x31f2ae92057a7123ef0e490b";
 
-  const defaultInventoryCount = 2;
+  const defaultInventoryCount = 10;
 
   let satTokenInstance;
   let assetManagerInstance;
@@ -106,7 +106,7 @@ contract('OrderManagerTest general test cases.', function(accounts) {
 
   it('should deploy new order contract successfully!', async function() {
     await create_asset();
-    await purchase("0x31", assetAddress, 1, 1000);
+    await purchase("0x31", assetAddress, 2, (1000 * 2));
     let length = await orderManagerInstance.getOrdersLength();
     // console.log('number of orders: ' + length);
     assert.equal(length, 1, "Number of orders is not 1!");
@@ -130,13 +130,14 @@ contract('OrderManagerTest general test cases.', function(accounts) {
 
   })
 
-  it('should current inventory at 2', async function() {
+  it('should current inventory at 8', async function() {
 
     let currentInventory = await assetInstance.inventoryCount();
     // console.log('current inventory count: ' + currentInventory);
-    assert.equal(defaultInventoryCount - 1, currentInventory, "Initial inventory count is not expected!");
+    assert.equal(8, currentInventory, "Initial inventory count is not expected!");
 
   })
+
 
   it('should defaultBuyer balance be less than 1000 off original balance', async function() {
     await create_asset();
