@@ -5,8 +5,8 @@ import './Asset.sol';  //change to interface later
 contract Arbitration {
     
     enum Reasons { SPAM, BROKEN, NOTRECIEVED, NOREASON }
-    enum Winners { UNDECIDED, REPORTER, SELLER  }
-    enum Statuses { REPORTED, SELLER_STAKED_2X, REPORTER_STAKED_2X, RESOLVED, UNRESOLVED }
+    enum Winners { UNDECIDED, REPORTER, SELLER, NEITHER }
+    enum Statuses { REPORTED, SELLER_STAKED_2X, REPORTER_STAKED_2X, PENDING_DECISION, RESOLVED, UNRESOLVED }
 
     bytes12 public arbitrationId;
     address public reporter;
@@ -22,19 +22,6 @@ contract Arbitration {
     address public asset;
     address public arbitrator;
 
-    modifier onlyArbitrator() {
-        require(arbitrator == msg.sender);
-        _;
-    }
-
-    modifier onlyReporter() {
-        require(msg.sender == reporter);
-        _;
-    }
-    modifier onlyStatus(Statuses _status) {
-        require(_status == status);
-        _;
-    }
 
     modifier onlyManager() {
         require(ManagerAbstract(msg.sender).isManager(msg.sender) == true);
@@ -56,7 +43,7 @@ contract Arbitration {
     
     //@dev selected arbitrator gets to decide case
     //Arbitrator can select winner only after reporter 2x
-    function setWinner(Winners _winner) public onlyManager onlyStatus(Statuses.REPORTER_STAKED_2X) {
+    function setWinner(Winners _winner) public onlyManager {
         winner = _winner;
         status = Statuses.RESOLVED;
     }    
@@ -69,6 +56,7 @@ contract Arbitration {
     //@dev set arbitrator so that person resolves this arbitration
     function setArbitrator(address _arbitrator) public onlyManager {
         arbitrator = _arbitrator;
+        status = Statuses.PENDING_DECISION;
     } 
 
     //@dev get arbitrator

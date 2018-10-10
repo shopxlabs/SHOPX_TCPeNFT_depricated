@@ -31,7 +31,12 @@ contract ArbitrationManager is Owned, Events {
         require(Asset(assetAddress).seller() == msg.sender);        
         _;
     }
-        
+
+    modifier onlyStatus(bytes12 _arbitrationId, Arbitration.Statuses _status) {
+        address arbitrationAddress = arbitrationData.addressByArbitrationId(_arbitrationId);
+        require(Arbitration(arbitrationAddress).status() == _status); 
+        _;
+    }        
 
     constructor(address _splytManager) public {
         splytManager = SplytManager(_splytManager);
@@ -58,7 +63,7 @@ contract ArbitrationManager is Owned, Events {
     }
 
     //TODO: write test to see if tokens gets distributed correctly to winner and arbitrator
-    function setWinner(bytes12 _arbitrationId, Arbitration.Winners _winner) public onlyArbitrator(_arbitrationId) {
+    function setWinner(bytes12 _arbitrationId, Arbitration.Winners _winner) public onlyArbitrator(_arbitrationId) onlyStatus(_arbitrationId, Arbitration.Statuses.PENDING_DECISION) {
         
         address arbitrationAddress = arbitrationData.addressByArbitrationId(_arbitrationId);
         Arbitration arbitration = Arbitration(arbitrationAddress);
@@ -156,7 +161,7 @@ contract ArbitrationManager is Owned, Events {
 
     //@dev seller disputes reporter by staking initial stake amount
     //@dev initial stake is asset contract
-    function set2xStakeBySeller(bytes12 _arbitrationId) public onlySeller(_arbitrationId) {
+    function set2xStakeBySeller(bytes12 _arbitrationId) public onlySeller(_arbitrationId) onlyStatus(_arbitrationId, Arbitration.Statuses.REPORTED){
         address arbitrationAddress = arbitrationData.addressByArbitrationId(_arbitrationId);           
         Arbitration arbitration = Arbitration(arbitrationAddress);
         arbitration.set2xStakeBySeller();
@@ -166,7 +171,7 @@ contract ArbitrationManager is Owned, Events {
     }      
 
     //@dev report puts in 2x stake
-    function set2xStakeByReporter(bytes12 _arbitrationId) public onlyReporter(_arbitrationId) {
+    function set2xStakeByReporter(bytes12 _arbitrationId) public onlyReporter(_arbitrationId) onlyStatus(_arbitrationId, Arbitration.Statuses.SELLER_STAKED_2X){
         address arbitrationAddress = arbitrationData.addressByArbitrationId(_arbitrationId);   
         Arbitration arbitration = Arbitration(arbitrationAddress);
         arbitration.set2xStakeByReporter();

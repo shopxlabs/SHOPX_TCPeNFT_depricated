@@ -121,12 +121,20 @@ contract('ArbitrationManagerTest general test cases.', function(accounts) {
   })
 
 
-  it('should be status 2=IN_ARBITRATION after reporter creates an arbitration!', async function() {
+  it('should be asset status 2=IN_ARBITRATION after reporter creates an arbitration!', async function() {
     
     let status = await assetInstance.status();
 
     // console.log('asset status after being reported:: ' + status);
     assert.equal(status, 2, "Status is not in IN_ARBITRATION!");
+  })
+
+
+  it('should arbitration status be 0=REPORTED after arbitration creation', async function() {
+    let status = await arbitrationManagerInstance.getStatus('0x31f2ae92057a7123ef0e490a');
+    console.log('status is ' + status);
+    assert.equal(0,status,"Status is not in 0=REPORTED as expected!");
+
   })
 
 
@@ -144,23 +152,14 @@ contract('ArbitrationManagerTest general test cases.', function(accounts) {
   })
 
 
-  it('should be able to assign arbitrator in the Arbitration contract!', async function() {
-
-    await arbitrationManagerInstance.setArbitrator("0x31f2ae92057a7123ef0e490a", defaultArbitrator);
-    // console.log('assigning arbitrator: ' + defaultArbitrator);
-    let arbitrator = await arbitrationManagerInstance.getArbitrator("0x31f2ae92057a7123ef0e490a");
-    // console.log('returned arbitrator: ' + arbitrator);
-    assert.equal(defaultArbitrator, arbitrator,"Arbitrator did not get assigned!");
-
-  })
-
   it('should seller be able to 2x stake on the arbitration contract', async function() {
     await arbitrationManagerInstance.set2xStakeBySeller("0x31f2ae92057a7123ef0e490a", { from: defaultSeller });
     let status = await arbitrationManagerInstance.getStatus("0x31f2ae92057a7123ef0e490a");
-    // console.log('arbitration status: ' + status);
+    console.log('arbitration status: ' + status);
     assert.equal(1,status,"Status is not in 2=SELLER_STAKE_2x as expected!");
 
   })
+
 
  it('should reporter be able to 2x stake on the arbitration contract', async function() {
     await arbitrationManagerInstance.set2xStakeByReporter("0x31f2ae92057a7123ef0e490a", { from: defaultBuyer });
@@ -170,9 +169,19 @@ contract('ArbitrationManagerTest general test cases.', function(accounts) {
 
   })
 
-  it('should arbitrator to set the winner to reporter!', async function() {
+  it('should be able to assign arbitrator in the Arbitration contract!', async function() {
 
-    console.log('arbitrator: ' + defaultArbitrator);
+    await arbitrationManagerInstance.setArbitrator("0x31f2ae92057a7123ef0e490a", defaultArbitrator);
+    // console.log('assigning arbitrator: ' + defaultArbitrator);
+    let arbitrator = await arbitrationManagerInstance.getArbitrator("0x31f2ae92057a7123ef0e490a");
+    // console.log('returned arbitrator: ' + arbitrator);
+    assert.equal(defaultArbitrator, arbitrator,"Arbitrator did not get assigned!");
+
+  }) 
+
+  it('should arbitrator to set the winner to reporter!', async function() {
+    let status = await assetManagerInstance.getStatus(assetAddress);
+    console.log('status: ' + status);
     await arbitrationManagerInstance.setWinner("0x31f2ae92057a7123ef0e490a", 1, { from: defaultArbitrator });
     let winner = await arbitrationManagerInstance.getWinner("0x31f2ae92057a7123ef0e490a");
     // console.log('winner is ' + winner)
@@ -180,9 +189,19 @@ contract('ArbitrationManagerTest general test cases.', function(accounts) {
 
   })
 
+
+  it('should arbitration status be 4=RESOLVED after decision!', async function() {
+    let status = await arbitrationManagerInstance.getStatus('0x31f2ae92057a7123ef0e490a');
+    console.log('status: ' + status);
+    // console.log('winner is ' + winner)
+    assert.equal(4, status,"Status for RESOLVED incorrect");
+
+  })
+
+
   it('should asset status be 5=CLOSED after arbitration sides with reporter!', async function() {
     let status = await assetManagerInstance.getStatus(assetAddress);
-    // console.log('status is ' + status);
+    console.log('status is ' + status);
     assert.equal(5,status,"Status is not in 5=CLOSED as expected!");
 
   })
