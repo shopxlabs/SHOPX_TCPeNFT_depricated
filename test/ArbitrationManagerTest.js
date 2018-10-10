@@ -165,7 +165,7 @@ contract('ArbitrationManagerTest general test cases.', function(accounts) {
     await arbitrationManagerInstance.set2xStakeByReporter("0x31f2ae92057a7123ef0e490a", { from: defaultBuyer });
     let status = await arbitrationManagerInstance.getStatus("0x31f2ae92057a7123ef0e490a");
     // console.log('arbitration status: ' + status);
-    assert.equal(2,status,"Status is not in 2=REPORTER_STAKE_2x as expected!");
+    assert.equal(2,status,"Status is not in 2=REPORTER_STAKE_2X as expected!");
 
   })
 

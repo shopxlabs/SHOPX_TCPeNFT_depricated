@@ -94,7 +94,7 @@ contract ArbitrationManager is Owned, Events {
 
 
     //@dev set arbitrator so that person resolves this arbitration
-    function setArbitrator(bytes12 _arbitrationId, address _arbitrator) public onlyOwner {
+    function setArbitrator(bytes12 _arbitrationId, address _arbitrator) public onlyOwner onlyStatus(_arbitrationId, Arbitration.Statuses.REPORTER_STAKED_2X){
         address arbitrationAddress = arbitrationData.addressByArbitrationId(_arbitrationId);   
         Arbitration(arbitrationAddress).setArbitrator(_arbitrator);
     } 
