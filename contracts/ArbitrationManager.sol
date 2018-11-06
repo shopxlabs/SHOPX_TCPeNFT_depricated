@@ -148,15 +148,15 @@ contract ArbitrationManager is Owned, Events {
       return arbitrationData.addressByIndex(_index);
     }   
 
-    function getArbitrationInfoByIndex(uint _index) public view returns (bytes12, Arbitration.Reasons, address, Arbitration.Winners, Arbitration.Statuses, address, address) {
+    function getArbitrationInfoByIndex(uint _index) public view returns (bytes12, Arbitration.Reasons, address, Arbitration.Winners, Arbitration.Statuses, address, address, address) {
       Arbitration a = Arbitration(arbitrationData.addressByIndex(_index));
 
-      return (a.arbitrationId(), a.reason(), a.reporter(), a.winner(), a.status(), a.asset(), a.arbitrator());
+      return (a.arbitrationId(), a.reason(), a.reporter(), a.winner(), a.status(), a.asset(), a.arbitrator(), address(a));
     }   
 
-    function getArbitrationInfoByArbitrationId(bytes12 _arbitrationId) public view returns (bytes12, Arbitration.Reasons, address, Arbitration.Winners, Arbitration.Statuses, address, address) {
+    function getArbitrationInfoByArbitrationId(bytes12 _arbitrationId) public view returns (bytes12, Arbitration.Reasons, address, Arbitration.Winners, Arbitration.Statuses, address, address, address) {
       Arbitration a = Arbitration(arbitrationData.addressByArbitrationId(_arbitrationId));
-      return (a.arbitrationId(), a.reason(), a.reporter(), a.winner(), a.status(), a.asset(), a.arbitrator());
+      return (a.arbitrationId(), a.reason(), a.reporter(), a.winner(), a.status(), a.asset(), a.arbitrator(), address(a));
     }   
 
     //@dev seller disputes reporter by staking initial stake amount
