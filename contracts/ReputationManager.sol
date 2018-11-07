@@ -56,30 +56,30 @@ contract ReputationManager is Owned, Events  {
     }
 
     //@dev get review information
-    function getRateInfoByWalletAndIndex(address _wallet, uint _index) public view returns (uint, address, uint) {
+    function getRateInfoByWalletAndIndex(address _wallet, uint _index) public view returns (uint, address, uint, address) {
 
         Reputation rep = Reputation(reputationData.reputationByWallet(_wallet));
         return rep.getRateInfoByIndex(_index);      
     }  
 
     //@dev get review information
-    function getReputationInfoByIndex(uint _index) public view returns (address, uint, uint) {
+    function getReputationInfoByIndex(uint _index) public view returns (address, uint, uint, address) {
 
         Reputation rep = Reputation(reputationData.reputationByIndex(_index));
         uint length = rep.getRatesLength();
         uint average = getAverageRatingByWallet(rep.wallet());
 
-        return (rep.wallet(), average, length);      
+        return (rep.wallet(), average, length, address(rep));      
     }  
 
     //@dev get review information
-    function getReputationInfoByWallet(address _wallet) public view returns (address, uint, uint) {
+    function getReputationInfoByWallet(address _wallet) public view returns (address, uint, uint, address) {
 
         Reputation rep = Reputation(reputationData.reputationByWallet(_wallet));
         uint length = rep.getRatesLength();
         uint average = getAverageRatingByWallet(rep.wallet());
 
-        return (rep.wallet(), average, length);      
+        return (rep.wallet(), average, length, address(rep));      
     }  
 
 
