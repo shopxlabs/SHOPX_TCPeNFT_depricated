@@ -68,14 +68,17 @@ contract OrderData is Owned {
     }   
 
     //create new fractioinal order
-    function saveFractional(bytes12 _orderId, address _asset, address _contributor, uint _amount, Statuses _status) public onlyOwner returns (uint) {
+    function saveFractional(bytes12 _orderId, address _asset, address _contributor, uint _amount, Statuses _status) public onlyOwner returns (bool) {
         orders[_orderId].version = version;
+        orders[_orderId].orderId = _orderId;
         orders[_orderId].asset = _asset;
         orders[_orderId].status = _status;    
         orders[_orderId].contributors[_contributor] += _amount;
         orders[_orderId].totalContributions += _amount;
         fractionalOrders[_asset] = _orderId;
-
+        orderIdByIndex[index] = _orderId;
+        index++;
+        return true;
     }   
 
     function updateFractional(bytes12 _orderId, address _contributor, uint _amount, Statuses _status) public onlyOwner returns (uint) {
