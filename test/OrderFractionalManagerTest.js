@@ -9,6 +9,9 @@ const Asset = artifacts.require("./Asset.sol");
 contract('OrderManagerTest for fractional general test cases.', function(accounts) {
 
   const defaultBuyer = accounts[0];
+  const defaultBuyer2 = accounts[3];
+  const defaultBuyer3 = accounts[4]
+
   const defaultSeller = accounts[1];
   const defaultMarketPlace = accounts[2];
   const defaultPrice = 1000;
@@ -42,9 +45,9 @@ contract('OrderManagerTest for fractional general test cases.', function(account
 
 
 
-  async function purchase(_orderId = "0x31f2ae92057a7123ef0e490c" , _assetAddress = "0x31f2ae92057a7123ef0e490a", _quantity = 1, _amount = defaultPrice) {
-
-    await orderManagerInstance.purchase(_orderId, _assetAddress, _quantity, _amount, { from: defaultBuyer });
+  async function purchase(_orderId = "0x31f2ae92057a7123ef0e490c" , _assetAddress = "0x31f2ae92057a7123ef0e490a", _quantity = 1, _amount = defaultPrice, _buyer = defaultBuyer) {
+    console.log('buyer is ' + _buyer)
+    await orderManagerInstance.purchase(_orderId, _assetAddress, _quantity, _amount, { from: _buyer });
     // console.log('orderId: ' + orderId);
     // assetInstance = await Asset.at(assetAddress);
 
@@ -109,9 +112,18 @@ contract('OrderManagerTest for fractional general test cases.', function(account
     assert.equal(type, 1, "Asset type is not 1 as expected!");
   })
 
+
+  it('should get false if there are no contributions', async function() {
+
+    let result = await orderManagerInstance.isFractionalOrderExists(assetFractionalAddress);
+    console.log('fractional order exists? ' + result);
+
+    assert.equal(result, false, "Order should be false for fractional payments!");
+  })
+
  
   it('should get status 5=CONTRIBUTIONS_OPEN for fractional asset', async function() {
-    await purchase("0x3130", assetFractionalAddress, 0, 500);
+    await purchase("0x3130", assetFractionalAddress, 0, 500, defaultBuyer);
 
     let orderId = await orderManagerInstance.getFractionalOrderIdByAsset(assetFractionalAddress);
     // console.log('order id: ' + orderId);
@@ -125,8 +137,17 @@ contract('OrderManagerTest for fractional general test cases.', function(account
     assert.equal(status, 5, "Order status is not 5=CONTRIBUTIONS_OPEN as expected!");
   })
 
+
+  it('should get true if there have been any contributions', async function() {
+
+    let result = await orderManagerInstance.isFractionalOrderExists(assetFractionalAddress);
+    console.log('fractional order exists? ' + result);
+
+    assert.equal(result, true, "Order should be true for fractional payments!");
+  })
+
   it('should get status 6=CONTRIBUTIONS_FULFILLED for fractional asset', async function() {
-    await purchase("0x3130", assetFractionalAddress, 0, 500);
+    await purchase("0x3130", assetFractionalAddress, 0, 500, defaultBuyer2);
 
     let orderId = await orderManagerInstance.getFractionalOrderIdByAsset(assetFractionalAddress);
     // console.log('order id: ' + orderId);
@@ -148,25 +169,68 @@ contract('OrderManagerTest for fractional general test cases.', function(account
 
   it('should return total number of 1 orders', async function() {
     let length = await orderManagerInstance.getOrdersLength();
-    console.log('total orders: ' + length)
+    console.log('total orders: ' + length);
     assert.equal(length, 1, "Number of orders is incorrect!");
   })
 
-  it('should return fractional order info by index 1', async function() {
-    let length = await orderManagerInstance.getOrdersLength();
-    console.log('total orders: ' + length)
-    let fields = await orderManagerInstance.getOrderInfoByIndex(0);
-    console.log(fields[0])
-    console.log(fields[1])
-    console.log(fields[2])
-    console.log(fields[3])
-    console.log(fields[4])
-    console.log(fields[5])
-    console.log(fields[6])
+  it('should return 2 contributors', async function() {
+    let orderId = await orderManagerInstance.getFractionalOrderIdByAsset(assetFractionalAddress);
+    let length = await orderManagerInstance.getContributorsLength(orderId);
+    console.log('contributors length: ' + length);
+    assert.equal(length, 2, "expected number of contributors is incorrect!");
+  })
 
-    assert.equal(0, 1, "expected return info is incorrect!");
+ 
+  it('should return defaultBuyer as contributor 1', async function() {
+    let orderId = await orderManagerInstance.getFractionalOrderIdByAsset(assetFractionalAddress);
+    // let fields = await orderManagerInstance.getContributionByOrderIdAndIndex(orderId, 0);
+    let address = await orderManagerInstance.getContributorByOrderIdAndIndex(orderId, 0);
+
+    console.log(address)
+    // console.log(fields[1])
+    // console.log(fields[2])
+
+    assert.equal(address, defaultBuyer, "expected contributor is incorrect!");
+  })
+
+  it('should return defaultBuyer2 as contributor 2', async function() {
+    let orderId = await orderManagerInstance.getFractionalOrderIdByAsset(assetFractionalAddress);
+    let address = await orderManagerInstance.getContributorByOrderIdAndIndex(orderId, 1);
+
+    console.log(address)
+    
+    assert.equal(address, defaultBuyer2, "expected contributor is incorrect!");
+  })
+
+  it('should return total contribution amount as 1000', async function() {
+    let orderId = await orderManagerInstance.getFractionalOrderIdByAsset(assetFractionalAddress);
+    let amount = await orderManagerInstance.getTotalContributions(orderId);
+
+    console.log(amount)
+    
+    assert.equal(amount, 1000, "expected total contributions is not 1000!");
   })
 
 
+  it('should return 500 contribution for condtributor 1', async function() {
+    let orderId = await orderManagerInstance.getFractionalOrderIdByAsset(assetFractionalAddress);
+    // let fields = await orderManagerInstance.getContributionByOrderIdAndIndex(orderId, 0);
+    let fields = await orderManagerInstance.getContributionByOrderIdAndIndex(orderId, 0);
+    console.log(fields[0])
+    console.log(fields[1])
+    console.log(fields[2])
+  
+    assert.equal(fields[1], 500, "expected contribution of 500 is incorrect!");
+  })
 
+  it('should return 500 contribution for condtributor 2', async function() {
+    let orderId = await orderManagerInstance.getFractionalOrderIdByAsset(assetFractionalAddress);
+    // let fields = await orderManagerInstance.getContributionByOrderIdAndIndex(orderId, 0);
+    let fields = await orderManagerInstance.getContributionByOrderIdAndIndex(orderId, 1);
+    console.log(fields[0])
+    console.log(fields[1])
+    console.log(fields[2])
+  
+    assert.equal(fields[1], 500, "expected contribution of 500 is incorrect!");
+  })
 })

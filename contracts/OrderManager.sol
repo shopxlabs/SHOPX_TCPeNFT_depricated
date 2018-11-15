@@ -71,8 +71,12 @@ contract OrderManager is Owned, Events {
         if (asset.assetType() == Asset.AssetTypes.NORMAL) {
             createOrder(_orderId, asset, _qty, _tokenAmount);
         } else {
-            //Fractional ownership
-            contributeOrder(_orderId, asset, _tokenAmount);            
+            //Fractional ownership. check if already exist
+            bytes12 fractionalOrderId = orderData.fractionalOrders(_assetAddress);
+            if (fractionalOrderId == bytes12(0)) {
+                fractionalOrderId = _orderId;
+            }
+            contributeOrder(fractionalOrderId, asset, _tokenAmount);   
         }
 
         return true;
@@ -115,6 +119,17 @@ contract OrderManager is Owned, Events {
     }
 
     //@dev for fractional purchases
+    function isFractionalOrderExists(address _asset) public view returns (bool) {
+        bytes12 fractionalOrderId = orderData.fractionalOrders(_asset);
+        if (fractionalOrderId == bytes12(0)) {
+            return false;
+        } else {
+            return true;
+        }
+
+    }
+
+    //@dev for fractional purchases
     function contributeOrder(bytes12 _orderId, Asset _asset, uint _tokenAmount) private {
        
         uint buyerBalance = splytManager.getBalance(msg.sender);
@@ -132,7 +147,7 @@ contract OrderManager is Owned, Events {
             uint totalContributions = orderData.getTotalContributions(_orderId) + _tokenAmount;         
             updatedStatus = totalContributions >= _asset.totalCost() ? OrderData.Statuses.CONTRIBUTIONS_FULFILLED : OrderData.Statuses.CONTRIBUTIONS_OPEN;   
             splytManager.internalContribute(msg.sender, address(_asset), _tokenAmount); //transfer contributed amount to asset contract
-            orderData.updateFractional(_orderId, msg.sender, _tokenAmount, updatedStatus);       
+            orderData.addContribution(_orderId, msg.sender, _tokenAmount, updatedStatus);       
         } else {
             //create new fractional order
             updatedStatus = _tokenAmount >=  _asset.totalCost() ? OrderData.Statuses.CONTRIBUTIONS_FULFILLED : OrderData.Statuses.CONTRIBUTIONS_OPEN;          
@@ -234,6 +249,11 @@ contract OrderManager is Owned, Events {
        orderData = OrderData(_orderData);
     }
 
+    function getFractionOrderIdByAssetAddress(address _asset) public view returns (bytes12) {
+      return orderData.fractionalOrders(_asset);
+    }    
+
+
     function getOrderInfoByOrderId(bytes12 _orderId) public view returns (uint, bytes12, address, address, uint, uint, OrderData.Statuses) {
       return orderData.getOrderByOrderId(_orderId);
     }    
@@ -241,6 +261,21 @@ contract OrderManager is Owned, Events {
     function getOrderInfoByIndex(uint _index) public view returns (uint, bytes12, address, address, uint, uint, OrderData.Statuses) {
       return orderData.getOrderByOrderId(orderData.orderIdByIndex(_index));
     }    
+
+
+    function getContributorsLength(bytes12 _orderId) public view returns (uint) {
+      return orderData.getContributorsLengthByOrderId(_orderId);
+    }    
+
+
+    function getContributionByOrderIdAndIndex(bytes12 _orderId, uint _index) public view returns (address, uint, uint) {
+      return orderData.getContributionByOrderIdAndIndex(_orderId, _index);
+    }    
+
+    function getContributorByOrderIdAndIndex(bytes12 _orderId, uint _index) public view returns (address) {
+      return orderData.getContributorByOrderIdAndIndex(_orderId, _index);
+    }    
+
 
     function getDataVersion() public view returns (uint) {
       return orderData.version();
