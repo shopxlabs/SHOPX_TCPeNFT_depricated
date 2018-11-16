@@ -25,9 +25,11 @@ contract OrderData is Owned {
         Statuses status;        
         
         Reasons reason; //refund request reason
-        mapping (address => Contribution) contributions; //address and mounts for fractional contributors. use another struct?
+        // mapping (address => Contribution) contributions; //address and mounts for fractional contributors. use another struct?
 
-        address[] contributors; //array of all the contributors/fractional
+        // address[] contributors; //array of all the contributors/fractional
+
+        Contribution[] contributions;
 
         mapping (bytes12 => bytes12) bytesAttributes; //for future 
         mapping (bytes12 => uint) intAttributes; //for future
@@ -83,11 +85,10 @@ contract OrderData is Owned {
 
     //@dev: iterate through contributions
     function getTotalContributions(bytes12 _orderId) public view returns (uint) {
-        uint length = orders[_orderId].contributors.length;
+        uint length = orders[_orderId].contributions.length;
         uint total = 0;
         for (uint i = 0; i < length; i++) {
-            address contributor = orders[_orderId].contributors[i];
-            total += orders[_orderId].contributions[contributor].amount;
+            total += orders[_orderId].contributions[i].amount;
         }
         return total;
     }   
@@ -100,11 +101,11 @@ contract OrderData is Owned {
         orders[_orderId].asset = _asset;
         orders[_orderId].status = _status; 
 
-        orders[_orderId].contributions[_contributor].amount += _amount; //mapping of contributors and amounts they contributed
-        orders[_orderId].contributions[_contributor].date = now; //mapping of contributors and amounts they contributed
-        orders[_orderId].contributions[_contributor].contributor = _contributor; //mapping of contributors and amounts they contributed
+        // orders[_orderId].contributions[_contributor].amount += _amount; //mapping of contributors and amounts they contributed
+        // orders[_orderId].contributions[_contributor].date = now; //mapping of contributors and amounts they contributed
+        // orders[_orderId].contributions[_contributor].contributor = _contributor; //mapping of contributors and amounts they contributed
         
-        orders[_orderId].contributors.push(_contributor); //address of contributors
+        orders[_orderId].contributions.push(Contribution(_contributor, _amount, now)); //address of contributors
 
         fractionalOrders[_asset] = _orderId;
         orderIdByIndex[index] = _orderId;
@@ -115,12 +116,12 @@ contract OrderData is Owned {
     //add contributor for existing fractional orders
     function addContribution(bytes12 _orderId, address _contributor, uint _amount, Statuses _status) public onlyOwner returns (uint) {
 
-        orders[_orderId].contributions[_contributor].amount += _amount; //mapping of contributors and amounts they contributed
-        orders[_orderId].contributions[_contributor].date = now; //mapping of contributors and amounts they contributed
-        orders[_orderId].contributions[_contributor].contributor = _contributor; //mapping of contributors and amounts they contributed
+        // orders[_orderId].contributions[_contributor].amount += _amount; //mapping of contributors and amounts they contributed
+        // orders[_orderId].contributions[_contributor].date = now; //mapping of contributors and amounts they contributed
+        // orders[_orderId].contributions[_contributor].contributor = _contributor; //mapping of contributors and amounts they contributed
         
+        orders[_orderId].contributions.push(Contribution(_contributor, _amount, now)); //address of contributors
         orders[_orderId].status = _status; 
-        orders[_orderId].contributors.push(_contributor); //address of contributors    
     }   
 
 
@@ -128,9 +129,9 @@ contract OrderData is Owned {
         return fractionalOrders[_assetAddress];
     }   
 
-    function getMyContributions(bytes12 _orderId, address _contributor) public view returns (uint) {
-        return orders[_orderId].contributions[_contributor].amount;
-    }
+    // function getMyContributions(bytes12 _orderId, address _contributor) public view returns (uint) {
+    //     return orders[_orderId].contributions[_contributor].amount;
+    // }
     
 
     function getBuyer(bytes12 _orderId) public view returns (address) {
@@ -181,17 +182,12 @@ contract OrderData is Owned {
         return orders[_orderId].addressAttributes[_attributeKey];    
     }       
 
-    function getContributorsLengthByOrderId(bytes12 _orderId) public view returns (uint) {
-        return orders[_orderId].contributors.length;    
+    function getContributionsLengthByOrderId(bytes12 _orderId) public view returns (uint) {
+        return orders[_orderId].contributions.length;    
     }     
 
-    function getContributorByOrderIdAndIndex(bytes12 _orderId, uint _index) public view returns (address) {
-        return orders[_orderId].contributors[_index];
-    }   
-
     function getContributionByOrderIdAndIndex(bytes12 _orderId, uint _index) public view returns (address, uint, uint) {
-        address contributor = orders[_orderId].contributors[_index];
-        return (contributor, orders[_orderId].contributions[contributor].amount, orders[_orderId].contributions[contributor].date);
+        return (orders[_orderId].contributions[_index].contributor, orders[_orderId].contributions[_index].amount, orders[_orderId].contributions[_index].date);
     }      
 
 }

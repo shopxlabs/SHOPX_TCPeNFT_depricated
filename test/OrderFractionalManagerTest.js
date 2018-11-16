@@ -175,7 +175,7 @@ contract('OrderManagerTest for fractional general test cases.', function(account
 
   it('should return 2 contributors', async function() {
     let orderId = await orderManagerInstance.getFractionalOrderIdByAsset(assetFractionalAddress);
-    let length = await orderManagerInstance.getContributorsLength(orderId);
+    let length = await orderManagerInstance.getContributionsLength(orderId);
     console.log('contributors length: ' + length);
     assert.equal(length, 2, "expected number of contributors is incorrect!");
   })
@@ -184,22 +184,22 @@ contract('OrderManagerTest for fractional general test cases.', function(account
   it('should return defaultBuyer as contributor 1', async function() {
     let orderId = await orderManagerInstance.getFractionalOrderIdByAsset(assetFractionalAddress);
     // let fields = await orderManagerInstance.getContributionByOrderIdAndIndex(orderId, 0);
-    let address = await orderManagerInstance.getContributorByOrderIdAndIndex(orderId, 0);
+    let fields = await orderManagerInstance.getContributionByOrderIdAndIndex(orderId, 0);
 
-    console.log(address)
+    console.log(fields)
     // console.log(fields[1])
     // console.log(fields[2])
 
-    assert.equal(address, defaultBuyer, "expected contributor is incorrect!");
+    assert.equal(fields[0], defaultBuyer, "expected contributor is incorrect!");
   })
 
   it('should return defaultBuyer2 as contributor 2', async function() {
     let orderId = await orderManagerInstance.getFractionalOrderIdByAsset(assetFractionalAddress);
-    let address = await orderManagerInstance.getContributorByOrderIdAndIndex(orderId, 1);
+    let fields = await orderManagerInstance.getContributionByOrderIdAndIndex(orderId, 1);
 
-    console.log(address)
+    console.log(fields)
     
-    assert.equal(address, defaultBuyer2, "expected contributor is incorrect!");
+    assert.equal(fields[0], defaultBuyer2, "expected contributor is incorrect!");
   })
 
   it('should return total contribution amount as 1000', async function() {

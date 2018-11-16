@@ -230,12 +230,6 @@ contract OrderManager is Owned, Events {
     function getTotalContributions(bytes12 _orderId) public view returns (uint) {
         return orderData.getTotalContributions(_orderId);
     }
-    
-
-    function getMyContributions(bytes12 _orderId) public view returns (uint) {
-        return orderData.getMyContributions(_orderId, msg.sender);
-    }
-    
 
     function setSplytManager(address _address) public onlyOwner {
         splytManager = SplytManager(_address);
@@ -263,17 +257,13 @@ contract OrderManager is Owned, Events {
     }    
 
 
-    function getContributorsLength(bytes12 _orderId) public view returns (uint) {
-      return orderData.getContributorsLengthByOrderId(_orderId);
+    function getContributionsLength(bytes12 _orderId) public view returns (uint) {
+      return orderData.getContributionsLengthByOrderId(_orderId);
     }    
 
 
     function getContributionByOrderIdAndIndex(bytes12 _orderId, uint _index) public view returns (address, uint, uint) {
       return orderData.getContributionByOrderIdAndIndex(_orderId, _index);
-    }    
-
-    function getContributorByOrderIdAndIndex(bytes12 _orderId, uint _index) public view returns (address) {
-      return orderData.getContributorByOrderIdAndIndex(_orderId, _index);
     }    
 
 
