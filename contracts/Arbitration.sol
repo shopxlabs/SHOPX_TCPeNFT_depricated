@@ -5,8 +5,8 @@ import './Asset.sol';  //change to interface later
 contract Arbitration {
     
     enum Reasons { SPAM, BROKEN, NOTRECIEVED, NOREASON }
-    enum Winners { UNDECIDED, REPORTER, SELLER, NEITHER }
-    enum Statuses { REPORTED, SELLER_STAKED_2X, REPORTER_STAKED_2X, PENDING_DECISION, RESOLVED, UNRESOLVED }
+    enum Winners { UNDECIDED, REPORTER, SELLER, NEITHER, SPLIT }
+    enum Statuses { REPORTED, SELLER_STAKED_2X, REPORTER_STAKED_2X, PENDING_ARBITRATOR_DECISION, RESOLVED, UNRESOLVED }
 
     bytes12 public arbitrationId;
     address public reporter;
@@ -56,7 +56,7 @@ contract Arbitration {
     //@dev set arbitrator so that person resolves this arbitration
     function setArbitrator(address _arbitrator) public onlyManager {
         arbitrator = _arbitrator;
-        status = Statuses.PENDING_DECISION;
+        status = Statuses.PENDING_ARBITRATOR_DECISION;
     } 
 
     //@dev get arbitrator
