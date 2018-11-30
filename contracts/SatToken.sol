@@ -20,7 +20,7 @@ contract SatToken is ERC20 {
     // Temperory give each user 20500 tokens for free
     function initUser(address _user) public {
         user[_user] = 205000000;
-        totalMinted += 205000000;
+        totalMinted = SafeMath.add(205000000, totalMinted);
     }
     
     // This function will trade your ether with sat tokens for you.
@@ -43,4 +43,3 @@ contract SatToken is ERC20 {
     }
     
 }
-
