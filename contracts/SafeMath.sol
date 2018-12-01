@@ -45,4 +45,22 @@ library SafeMath {
     assert(c >= a);
     return c;
   }
+  
+  /**
+   * @dev a is power of and b is power
+  */
+  function power(uint256 a, uint256 b) internal pure returns (uint256 c) {
+      uint result = 0;
+      if(b == 1) {
+        return c;
+      } else {
+        if(result == 0) {
+            a * a;
+        } else {
+            result * a;
+        }
+      	result = (result == 0) ? a * a : result *a;
+ 		power(a, b - 1);
+      }
+  }
 }
