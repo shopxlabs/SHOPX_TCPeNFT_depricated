@@ -11,8 +11,11 @@ Ethereum contracts for split protocol
  - In terminal `cd path/to/project`
  - `truffle compile`. Will compile all contracts
  - `truffle migrate --reset`. Will deploy all contracts to testrpc network
- - `truffle test ./test/[fileName].js`. Will test all functions in that file
+ - `truffle test ./test/[fileName].js`. Will test all functions in that file  
  
+ ### Deploy contracts to Ropsten:  
+ - In terminal type  `truffle migrate --network testnet  --reset`.
+ - Copy splytManagerAddress and update in /splytcoreui/conifg/env/dev.js  
  
  **Things to look out for: 
  
@@ -36,7 +39,7 @@ Remeber only the wallet used to deploy these contracts are the 'owner'. The role
 
 
 ### Updating manager contracts.  
--  All contracts except the data contracts can be replaced. Thus updated versions of the manager contracts can be bined with the existing data contracts.  
+-  All contracts except the data contracts can be replaced. Thus updated versions of the manager contracts can be binded with the existing data contracts.  
 -  After updating any of the manager contracts, you can change ownership of the data contract from the old manager to the new manager contracts in the following steps:  
 1.  Deploy updated manager contract.  After being mined, save the new address. Do it for each manager contract you are updating. 
 2.  Using the new mangager contract call function 'setDataContract(_dataAddress)'. This will be bind the old existing data contract to the new manager contract.  

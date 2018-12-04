@@ -104,13 +104,18 @@ contract OrderManager is Owned, Events {
 
         (mpGets, sellerGets) = calcDistribution(totalCost, _asset.getMarketPlacesLength(), _asset.kickbackAmount());
         splytManager.internalContribute(msg.sender, _asset.seller(), sellerGets);
-        
+      
+
         //distribute commission to all the market places
         if(mpGets > 0) {
             for(uint i = 0; i < _asset.getMarketPlacesLength(); i++) {
                 splytManager.internalContribute(msg.sender, _asset.getMarketPlaceByIndex(i), mpGets);
             }
         }
+
+
+        //return stake to seller
+        splytManager.internalContribute(address(_asset), _asset.seller(), _asset.initialStakeAmount());
 
         orderData.save(_orderId, address(_asset), msg.sender, _qty, _tokenAmount); //save it to the data contract                
         splytManager.subtractInventory(address(_asset), _qty); //update inventory

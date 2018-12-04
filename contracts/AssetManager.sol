@@ -35,9 +35,11 @@ contract AssetManager is Owned, Events {
 
         //calculate stake
         uint sellersBal = splytManager.getBalance(_seller);
-        uint stakeTokens = splytManager.calculateStakeTokens(_totalCost);
+        
+        uint stakeTokensPerAsset = splytManager.calculateStakeTokens(_totalCost);
+        uint stakeTokensTotal = stakeTokensPerAsset * _inventoryCount;
 
-        if(stakeTokens > sellersBal) {
+        if(stakeTokensTotal > sellersBal) {
             revert();
         }
 
@@ -51,10 +53,10 @@ contract AssetManager is Owned, Events {
             _mpAddress, 
             _mpAmount,
             _inventoryCount,
-            stakeTokens
+            stakeTokensPerAsset
             ); 
 
-        splytManager.internalContribute(_seller, asset, stakeTokens);
+        splytManager.internalContribute(_seller, asset, stakeTokensTotal);
         assetData.save(_assetId, address(asset));
         emit Success(1, address(asset));
     }
