@@ -31,7 +31,8 @@ contract('AssetManagerTest general test cases.', function(accounts) {
   }
 
   // This function gets ran before every test cases in this file.
-  beforeEach('Default instances of contracts for each test', async function() {
+  before('Default instances of contracts for each test', async function() {
+    console.log('Deploy contracts')
     satTokenInstance = await SatToken.deployed()   
     assetManagerInstance = await AssetManager.deployed();
     splytManagerInstance = await SplytManager.deployed();
