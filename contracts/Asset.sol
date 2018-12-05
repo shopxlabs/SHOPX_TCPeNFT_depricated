@@ -95,15 +95,18 @@ contract Asset is Events {
     //assetManager is the owner
      function subtractInventory(uint _qty) public onlyManager {
         inventoryCount -=  _qty;
-        if (inventoryCount == 0) {
+        if (inventoryCount == 0)
             status = Statuses.SOLD_OUT;
-        }
     }   
 
     //assetManager is the owner
      function setInventory(uint _count) public onlyManager {
         inventoryCount = _count;
-    }   
+    }  
+    
+    function isOnlyAffiliate() public constant returns (bool) {
+        return seller == listOfMarketPlaces[0];
+    }
 
      
 }

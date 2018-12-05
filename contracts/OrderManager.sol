@@ -95,27 +95,27 @@ contract OrderManager is Owned, Events {
         //     revert()
         // }
 
-        if (_tokenAmount < totalCost || buyerBalance < totalCost || _qty > inventoryCount) {
-            revert();
-        }
+        assert(totalCost < _tokenAmount || totalCost < buyerBalance || inventoryCount < _qty);
 
         uint mpGets; //marketplaces commission
         uint sellerGets;
-
-        (mpGets, sellerGets) = calcDistribution(totalCost, _asset.getMarketPlacesLength(), _asset.kickbackAmount());
+        uint mpLength;
+        uint i = 0;
+        
+        if(_asset.isOnlyAffiliate()) {
+            mpLength = _asset.getMarketPlacesLength() - 1;
+            i = 1;
+        }
+        
+        (mpGets, sellerGets) = calcDistribution(totalCost, mpLength, _asset.kickbackAmount());
         splytManager.internalContribute(msg.sender, _asset.seller(), sellerGets);
-      
-
+        
         //distribute commission to all the market places
         if(mpGets > 0) {
-            for(uint i = 0; i < _asset.getMarketPlacesLength(); i++) {
+            for(i; i < _asset.getMarketPlacesLength(); i++) {
                 splytManager.internalContribute(msg.sender, _asset.getMarketPlaceByIndex(i), mpGets);
             }
         }
-
-
-        //return stake to seller
-        splytManager.internalContribute(address(_asset), _asset.seller(), _asset.initialStakeAmount());
 
         orderData.save(_orderId, address(_asset), msg.sender, _qty, _tokenAmount); //save it to the data contract                
         splytManager.subtractInventory(address(_asset), _qty); //update inventory
@@ -139,6 +139,7 @@ contract OrderManager is Owned, Events {
        
         uint buyerBalance = splytManager.getBalance(msg.sender);
         //check if buyer has the amount he proposes to use to contribute
+        assert()
         if (buyerBalance < _tokenAmount) {
             revert();
         }

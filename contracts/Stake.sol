@@ -1,34 +1,35 @@
 pragma solidity ^0.4.24;
 
+import "./SafeMath.sol";
+
 contract Stake {
     
-    // Equation: 10,000,000,000,000/ (100X + 2,000,000,000)
-    // 10000000000000, 2000000000, 100
-    // Where X is the total cost of item say 4, eqVar1 == 1,000,000, eqVar2 == 100,000, eqVar3 == 100
+    // Equation: 1,000,000,000,000,000 / x + 200,000,000,000
+    // Deploy params: 1000000000000000, 200000000000
+    // Where X is the total cost, eqVar1 == 1,000,000,000,000,000, eqVar2 == 200,000,000,000
     
-    uint eqVar1;
-    uint eqVar2;
-    uint eqVar3;
-    
-    constructor(uint _eqVar1, uint _eqVar2, uint _eqVar3) public {
-        setConstants(_eqVar1, _eqVar2, _eqVar3);
+    uint public eqVar1;
+    uint public eqVar2;
+
+    constructor(uint _eqVar1, uint _eqVar2) public {
+        setConstants(_eqVar1, _eqVar2);
     }
     
-    function setConstants(uint _eqVar1, uint _eqVar2, uint _eqVar3) public {
+    // change change constants if need to after deploying the contract
+    function setConstants(uint _eqVar1, uint _eqVar2) public {
         eqVar1 = _eqVar1;
         eqVar2 = _eqVar2;
-        eqVar3 = _eqVar3;
     }
     
-    function calcStakePercentage(uint _itemCost) public constant returns (uint percentage) {
-        uint axe = eqVar3 * _itemCost;
-        uint denom = axe + eqVar2;
-        percentage = eqVar1 / denom;
+    //calculates staking percentages, all returns need to be multiplied by 10^5 to convert to
+    //percentages in decimal format
+    function calcStakePercentage(uint _itemCost) public constant returns (uint stakePercent) {
+        uint denom = SafeMath.add(_itemCost, eqVar2);
+        return SafeMath.div(eqVar1, denom);
+    }
+    
+    function calculateStakeTokens(uint _itemCost) public constant returns(uint stakeTokens) {
         
-        return percentage;
-    }
-    
-    function calculateStakeTokens(uint _itemCost) public constant returns(uint _stakeTokens) {
-        return (_itemCost * calcStakePercentage(_itemCost)) / 100000;
+        return (SafeMath.div(SafeMath.mul(_itemCost, calcStakePercentage(_itemCost)), 100000));
     }
 }
