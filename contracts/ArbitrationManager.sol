@@ -63,7 +63,7 @@ contract ArbitrationManager is Owned, Events {
     }
 
     //TODO: write test to see if tokens gets distributed correctly to winner and arbitrator
-    function setWinner(bytes12 _arbitrationId, Arbitration.Winners _winner) public onlyArbitrator(_arbitrationId) onlyStatus(_arbitrationId, Arbitration.Statuses.PENDING_DECISION) {
+    function setWinner(bytes12 _arbitrationId, Arbitration.Winners _winner) public onlyArbitrator(_arbitrationId) onlyStatus(_arbitrationId, Arbitration.Statuses.PENDING_ARBITRATOR_DECISION) {
         
         address arbitrationAddress = arbitrationData.addressByArbitrationId(_arbitrationId);
         Arbitration arbitration = Arbitration(arbitrationAddress);

@@ -3,6 +3,7 @@ const SplytManager = artifacts.require("./SplytManager.sol");
 const ManagerTracker = artifacts.require("./ManagerTracker.sol");
 
 const SatToken = artifacts.require("./SatToken.sol");
+const Stake = artifacts.require("./Stake.sol");
 const Asset = artifacts.require("./Asset.sol");
 
 
@@ -16,9 +17,10 @@ contract('AssetManagerTest general test cases.', function(accounts) {
   let assetManagerInstance;
   let splytManagerInstance;
   let assetInstance;
+  let stakeInstance;
 
   async function create_asset(_assetId = "0x31f2ae92057a7123ef0e490a", _term = 0, _seller = defaultSeller, _title = "MyTitle",
-      _totalCost = 1000, _expirationDate = 10001556712588, _mpAddress = defaultMarketPlace, _mpAmount = 2, _inventoryCount = 2) {
+      _totalCost = 1000000, _expirationDate = 10001556712588, _mpAddress = defaultMarketPlace, _mpAmount = 2, _inventoryCount = 2) {
     
     // let managerTrackerAddress = await splytManagerInstance.getManagerTrackerAddress();
 
@@ -29,11 +31,13 @@ contract('AssetManagerTest general test cases.', function(accounts) {
   }
 
   // This function gets ran before every test cases in this file.
-  beforeEach('Default instances of contracts for each test', async function() {
+  before('Default instances of contracts for each test', async function() {
+    console.log('Deploy contracts')
     satTokenInstance = await SatToken.deployed()   
     assetManagerInstance = await AssetManager.deployed();
     splytManagerInstance = await SplytManager.deployed();
     managerTrackerInstance = await ManagerTracker.deployed();
+    stakeInstance = await Stake.deployed();
 
     accounts.forEach(async function(acc) {
       await satTokenInstance.initUser(acc)
@@ -51,7 +55,6 @@ contract('AssetManagerTest general test cases.', function(accounts) {
 
 
   it('should create new asset manager contract successfully!', async function() {
-    await create_asset();
     
     let assetManagerAddress = assetManagerInstance.address;
 
@@ -63,6 +66,16 @@ contract('AssetManagerTest general test cases.', function(accounts) {
     await create_asset();
     // assert.equal(orderId, , 'No money should be transfered to seller\'s wallet!');
     assert.notEqual(assetInstance.address, 0x0, "Asset contract has not been deployed!");
+  })
+
+
+  it('should get stake amount from asset!', async function() {
+    let stakeAmount = await assetInstance.initialStakeAmount();
+    console.log('stake amount: ' + stakeAmount);
+
+    let stakeAmount2 = await stakeInstance.calculateStakeTokens(1000000);
+    console.log('stake amount(Stake Contract): ' + stakeAmount2);
+    assert.equal(parseInt(stakeAmount), parseInt(stakeAmount2), "Expected stake amount does not match!");
   })
 
   it('should status be 1=ACTIVE if asset is available for purchase!', async function() {
@@ -136,7 +149,7 @@ contract('AssetManagerTest general test cases.', function(accounts) {
   it('should interate through list of assets', async function() {
     let index = await assetManagerInstance.getAssetsLength();
     for (let i = 0; i < index; i++) {
-      console.log('index: ' + i)
+      // console.log('index: ' + i)
       let fields = await assetManagerInstance.getAssetInfoByIndex(i)
       // console.log('asset info: ' + fields);      
     }
