@@ -221,9 +221,14 @@ contract('StakeTest general test cases.', function(accounts) {
  
     let sellerCurrentBalance = await splytManagerInstance.getBalance(defaultSeller)
     let buyerCurrentBalance = await splytManagerInstance.getBalance(defaultBuyer)
+    let defaultMarketPlaceBalance = await splytManagerInstance.getBalance(defaultMarketPlace)
+    let defaultMarketPlaceBalance2= await splytManagerInstance.getBalance(defaultMarketPlace2)
+
 
     console.log('current balance of seller ' + sellerCurrentBalance)
     console.log('current balance of buyer ' + buyerCurrentBalance)
+    console.log('current balance of defaultMarketPlace ' + defaultMarketPlaceBalance)
+    console.log('current balance of defaultMarketPlace2 ' + defaultMarketPlaceBalance2)
 
     console.log('asset address ' + assetManagerInstance.address)
     
@@ -251,7 +256,13 @@ contract('StakeTest general test cases.', function(accounts) {
 
     let sellerUpdatedBalance = await splytManagerInstance.getBalance(defaultSeller)
     let buyerUpdatedBalance = await splytManagerInstance.getBalance(defaultBuyer)
-    
+
+    defaultMarketPlaceBalance = await splytManagerInstance.getBalance(defaultMarketPlace)
+    defaultMarketPlaceBalance2= await splytManagerInstance.getBalance(defaultMarketPlace2)
+
+    console.log('updated balance of defaultMarketPlace ' + defaultMarketPlaceBalance)
+    console.log('updated balance of defaultMarketPlace2 ' + defaultMarketPlaceBalance2)
+
     console.log('updated balance of seller ' + sellerUpdatedBalance)
     console.log('updated balance of buyer ' + buyerUpdatedBalance)
 
