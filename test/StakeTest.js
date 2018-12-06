@@ -11,7 +11,12 @@ contract('StakeTest general test cases.', function(accounts) {
   const defaultBuyer = accounts[0]
   const defaultSeller = accounts[1]
   const defaultMarketPlace = accounts[2]
-  const defaultAffiliate = accounts[3]
+  const defaultMarketPlace2 = accounts[3]
+  const defaultMarketPlace3 = accounts[4]
+  
+  
+  const defaultAffiliate = accounts[5]
+
 
   let satTokenInstance
   let assetManagerInstance
@@ -234,7 +239,7 @@ contract('StakeTest general test cases.', function(accounts) {
     console.log('marketplaces length: ' + marketPlacesLength)
     console.log('kickbackAmount: ' + kickbackAmount)
 
-    await orderManagerInstance.purchase(id1Hex, assetInstance.address, 1, defaultCost, defaultMarketPlace,{ from: defaultBuyer })
+    await orderManagerInstance.purchase(id1Hex, assetInstance.address, 1, defaultCost, defaultMarketPlace2,{ from: defaultBuyer })
   
     let marketPlacesLength2 = await assetInstance.getMarketPlacesLength()
     console.log('marketplaces length2: ' + marketPlacesLength2)
