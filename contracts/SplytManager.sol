@@ -139,11 +139,17 @@ contract SplytManager is Events, Owned {
     //@dev used to update    
     function setAssetStatus(address _assetAddress, Asset.Statuses _status) public onlyManagers {
         assetManager.setStatus(_assetAddress, _status);
-    }    
+    }   
+
     //@dev used to update    
     function addInventory(address _assetAddress, uint _quantity) public onlyManagers {
         assetManager.addInventory(_assetAddress, _quantity);
     }    
+
+   function addMarketPlace(address _assetAddress, address _marketPlace) public onlyManagers {
+        assetManager.addMarketPlaceByAssetAddress(_assetAddress, _marketPlace);        
+    }    
+
 
     //@dev used to update    
     function getManagerTrackerAddress() public view returns (address) {

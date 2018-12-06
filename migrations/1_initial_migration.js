@@ -46,7 +46,7 @@ module.exports = function(deployer, network, accounts) {
     //give accounts 1 default tokens
     await satToken.initUser(accounts[0], walletConfig)
 
-    var stake = await deployer.deploy(Stake, 10000000000000, 2000000000, 100, walletConfig)
+    var stake = await deployer.deploy(Stake, 1000000000000000, 200000000000, walletConfig)
     console.log('Stake address: ', stake.address)
 
 

@@ -63,9 +63,12 @@ contract OrderManager is Owned, Events {
     //@dev buyer must pay it in full to create order
     // To succcessfully purchase an asset, buy must purchase the whole amount times the quantity.
     // The asset must be in 'ACTIVE' status.    
-    function purchase(bytes12 _orderId, address _assetAddress, uint _qty, uint _tokenAmount) public onlyAssetStatus(Asset.Statuses.ACTIVE, _assetAddress) returns (bool) {
+    function purchase(bytes12 _orderId, address _assetAddress, uint _qty, uint _tokenAmount, address _marketPlace) public onlyAssetStatus(Asset.Statuses.ACTIVE, _assetAddress) returns (bool) {
 
         Asset asset = Asset(_assetAddress);
+
+        //add to marketplace
+        splytManager.addMarketPlace(_assetAddress, _marketPlace);
 
         //Regular asset purchase or a fractional purchase
         if (asset.assetType() == Asset.AssetTypes.NORMAL) {
@@ -101,21 +104,27 @@ contract OrderManager is Owned, Events {
         uint sellerGets;
         uint mpLength;
         uint i = 0;
-        
+
         if(_asset.isOnlyAffiliate()) {
             mpLength = _asset.getMarketPlacesLength() - 1;
             i = 1;
+        } else {
+            mpLength = _asset.getMarketPlacesLength();
         }
-        
+                         
         (mpGets, sellerGets) = calcDistribution(totalCost, mpLength, _asset.kickbackAmount());
+       
         splytManager.internalContribute(msg.sender, _asset.seller(), sellerGets);
         
-        //distribute commission to all the market places
+        // distribute commission to all the market places
         if(mpGets > 0) {
             for(i; i < _asset.getMarketPlacesLength(); i++) {
                 splytManager.internalContribute(msg.sender, _asset.getMarketPlaceByIndex(i), mpGets);
             }
         }
+
+        //return stake to seller
+        splytManager.internalContribute(address(_asset), _asset.seller(), (_asset.initialStakeAmount() * _qty));
 
         orderData.save(_orderId, address(_asset), msg.sender, _qty, _tokenAmount); //save it to the data contract                
         splytManager.subtractInventory(address(_asset), _qty); //update inventory
@@ -139,7 +148,7 @@ contract OrderManager is Owned, Events {
        
         uint buyerBalance = splytManager.getBalance(msg.sender);
         //check if buyer has the amount he proposes to use to contribute
-        assert()
+ 
         if (buyerBalance < _tokenAmount) {
             revert();
         }
