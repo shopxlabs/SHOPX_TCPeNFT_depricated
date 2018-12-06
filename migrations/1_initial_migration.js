@@ -18,6 +18,7 @@ var ReputationData = artifacts.require("./ReputationData.sol")
 var ManagerTracker = artifacts.require("./ManagerTracker.sol")
 
 var Stake = artifacts.require("./Stake.sol")
+var SplytPriceOracle = artifacts.require("./SplytPriceOracle.sol")
 var chalk = require('chalk')
 
 module.exports = function(deployer, network, accounts) {
@@ -44,9 +45,9 @@ module.exports = function(deployer, network, accounts) {
     console.log('Sat Token address: ', SatToken.address)
 
     //give accounts 1 default tokens
-    await satToken.initUser(accounts[0], walletConfig)
+    await satToken.initUser(accounts[0], 205000000, walletConfig)
 
-    var stake = await deployer.deploy(Stake, 10000000000000, 2000000000, 100, walletConfig)
+    var stake = await deployer.deploy(Stake, 10000000000000, 2000000000, walletConfig)
     console.log('Stake address: ', stake.address)
 
 
@@ -73,6 +74,9 @@ module.exports = function(deployer, network, accounts) {
     console.log('ReputationManager address: ', reputationManager.address)
     splytManager.setReputationManager(reputationManager.address, walletConfig)
 
+    var splytPriceOracle = await deployer.deploy(SplytPriceOracle, walletConfig)
+    assetManager.setOracleAddress(splytPriceOracle.address, walletConfig)
+    console.log('Splyt Price Oracle address: ', splytPriceOracle.address)
   });
   
 };

@@ -30,7 +30,7 @@ contract('AssetTest general test cases.', function(accounts) {
     // reset all account's token balance to 20500 before running each test
     satTokenInstance = await SatToken.deployed()
     accounts.forEach(async function(acc) {
-      await satTokenInstance.initUser(acc)
+      await satTokenInstance.initUser(acc, 205000000)
     })
   })
 

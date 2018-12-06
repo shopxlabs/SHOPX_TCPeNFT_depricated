@@ -139,10 +139,7 @@ contract OrderManager is Owned, Events {
        
         uint buyerBalance = splytManager.getBalance(msg.sender);
         //check if buyer has the amount he proposes to use to contribute
-        assert()
-        if (buyerBalance < _tokenAmount) {
-            revert();
-        }
+        assert(_tokenAmount < buyerBalance);
 
         // uint orderId = orderData.getFractionalOrderIdByAsset(address(_asset));
         OrderData.Statuses currentStatus = getStatus(_orderId);

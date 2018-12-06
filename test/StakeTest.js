@@ -52,7 +52,7 @@ contract('StakeTest general test cases.', function(accounts) {
     managerTrackerInstance = await ManagerTracker.deployed()
     stakeInstance = await Stake.deployed()
     accounts.forEach(async function(acc) {
-      await satTokenInstance.initUser(acc)
+      await satTokenInstance.initUser(acc, 205000000)
     })
 
   })

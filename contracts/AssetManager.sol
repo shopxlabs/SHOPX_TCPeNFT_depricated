@@ -6,10 +6,17 @@ import "./Asset.sol";
 import "./AssetData.sol";
 import "./SplytManager.sol";
 
+contract OracleInterface {
+  function getEthUsd() public returns (uint _ethUsdPrice);
+}
+
 contract AssetManager is Owned, Events {
     
     AssetData public assetData;
     SplytManager public splytManager;
+    address oracleAddress;
+    address splytWalletAddress;
+
 
     //allow owner or splytManager
     modifier onlyOwnerOrSplyt() {
@@ -176,4 +183,39 @@ contract AssetManager is Owned, Events {
         assetData.acceptOwnership();
     }
 
+    function ethToSat(
+      bytes12 _assetId, 
+      uint _term, 
+      address _seller, 
+      string _title, 
+      uint _totalCost, 
+      uint _expirationDate, 
+      address _mpAddress, 
+      uint _mpAmount,
+      uint _inventoryCount
+    ) payable public {
+      // get current ether price
+      OracleInterface oracleInstance = OracleInterface(oracleAddress);
+      uint ethPrice = oracleInstance.getEthUsd();
+
+      // confirm ether sent-in are the same as deposit amount required
+      uint stakeTokensPerAsset = splytManager.calculateStakeTokens(_totalCost * _inventoryCount);
+      uint differenceInCalculations;
+      if(ethPrice * msg.value >= stakeTokensPerAsset) {
+        differenceInCalculations = ethPrice * msg.value - stakeTokensPerAsset;
+      } else {
+        differenceInCalculations = stakeTokensPerAsset - ethPrice * msg.value;
+      }
+      
+      // confirm ether sent as depost and _totalCost * deposit % are same
+      
+      uint itemPriceInUsd = msg.value * ethPrice;
+      // transfer ethers to splyt's wallet address
+      splytWalletAddress.transfer(msg.value);
+      createAsset(_assetId, _term, _seller, _title, _totalCost, _expirationDate, _mpAddress, _mpAmount, _inventoryCount);
+    }
+
+    function setOracleAddress(address _oracleAddress) public {
+      oracleAddress = _oracleAddress;
+    }
 } 

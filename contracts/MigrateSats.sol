@@ -2,7 +2,7 @@ pragma solidity ^0.4.24;
 
 contract SatTokenInterface {
     
-    function initUser(address userWallet) public;
+    function initUser(address userWallet, uint amount) public;
 }
 
 // This contract gives out token to all existing users. update the users array as necessary
@@ -16,7 +16,7 @@ contract MigrateSats {
     function migrate() public {
         for(uint i = 0; i < 10; i++) {
             SatTokenInterface stInterface = SatTokenInterface(satTokenAddress);
-            stInterface.initUser(users[i + track]);
+            stInterface.initUser(users[i + track], 205000000);
             track += 1;
         }
     }
