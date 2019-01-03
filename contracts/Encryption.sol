@@ -1,9 +1,9 @@
-pragma solidity ^0.4.24;
+pragma solidity >= 0.4.24;
 
 
 contract EncryptionInterface {
-    function recieveMessage(string _message) public;
-    function saveFriendPublicKey(string _key) public;
+    function recieveMessage(string memory _message) public;
+    function saveFriendPublicKey(string memory _key) public;
 }
 
 contract Encryption {
@@ -13,11 +13,11 @@ contract Encryption {
     address public friendContractAddress;
     string public friendPublicKey;
 
-    function setMyPublicKey(string _publicKey) public  {
+    function setMyPublicKey(string memory _publicKey) public  {
         publicKey = _publicKey;
     }
     
-    function getLastMessage() public constant returns (string) {
+    function getLastMessage() public view returns (string memory) {
         return chats[chats.length - 1];
     }
     
@@ -25,12 +25,12 @@ contract Encryption {
         friendContractAddress = _friendContractAddress;
     }
     
-    function sendMessageToFriend(string _message) public {
+    function sendMessageToFriend(string memory _message) public {
         EncryptionInterface encryptionTestInterface = EncryptionInterface(friendContractAddress);
         encryptionTestInterface.recieveMessage(_message);
     }
     
-    function recieveMessage(string _message) public {
+    function recieveMessage(string memory _message) public {
         chats.push(_message);
     }
     
@@ -39,11 +39,11 @@ contract Encryption {
         encryptionTestInterface.saveFriendPublicKey(publicKey);
     }
     
-    function returnMyPublicKey() public constant returns (string) {
+    function returnMyPublicKey() public view returns (string memory) {
         return publicKey;
     }
     
-    function saveFriendPublicKey(string _key) public {
+    function saveFriendPublicKey(string memory _key) public {
         friendPublicKey = _key;
     }
     

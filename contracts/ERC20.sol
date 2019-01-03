@@ -1,14 +1,14 @@
-pragma solidity ^0.4.24;
+pragma solidity >= 0.4.24;
 
 import "./SafeMath.sol";
 
 contract ERC20 {
     using SafeMath for uint256;
     
-    string public constant name = "Splyt Autonomous Tokens";
-    string public constant symbol = "SAT";
-    uint8 public constant decimals = 4; // We use 4 decimals as of now
-    uint constant totalTokensAllowed = 64321684210000; // ~6.4 billion
+    string public name = "Splyt Autonomous Tokens";
+    string public symbol = "SAT";
+    uint8 public decimals = 4; // We use 4 decimals as of now
+    uint public totalTokensAllowed = 64321684210000; // ~6.4 billion
     uint public totalMinted;
     address trackerAddress;
     
@@ -30,11 +30,11 @@ contract ERC20 {
     }
     
     
-    function totalSupply() public pure returns (uint) {
+    function totalSupply() public view returns (uint) {
         return totalTokensAllowed;
     }
     
-    function balanceOf(address _owner) public constant returns (uint balance) {
+    function balanceOf(address _owner) public view returns (uint balance) {
         return user[_owner];
     }
     
@@ -48,7 +48,8 @@ contract ERC20 {
         return false;
     }
     
-    function transferFrom(address _from, address _to, uint _value) public onlyApprovedOrSplyt(_from, _to, _value) onlyNonBanned(_from) returns (bool success) {
+    function transferFrom(address _from, address _to, uint _value) public 
+    onlyApprovedOrSplyt(_from, _to, _value) onlyNonBanned(_from) returns (bool success) {
         
         if (user[_from] >= _value) {
             user[_from] -= _value;
@@ -65,15 +66,14 @@ contract ERC20 {
         return true;
     }
     
-    function allowance(address _owner, address _spender) public constant returns (uint remaining) {
+    function allowance(address _owner, address _spender) public view returns (uint remaining) {
         return allowed[_owner][_spender];
     }
 
     
     // Get ether balance of this contract
-    function getBalance() constant public returns (uint) {
-        address a = this;
-        return a.balance;
+    function getBalance() public view returns (uint) {
+        return address(this).balance;
     }
     
     event TransferEvent(address indexed _from, address indexed _to, uint _value);

@@ -1,7 +1,7 @@
-pragma solidity ^0.4.24;
+pragma solidity >= 0.4.24;
 
-import './ERC20.sol';
-import './SafeMath.sol';
+import "./ERC20.sol";
+import "./SafeMath.sol";
 
 contract SatToken is ERC20 {
     string name;
@@ -9,7 +9,7 @@ contract SatToken is ERC20 {
     string description;
     bool enablePayableFunc = false;
     
-    constructor (string _name, string _description, uint _version) public {
+    constructor (string memory _name, string memory _description, uint _version) public {
         name = _name;
         version = _version;
         description = _description;
@@ -38,9 +38,10 @@ contract SatToken is ERC20 {
     
     // If someone sends ether to this contract, without specifing a function, it'll end up here
     // in that case send their ether back to them.
-    function() public payable {
-        msg.sender.transfer(msg.value);
-    }
+    // Commendted out due to making every address variable payable which is too extreme
+    // function() external payable {
+    //     msg.sender.transfer(msg.value);
+    // }
     
 }
 

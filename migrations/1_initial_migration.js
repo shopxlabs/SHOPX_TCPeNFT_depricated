@@ -20,13 +20,16 @@ var ManagerTracker = artifacts.require("./ManagerTracker.sol")
 var Stake = artifacts.require("./Stake.sol")
 var SplytPriceOracle = artifacts.require("./SplytPriceOracle.sol")
 var chalk = require('chalk')
+var fetch = require('fetch').fetchUrl
+
 
 module.exports = function(deployer, network, accounts) {
 
-  var name = "SPLYT"
-  var desc = "Global inventory on the blockchain"
-  var ver  = 3
-  var walletConfig = {}
+  const name = "SPLYT"
+  const desc = "Global inventory on the blockchain"
+  const ver  = 3
+
+  let walletConfig = {}
 
   if(network === 'testnet') {
     walletConfig = { from: "0xf606a61e2fbc2db9b0b74f26c45469509dfb33ac" }
@@ -37,7 +40,7 @@ module.exports = function(deployer, network, accounts) {
   console.log('using main wallet: ')
   console.log(walletConfig)
 
-
+  fetchCurrentEtherPrice()
   deployer.deploy(Migrations, walletConfig)
 
   deployer.deploy(SatToken, name, desc, ver, walletConfig)
@@ -77,6 +80,17 @@ module.exports = function(deployer, network, accounts) {
     var splytPriceOracle = await deployer.deploy(SplytPriceOracle, walletConfig)
     assetManager.setOracleAddress(splytPriceOracle.address, walletConfig)
     console.log('Splyt Price Oracle address: ', splytPriceOracle.address)
-  });
+    await splytPriceOracle.setEthUsd(parseInt(etherPrice), walletConfig)
+    var a = await splytPriceOracle.getEthUsd(walletConfig)
+  })
   
-};
+  function fetchCurrentEtherPrice() {
+    fetch('https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest?id=1027', {
+      method: 'GET',
+      headers: {'X-CMC_PRO_API_KEY':'9ee3f9be-fc7a-4b0f-8843-df2e01195d25'}
+    }, (err, meta, body) => {
+      // returning dollar amount moved 4 decimal places so intead od $86.5920xx... it'll be $865920.xx...
+      etherPrice = JSON.parse(body.toString()).data[1027].quote.USD.price * 10000
+    })
+  }
+}

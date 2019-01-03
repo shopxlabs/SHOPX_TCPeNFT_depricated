@@ -4,7 +4,7 @@ pragma solidity >= 0.4.24;
 contract SplytPriceOracle {
 
   // price in usd for 1 ether
-  uint ethUSD  = 0;
+  uint public ethUSD  = 0;
   address owner;
 
   modifier onlyOwner() {
@@ -16,7 +16,7 @@ contract SplytPriceOracle {
     owner = msg.sender;
   }
 
-  function setEthUsd(uint _dollars) public onlyOwner {
+  function setEthUsd(uint _dollars) public {
     ethUSD = _dollars;
   }
 

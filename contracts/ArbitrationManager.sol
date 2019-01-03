@@ -1,4 +1,4 @@
-pragma solidity ^0.4.24;
+pragma solidity >= 0.4.24;
 
 import "./Owned.sol";
 import "./Events.sol";
@@ -15,26 +15,26 @@ contract ArbitrationManager is Owned, Events {
     //middlware only arbitrator 
     modifier onlyArbitrator(bytes12 _arbitrationId) {
         address arbitrationAddress = arbitrationData.addressByArbitrationId(_arbitrationId);      
-        require(Arbitration(arbitrationAddress).arbitrator() == msg.sender);
+        require(Arbitration(arbitrationAddress).arbitrator() == msg.sender, "You aren't the arbitrator");
         _;
     }
 
     modifier onlyReporter(bytes12 _arbitrationId) {
-         address arbitrationAddress = arbitrationData.addressByArbitrationId(_arbitrationId);
-        require(Arbitration(arbitrationAddress).reporter() == msg.sender);        
+        address arbitrationAddress = arbitrationData.addressByArbitrationId(_arbitrationId);
+        require(Arbitration(arbitrationAddress).reporter() == msg.sender, "You aren't the reporter");
         _;
     }
         
     modifier onlySeller(bytes12 _arbitrationId) {
         address arbitrationAddress = arbitrationData.addressByArbitrationId(_arbitrationId);
         address assetAddress = Arbitration(arbitrationAddress).asset();
-        require(Asset(assetAddress).seller() == msg.sender);        
+        require(Asset(assetAddress).seller() == msg.sender, "You aren't the seller");
         _;
     }
 
     modifier onlyStatus(bytes12 _arbitrationId, Arbitration.Statuses _status) {
         address arbitrationAddress = arbitrationData.addressByArbitrationId(_arbitrationId);
-        require(Arbitration(arbitrationAddress).status() == _status); 
+        require(Arbitration(arbitrationAddress).status() == _status, "Error Status cannot be changed"); 
         _;
     }        
 
@@ -56,14 +56,15 @@ contract ArbitrationManager is Owned, Events {
         //change status so no one can purchase during arbitration
         splytManager.setAssetStatus(_assetAddress, Asset.Statuses.IN_ARBITRATION);
         //set stake for reporter
-        splytManager.internalContribute(reporter, asset, stakeAmount);
+        splytManager.internalContribute(reporter, address(asset), stakeAmount);
         
         emit Success(3, address(arbitration));
       
     }
 
     //TODO: write test to see if tokens gets distributed correctly to winner and arbitrator
-    function setWinner(bytes12 _arbitrationId, Arbitration.Winners _winner) public onlyArbitrator(_arbitrationId) onlyStatus(_arbitrationId, Arbitration.Statuses.PENDING_ARBITRATOR_DECISION) {
+    function setWinner(bytes12 _arbitrationId, Arbitration.Winners _winner) public
+    onlyArbitrator(_arbitrationId) onlyStatus(_arbitrationId, Arbitration.Statuses.PENDING_ARBITRATOR_DECISION) {
         
         address arbitrationAddress = arbitrationData.addressByArbitrationId(_arbitrationId);
         Arbitration arbitration = Arbitration(arbitrationAddress);
@@ -94,7 +95,8 @@ contract ArbitrationManager is Owned, Events {
 
 
     //@dev set arbitrator so that person resolves this arbitration
-    function setArbitrator(bytes12 _arbitrationId, address _arbitrator) public onlyOwner onlyStatus(_arbitrationId, Arbitration.Statuses.REPORTER_STAKED_2X){
+    function setArbitrator(bytes12 _arbitrationId, address _arbitrator) public
+    onlyOwner onlyStatus(_arbitrationId, Arbitration.Statuses.REPORTER_STAKED_2X){
         address arbitrationAddress = arbitrationData.addressByArbitrationId(_arbitrationId);   
         Arbitration(arbitrationAddress).setArbitrator(_arbitrator);
     } 
@@ -102,66 +104,68 @@ contract ArbitrationManager is Owned, Events {
     //@dev get arbitrator
     function getArbitrator(bytes12 _arbitrationId) public view returns (address) {
         address arbitrationAddress = arbitrationData.addressByArbitrationId(_arbitrationId);   
-       return Arbitration(arbitrationAddress).arbitrator();
+        return Arbitration(arbitrationAddress).arbitrator();
     } 
 
     //@dev get arbitration status
     function getStatus(bytes12 _arbitrationId) public view returns (Arbitration.Statuses) {
         address arbitrationAddress = arbitrationData.addressByArbitrationId(_arbitrationId);  
-       return Arbitration(arbitrationAddress).status();
+        return Arbitration(arbitrationAddress).status();
     } 
 
 
     //@dev get number of arbitrations
     function getArbitrationsLength() public view returns (uint) {
-       return arbitrationData.index();
+        return arbitrationData.index();
     }
 
     //@dev  return address or arbitration
     function getAddressById(bytes12 _arbitrationId) public view returns (address) {
-       return arbitrationData.addressByArbitrationId(_arbitrationId);
+        return arbitrationData.addressByArbitrationId(_arbitrationId);
     }
 
     function getDataContractAddress() public view returns (address) {
-       return address(arbitrationData);
+        return address(arbitrationData);
     }
 
     //@dev change data contract
     function setDataContract(address _arbitrationData) public onlyOwner {
-       arbitrationData = ArbitrationData(_arbitrationData);
+        arbitrationData = ArbitrationData(_arbitrationData);
     }
     
     //@dev set splytmanager
     function setSplytManager(address _address) public onlyOwner {
-       splytManager = SplytManager(_address);
+        splytManager = SplytManager(_address);
     }
 
     function getAddressByArbitrationId(bytes12 _arbitrationId) public view returns (address) {
-      return arbitrationData.addressByArbitrationId(_arbitrationId);
+        return arbitrationData.addressByArbitrationId(_arbitrationId);
     }
     
     function getArbitrationIdByAddress(address _arbitrationAddress) public view returns (bytes12) {
-      return arbitrationData.arbitrationIdByAddress(_arbitrationAddress);
+        return arbitrationData.arbitrationIdByAddress(_arbitrationAddress);
     }   
 
     function getArbitrationByIndex(uint _index) public view returns (address) {
-      return arbitrationData.addressByIndex(_index);
+        return arbitrationData.addressByIndex(_index);
     }   
 
-    function getArbitrationInfoByIndex(uint _index) public view returns (bytes12, Arbitration.Reasons, address, Arbitration.Winners, Arbitration.Statuses, address, address, address) {
-      Arbitration a = Arbitration(arbitrationData.addressByIndex(_index));
-
-      return (a.arbitrationId(), a.reason(), a.reporter(), a.winner(), a.status(), a.asset(), a.arbitrator(), address(a));
+    function getArbitrationInfoByIndex(uint _index) public view 
+    returns (bytes12, Arbitration.Reasons, address, Arbitration.Winners, Arbitration.Statuses, address, address, address) {
+        Arbitration a = Arbitration(arbitrationData.addressByIndex(_index));
+        return (a.arbitrationId(), a.reason(), a.reporter(), a.winner(), a.status(), a.asset(), a.arbitrator(), address(a));
     }   
 
-    function getArbitrationInfoByArbitrationId(bytes12 _arbitrationId) public view returns (bytes12, Arbitration.Reasons, address, Arbitration.Winners, Arbitration.Statuses, address, address, address) {
-      Arbitration a = Arbitration(arbitrationData.addressByArbitrationId(_arbitrationId));
-      return (a.arbitrationId(), a.reason(), a.reporter(), a.winner(), a.status(), a.asset(), a.arbitrator(), address(a));
+    function getArbitrationInfoByArbitrationId(bytes12 _arbitrationId) public view 
+    returns (bytes12, Arbitration.Reasons, address, Arbitration.Winners, Arbitration.Statuses, address, address, address) {
+        Arbitration a = Arbitration(arbitrationData.addressByArbitrationId(_arbitrationId));
+        return (a.arbitrationId(), a.reason(), a.reporter(), a.winner(), a.status(), a.asset(), a.arbitrator(), address(a));
     }   
 
     //@dev seller disputes reporter by staking initial stake amount
     //@dev initial stake is asset contract
-    function set2xStakeBySeller(bytes12 _arbitrationId) public onlySeller(_arbitrationId) onlyStatus(_arbitrationId, Arbitration.Statuses.REPORTED){
+    function set2xStakeBySeller(bytes12 _arbitrationId) public 
+    onlySeller(_arbitrationId) onlyStatus(_arbitrationId, Arbitration.Statuses.REPORTED){
         address arbitrationAddress = arbitrationData.addressByArbitrationId(_arbitrationId);           
         Arbitration arbitration = Arbitration(arbitrationAddress);
         arbitration.set2xStakeBySeller();
@@ -171,7 +175,8 @@ contract ArbitrationManager is Owned, Events {
     }      
 
     //@dev report puts in 2x stake
-    function set2xStakeByReporter(bytes12 _arbitrationId) public onlyReporter(_arbitrationId) onlyStatus(_arbitrationId, Arbitration.Statuses.SELLER_STAKED_2X){
+    function set2xStakeByReporter(bytes12 _arbitrationId) public 
+    onlyReporter(_arbitrationId) onlyStatus(_arbitrationId, Arbitration.Statuses.SELLER_STAKED_2X){
         address arbitrationAddress = arbitrationData.addressByArbitrationId(_arbitrationId);   
         Arbitration arbitration = Arbitration(arbitrationAddress);
         arbitration.set2xStakeByReporter();
