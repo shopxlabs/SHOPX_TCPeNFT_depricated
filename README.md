@@ -21,9 +21,10 @@ Ethereum contracts for split protocol
   - If you get this error `Error: sender doesn't have enough funds to send tx` restart testrpc (you ran out of test ether).
   - Or else the problem is with your code. Good luck.
  
- **Progress: 
- **(completed)
-  
+ **Progress:
+ 
+**Completed:
+
   - Fractional Listings
   - Standard Listings
   - Fractional buys
@@ -40,8 +41,7 @@ Ethereum contracts for split protocol
     - 4 decimal places to allow currency denomination
   - Splyt javascript library for easy plug and play
   
-  
-**(missing):
+**Missing:
  
  - NPM module for even easier plug and play functionality
  - ERC20 token distribution model
