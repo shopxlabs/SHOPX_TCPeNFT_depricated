@@ -21,4 +21,32 @@ Ethereum contracts for split protocol
   - If you get this error `Error: sender doesn't have enough funds to send tx` restart testrpc (you ran out of test ether).
   - Or else the problem is with your code. Good luck.
  
+ **Progress: 
+ **(completed)
+  
+  - Fractional Listings
+  - Standard Listings
+  - Fractional buys
+  - Standard buys
+  - Listing commissions 
+  - Listing stakes as seller
+  - Arbitration mitigation where seller puts 2x stakes and spam reported puts 2x stakes
+    - In case of arbitration spam reporter puts 2x stakes
+    - Seller also puts in 2x stakes
+    - 3rd party arbitrator finds truth and distributes stake funds to winner/looser
+  - ERC20 token contract
+    - Blacklisting wallets as sellers, buyers, arbitrators
+    - Whitelisting group of splyt contracts for security
+    - 4 decimal places to allow currency denomination
+  - Splyt javascript library for easy plug and play
+  
+  
+**(missing):
+ 
+ - NPM module for even easier plug and play functionality
+ - ERC20 token distribution model
+ - FIAT -> SAT -> FIAT conversions
+ - Shopify app for auto pull push to seller's online store
+ - ERC721 implementation (maybe)
+  
  
