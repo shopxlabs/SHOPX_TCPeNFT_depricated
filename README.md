@@ -14,16 +14,16 @@ Ethereum contracts for split protocol
  - `truffle test ./test/[fileName].js`. Will test all functions in that file. Also `truffle test` will run all test in the test folder
  
  
- **Things to look out for: 
+### Things to look out for: 
  
   - Truffle doesn't like OSX folder `.DS_Store` so keep an eye for it in `/build/contracts` folder as well as anywhere else in the project. Remove that folder and run the instructions again if issues arise.
   - If you still have problems delete everything under `/build/contracts` and re-run the steps above.
   - If you get this error `Error: sender doesn't have enough funds to send tx` restart testrpc (you ran out of test ether).
   - Or else the problem is with your code. Good luck.
  
- **Progress:
+### Progress:
  
-**Completed:
+#### Completed:
 
   - Fractional Listings
   - Standard Listings
@@ -41,7 +41,7 @@ Ethereum contracts for split protocol
     - 4 decimal places to allow currency denomination
   - Splyt javascript library for easy plug and play
   
-**Missing:
+#### Missing:
  
  - NPM module for even easier plug and play functionality
  - ERC20 token distribution model
