@@ -1,6 +1,8 @@
 # splytprotocol
 Ethereum contracts for split protocol
 
+`For latest branch refer to`**ver2.1**
+
 ### Setup:
  - `git clone https://github.com/splytcore/splytprotocol.git`
  - `npm install truffle -g`
