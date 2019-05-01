@@ -4,11 +4,11 @@ Ethereum contracts for split protocol
 ### Setup:
  - `git clone https://github.com/splytcore/splytprotocol.git`
  - `npm install truffle -g`
- - `npm install testrpc -g`
+ - `npm install ganache-cli -g`
 
 ### Run:
- - In terminal `testrpc`. Leave terminal tab open
- - In terminal `cd path/to/project`
+ - In terminal `ganache-cli`. Leave terminal tab open
+ - In another terminal `cd path/to/project`
  - `truffle compile`. Will compile all contracts
  - `truffle migrate --reset`. Will deploy all contracts to testrpc network
  - `truffle test ./test/[fileName].js`. Will test all functions in that file. Also `truffle test` will run all test in the test folder
