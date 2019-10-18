@@ -18,7 +18,6 @@ var ReputationData = artifacts.require("./ReputationData.sol")
 var ManagerTracker = artifacts.require("./ManagerTracker.sol")
 
 var Stake = artifacts.require("./Stake.sol")
-var chalk = require('chalk')
 
 module.exports = function(deployer, network, accounts) {
 
@@ -27,7 +26,7 @@ module.exports = function(deployer, network, accounts) {
   var ver  = 3
   var walletConfig = {}
 
-  if(network === 'testnet') {
+  if(network === 'ropsten') {
     walletConfig = { from: "0xf606a61e2fbc2db9b0b74f26c45469509dfb33ac" }
   } else {                                                      
     walletConfig = { from: accounts[0] }

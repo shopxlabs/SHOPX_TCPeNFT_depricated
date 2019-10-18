@@ -98,7 +98,7 @@ contract OrderManager is Owned, Events {
         //     revert()
         // }
 
-        assert(totalCost < _tokenAmount || totalCost < buyerBalance || inventoryCount < _qty);
+        assert(totalCost <= _tokenAmount && totalCost < buyerBalance && _qty <= inventoryCount);
 
         uint mpGets; //marketplaces commission
         uint sellerGets;
