@@ -1,4 +1,4 @@
-pragma solidity ^0.4.24;
+pragma solidity >= 0.4.24;
 
 import "./Owned.sol";
 import "./Events.sol";
@@ -148,10 +148,7 @@ contract OrderManager is Owned, Events {
        
         uint buyerBalance = splytManager.getBalance(msg.sender);
         //check if buyer has the amount he proposes to use to contribute
- 
-        if (buyerBalance < _tokenAmount) {
-            revert();
-        }
+        assert(_tokenAmount < buyerBalance);
 
         // uint orderId = orderData.getFractionalOrderIdByAsset(address(_asset));
         OrderData.Statuses currentStatus = getStatus(_orderId);

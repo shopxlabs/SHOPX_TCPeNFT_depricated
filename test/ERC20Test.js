@@ -24,14 +24,14 @@ contract('ERC20 general test cases.', function(accounts) {
   it('initUser() adds to users account 20500 tockens and balanceOf() function retrieves user\'s balance.', async function() {
     let bal = await erc20Instance.balanceOf(accounts[1]);
     assert.equal(bal, 0, 'Value should be 0!');
-    await erc20Instance.initUser(accounts[1]);
+    await erc20Instance.initUser(accounts[1], 205000000);
     let bal2 = await erc20Instance.balanceOf(accounts[1]);
     assert.equal(bal2, 20500, 'Value should be 0!');
   })
 
   // This should fail if user A hasn't allowed the transfer based on allowance.
   it('transferFrom() function transfers tockenf from one wallet to another.', async function() {
-    await erc20Instance.initUser(accounts[1]);
+    await erc20Instance.initUser(accounts[1], 205000000);
     let bal2 = await erc20Instance.balanceOf(accounts[1]);
     assert.equal(bal2, 20500, 'Value should be >= 20500!');
     let bal3 = await erc20Instance.balanceOf(accounts[2]);
@@ -43,8 +43,8 @@ contract('ERC20 general test cases.', function(accounts) {
   })
 
   it('transferFrom() function does NOT transfer tockenf from one wallet to another because of not enought tockens in the wallet.', async function() {
-    await erc20Instance.initUser(accounts[1]);
-    await erc20Instance.initUser(accounts[2]);
+    await erc20Instance.initUser(accounts[1], 205000000);
+    await erc20Instance.initUser(accounts[2], 205000000);
     let bal2 = await erc20Instance.balanceOf(accounts[1]);
     assert.equal(bal2, 20500, 'Value should be >= 20500!');
     let bal3 = await erc20Instance.balanceOf(accounts[2]);
@@ -56,7 +56,7 @@ contract('ERC20 general test cases.', function(accounts) {
   })
 
   it('transfer() function transfers tockens from one wallet to another.', async function() {
-    await erc20Instance.initUser(accounts[2]);
+    await erc20Instance.initUser(accounts[2], 205000000);
     let bal3 = await erc20Instance.balanceOf(accounts[2]);
     await erc20Instance.transfer(accounts[2], 20000);
     let bal4 = await erc20Instance.balanceOf(accounts[2]);
@@ -69,8 +69,8 @@ contract('ERC20 general test cases.', function(accounts) {
   })
 
   // it('allowance() function returns allowance value.', async function() {
-  //   // await erc20Instance.initUser(accounts[1]);
-  //   // await erc20Instance.initUser(accounts[2]);
+  //   // await erc20Instance.initUser(accounts[1], 205000000);
+  //   // await erc20Instance.initUser(accounts[2], 205000000);
   //   let appr = await erc20Instance.approve.call(accounts[2], 100);
   //   console.log('appr is: ', appr);
   //   let all = await erc20Instance.allowance(accounts[1], accounts[2]);

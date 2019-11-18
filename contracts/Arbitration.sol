@@ -1,6 +1,6 @@
-pragma solidity ^0.4.24;
+pragma solidity >= 0.4.24;
 
-import './Asset.sol';  //change to interface later
+import "./Asset.sol";  //change to interface later
 
 contract Arbitration {
     
@@ -24,7 +24,7 @@ contract Arbitration {
 
 
     modifier onlyManager() {
-        require(ManagerAbstract(msg.sender).isManager(msg.sender) == true);
+        require(ManagerAbstract(msg.sender).isManager(msg.sender) == true, "You aren't manager");
         _;
     }
 
@@ -61,7 +61,7 @@ contract Arbitration {
 
     //@dev get arbitrator
     function getArbitrator() public view returns (address) {
-       return arbitrator;
+        return arbitrator;
     } 
 
     //@dev seller disputes reporter by staking initial stake amount

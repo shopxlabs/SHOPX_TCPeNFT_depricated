@@ -23,8 +23,10 @@ contract('AssetManagerTest general test cases.', function(accounts) {
       _totalCost = 1000000, _expirationDate = 10001556712588, _mpAddress = defaultMarketPlace, _mpAmount = 2, _inventoryCount = 2) {
     
     // let managerTrackerAddress = await splytManagerInstance.getManagerTrackerAddress();
-
-    await assetManagerInstance.createAsset(_assetId, _term, _seller, _title, _totalCost, _expirationDate, _mpAddress, _mpAmount, _inventoryCount);
+    var walletConfig = {
+      value: 1234567890123456789
+    }
+    await assetManagerInstance.ethToSat(_assetId, _term, _seller, _title, _totalCost, _expirationDate, _mpAddress, _mpAmount, _inventoryCount, walletConfig);
     assetAddress = await assetManagerInstance.getAddressById(_assetId);
     assetInstance = await Asset.at(assetAddress);
 
@@ -40,7 +42,7 @@ contract('AssetManagerTest general test cases.', function(accounts) {
     stakeInstance = await Stake.deployed();
 
     accounts.forEach(async function(acc) {
-      await satTokenInstance.initUser(acc)
+      await satTokenInstance.initUser(acc, 205000000)
     })
 
   })
@@ -64,8 +66,15 @@ contract('AssetManagerTest general test cases.', function(accounts) {
 
   it('should deploy new asset contract successfully!', async function() {
     await create_asset();
+    console.log('asset deployed using new passthrough')
     // assert.equal(orderId, , 'No money should be transfered to seller\'s wallet!');
     assert.notEqual(assetInstance.address, 0x0, "Asset contract has not been deployed!");
+    console.log('now checking balance of asset manager')
+    var balance = await assetManagerInstance.getBalance();
+    var balance2 = await assetManagerInstance.getBalanceOfWallet();
+
+    console.log('balance of contract', balance.toString());
+    console.log('balance of wallet', balance2.toString());
   })
 
 

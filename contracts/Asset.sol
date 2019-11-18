@@ -1,4 +1,4 @@
-pragma solidity ^0.4.24;
+pragma solidity >= 0.4.24;
 
 import "./Events.sol";
 
@@ -40,35 +40,25 @@ contract Asset is Events {
     uint public inventoryCount;
 
     modifier onlyManager() {
-        require(ManagerAbstract(msg.sender).isManager(msg.sender) == true);
+        require(ManagerAbstract(msg.sender).isManager(msg.sender) == true, "You aren't the manager");
         _;
     }
 
-    constructor(
-        bytes12 _assetId, 
-        uint _term, 
-        address _seller, 
-        string _title, 
-        uint _totalCost, 
-        uint _expirationDate, 
-        address _mpAddress, 
-        uint _mpAmount,
-        uint _inventoryCount,
-        uint _stakeAmount
-        ) public {
-            assetId = _assetId;
-            term = _term;
-            seller = _seller;
-            title = _title;
-            totalCost = _totalCost;
-            expirationDate = _expirationDate;
-            kickbackAmount = _mpAmount;
-            listOfMarketPlaces.push(_mpAddress);
-            initialStakeAmount = _stakeAmount;
-            inventoryCount = _inventoryCount;
+    constructor(bytes12 _assetId, uint _term, address _seller, string memory _title, uint _totalCost, uint _expirationDate, 
+      address _mpAddress, uint _mpAmount, uint _inventoryCount, uint _stakeAmount) public {
+        assetId = _assetId;
+        term = _term;
+        seller = _seller;
+        title = _title;
+        totalCost = _totalCost;
+        expirationDate = _expirationDate;
+        kickbackAmount = _mpAmount;
+        listOfMarketPlaces.push(_mpAddress);
+        initialStakeAmount = _stakeAmount;
+        inventoryCount = _inventoryCount;
 
-            status = Statuses.ACTIVE;
-            assetType =  _term > 0 ? AssetTypes.FRACTIONAL : AssetTypes.NORMAL;
+        status = Statuses.ACTIVE;
+        assetType = _term > 0 ? AssetTypes.FRACTIONAL : AssetTypes.NORMAL;
     }
 
     function setStatus(Statuses _status) public onlyManager {
@@ -93,18 +83,18 @@ contract Asset is Events {
     }  
 
     //assetManager is the owner
-     function subtractInventory(uint _qty) public onlyManager {
-        inventoryCount -=  _qty;
+    function subtractInventory(uint _qty) public onlyManager {
+        inventoryCount -= _qty;
         if (inventoryCount == 0)
             status = Statuses.SOLD_OUT;
     }   
 
     //assetManager is the owner
-     function setInventory(uint _count) public onlyManager {
+    function setInventory(uint _count) public onlyManager {
         inventoryCount = _count;
     }  
     
-    function isOnlyAffiliate() public constant returns (bool) {
+    function isOnlyAffiliate() public view returns (bool) {
         return seller == listOfMarketPlaces[0];
     }
 

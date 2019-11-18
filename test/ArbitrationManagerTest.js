@@ -81,7 +81,7 @@ contract('ArbitrationManagerTest general test cases.', function(accounts) {
   beforeEach('Default instances of contracts for each test', async function() {
     //reinitalize each account balance
     accounts.forEach(async function(acc) {
-      await satTokenInstance.initUser(acc)
+      await satTokenInstance.initUser(acc, 205000000)
     })
 
     // let balance = await satTokenInstance.balanceOf(defaultBuyer)

@@ -68,7 +68,7 @@ contract('OrderManagerTest for fractional general test cases.', function(account
 
     //give your account some tokens
     // accounts.forEach(async function(acc) {
-    //   await satTokenInstance.initUser(acc)
+    //   await satTokenInstance.initUser(acc, 205000000)
     // })
  
   }
@@ -78,7 +78,7 @@ contract('OrderManagerTest for fractional general test cases.', function(account
   beforeEach('Default instances of contracts for each test', async function() {
     //reinitalize each account balance
     accounts.forEach(async function(acc) {
-      await satTokenInstance.initUser(acc)
+      await satTokenInstance.initUser(acc, 205000000)
     })
 
     // let balance = await satTokenInstance.balanceOf(defaultBuyer)
