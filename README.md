@@ -1,7 +1,10 @@
 # splytprotocol
 Ethereum contracts for split protocol
 
-`For latest branch refer to`**ver2.1**
+`For latest features refer to branch:` **ver2.1**
+`Currently deployed branch: ` **ver2**
+
+
 
 ### Setup:
  - `git clone https://github.com/splytcore/splytprotocol.git`
