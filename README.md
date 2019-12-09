@@ -1,6 +1,9 @@
 # splytprotocol
 Ethereum contracts for split protocol
 
+### Branch specific info:
+ - Derived from branch **ver2.1**
+
 ### Setup:
  - `git clone https://github.com/splytcore/splytprotocol.git`
  - `npm install truffle -g`
@@ -53,3 +56,6 @@ Remeber only the wallet used to deploy these contracts are the 'owner'. The role
 -  Only the initial test for managers were created.    
 -  The old test files have been left alone.  
 
+
+### Changelogs
+2019-12-08: Added file export to addresses to be used in phase 2 of contract migrations. Upgraded compiler version to 0.5.13
