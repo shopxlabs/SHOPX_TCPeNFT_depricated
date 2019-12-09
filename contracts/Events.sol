@@ -1,4 +1,4 @@
-pragma solidity >= 0.4.24;
+pragma solidity >= 0.5.13;
 
 // Events to notify other market places of something
 // Success events gets triggered when a listing is created or a listing is fully/partially funded

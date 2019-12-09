@@ -1,4 +1,4 @@
-pragma solidity >= 0.4.24;
+pragma solidity >= 0.5.13;
 
 
 //TODO: use interfaces instead after we plan out what functions should be exposed to this contract.
