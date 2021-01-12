@@ -1,8 +1,9 @@
 # Splyt_Protocol
 Ethereum contracts for splyt
 
-`For latest features refer to branch:` **ver2.1**
-`Currently deployed branch: ` **ver2**
+`For latest features refer to branch:` **ver2.2**
+
+`Currently deployed branch:` **ver2**
 
 
 
