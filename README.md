@@ -1,5 +1,6 @@
 # splytprotocol
 Ethereum contracts for split protocol
+*Currently deployed to testnet
 
 ### Setup:
  - `git clone https://github.com/splytcore/splytprotocol.git`
