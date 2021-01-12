@@ -1,4 +1,4 @@
-# splytprotocol
+# Splyt_Protocol
 Ethereum contracts for splyt
 
 `For latest features refer to branch:` **ver2.1**
