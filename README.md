@@ -1,5 +1,5 @@
 # splytprotocol
-Ethereum contracts for split protocol
+Ethereum contracts for splyt
 
 `For latest features refer to branch:` **ver2.1**
 `Currently deployed branch: ` **ver2**
