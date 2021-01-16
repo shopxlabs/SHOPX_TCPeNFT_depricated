@@ -1,81 +1,92 @@
-pragma solidity >= 0.5.13;
+// SPDX-License-Identifier: MIT
+pragma solidity >=0.7.4;
 
 import "./SafeMath.sol";
 
+// Standard erc20 contract used from template
 contract ERC20 {
     using SafeMath for uint256;
-    
-    string public name = "Splyt Autonomous Tokens";
-    string public symbol = "SAT";
-    uint8 public decimals = 4; // We use 4 decimals as of now
-    uint public totalTokensAllowed = 64321684210000; // ~6.4 billion
-    uint public totalMinted;
-    address trackerAddress;
-    
-    mapping(address => mapping (address => uint256)) allowed;
-    mapping(address => mapping (address => bool)) banned;
-    mapping(address => uint) user;
-    
-    constructor() public {
-    }
-    
-    modifier onlyApprovedOrSplyt(address _from, address _to, uint _value) {
-        if(allowed[_from][_to] <= _value || msg.sender == trackerAddress)
-            _;
-    }
-    
-    modifier onlyNonBanned(address _from) {
-        if(banned[_from][msg.sender] == false)
-            _;
-    }
-    
-    
-    function totalSupply() public view returns (uint) {
-        return totalTokensAllowed;
-    }
-    
-    function balanceOf(address _owner) public view returns (uint balance) {
-        return user[_owner];
-    }
-    
-    function transfer(address _to, uint _value) public returns (bool success) {
         
-        if (user[msg.sender] >= _value) {
-            user[msg.sender] -= _value;
-            user[_to] += _value;
-            return true;
-        }
-        return false;
+    uint256 private _totalSupply = 64321684210000; // ~6.4 billion
+    string private _name = "Splyt Autonomous Tokens";
+    string private _symbol = "SAT";
+    uint8 private _decimals = 4; // We use 4 decimals as of now
+    mapping(address => uint256) _balances;
+    mapping(address => mapping (address => uint256)) _allowances;
+    
+    uint public _version;
+    uint256 public _totalMinted;
+    address _trackerAddress;
+    mapping(address => mapping (address => bool)) _banned;
+    string private _errZeroAddress = "zero address not allowed";
+    
+    
+    constructor(uint version) public {
+        _version = version;
     }
     
-    function transferFrom(address _from, address _to, uint _value) public 
-    onlyApprovedOrSplyt(_from, _to, _value) onlyNonBanned(_from) returns (bool success) {
-        
-        if (user[_from] >= _value) {
-            user[_from] -= _value;
-            user[_to] += _value;
-            emit TransferEvent(_from, _to, _value);
-            return true;
-        }
-        return false;
+    //Interface for getters
+    function name() public view returns (string memory) {
+        return _name;
+    }
+    function symbol() public view returns (string memory) {
+        return _symbol;
+    }
+    function decimals() public view returns (uint8) {
+        return _decimals;
+    }
+    function totalSupply() public view override returns (uint256) {
+        return _totalSupply;
+    }
+    function balanceOf(address account) public view override returns (uint256) {
+        return _balances[account];
     }
     
-    function approve(address _spender, uint _value) public returns (bool success) {
-        allowed[msg.sender][_spender] = _value;
-        emit ApprovalEvent(msg.sender, _spender, _value);
+
+
+    // Interface for setters
+    function transfer(address recipient, uint amount) public virtual override returns (bool) {
+        _transfer(_msgSender(), recipient, amount);
         return true;
     }
     
-    function allowance(address _owner, address _spender) public view returns (uint remaining) {
-        return allowed[_owner][_spender];
+    function transferFrom(address sender, address recipient, uint amount) public 
+    onlyApprovedOrSplyt(_from, _to, _value) onlyNonBanned(_from) returns (bool success) {
+        _transfer(sender, recipient, amount);
+        _approve(sender, _msgSender(), _allowances[sender][_msgSender()].sub(amount, "Transfer amount exceeds allowance"));
+        return true;
+    }
+    
+    function approve(address spender, uint256 amount) public virtual override returns (bool) {
+        _approve(_msgSender(), spender, amount);
+        return true;
+    }
+    
+    function allowance(address owner, address spender) public view virtual override returns (uint256) {
+        return _allowances[owner][spender];
     }
 
     
-    // Get ether balance of this contract
-    function getBalance() public view returns (uint) {
-        return address(this).balance;
+
+    // Internal functions
+    function _transfer(address sender, address recipient, uint256 amount) internal virtual {
+        require(sender != address(0), "Transfer from " + _errZeroAddress);
+        require(recipient != address(0), "Transfer to " + _errZeroAddress);
+        _beforeTransfer();
+
+        _balances[sender] = _balances[sender].sub(amount, "Transfer amount exceeds balance");
+        _balances[recipient] = _balances[recipient].add(amount);
+        emit Transfer(sender, recipient, amount);
+    }
+
+    function _approve(address owner, address spender, uint256 amount) internal virtual {
+        require(owner != address(0), "Approve from " + _errZeroAddress);
+        require(spender != address(0), "Approve to " + _errZeroAddress);
+
+        _allowances[owner][spender] = amount;
+        emit Approval(owner, spender, amount);
     }
     
-    event TransferEvent(address indexed _from, address indexed _to, uint _value);
-    event ApprovalEvent(address indexed _owner, address indexed _spender, uint _value);
+    event Transfer(address indexed sender, address indexed recipient, uint amount);
+    event Approval(address indexed owner, address indexed spender, uint amount);
 }

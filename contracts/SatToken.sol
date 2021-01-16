@@ -1,47 +1,71 @@
-pragma solidity >= 0.5.13;
+// SPDX-License-Identifier: MIT
+pragma solidity >=0.7.4;
 
 import "./ERC20.sol";
 import "./SafeMath.sol";
 
-contract SatToken is ERC20 {
-    string name;
-    uint version;
-    string description;
-    bool enablePayableFunc = false;
+// Splyt logic on top of standard erc20 contract
+contract SatToken is ERC20, Owned {
+    using SafeMath for uint256;
+
+    uint _version;
+    bool _paused;
+    uint256 _tokenPerEth;
     
-    constructor (string memory _name, string memory _description, uint _version) public {
-        name = _name;
-        version = _version;
-        description = _description;
+    constructor (uint version, uint256 tokenPerEth) public {
+        _version = version;
+        _paused = true;
+        _tokenPerEth = tokenPerEth;
     }
+
     
-    //TODO: Put splyt related $$ transfer logic here
-    
-    // Temperory give each user 20500 tokens for free
-    function initUser(address _user, uint _amount) public {
-        user[_user] = _amount;
-        totalMinted += _amount;
+    function getEthBalance() public view returns (uint) {
+        return address(this).balance;
     }
-    
+
+    function pause(bool pauseUnpause) public onlyOwner returns (bool) {
+        _paused = pauseUnpause;
+    }
+
     // This function will trade your ether with sat tokens for you.
     // the only way to attain sat tokens
-    function sendSatTokens() public payable returns(bool) {
-        if(enablePayableFunc == true) {
-            // we are accepting ether in return for tokens
-            
-        } else {
-            // we are NOT accepting ether at this time
-            // give the ether back to sender
-            msg.sender.transfer(msg.value);
-        }
+    function buyTokenFromEth() public payable returns(bool) {
+        _beforeTransfer();
+        // Accepting minimum 1 ether per tx in ICO phase
+        require(msg.value > 1000000000000000000, "Accepting minimum 1 eth per tx in ICO phase");
+        
+        uint256 eth = msg.value.div(1000000000000000000);
+        _mint(msg.sender, msg.value.mul(_tokenPerEth));
+        
     }
-    
-    // If someone sends ether to this contract, without specifing a function, it'll end up here
-    // in that case send their ether back to them.
-    // Commendted out due to making every address variable payable which is too extreme
-    // function() external payable {
-    //     msg.sender.transfer(msg.value);
+    //Splyt related logic to allow based on platform behaviour
+    // Might not be needed if splyt will use allowance style 
+    // modifier onlyApprovedOrSplyt(address _from, address _to, uint _value) {
+    //     if(allowed[_from][_to] <= _value || msg.sender == trackerAddress)
+    //         _;
     // }
     
+    function _beforeTransfer() internal virtual override {
+        require(paused, "Transfers are paused");
+    }
+    
+    fallback() external payable {
+        msg.sender.transfer(msg.value);
+    }
+    
+    function _mint(address account, uint256 amount) internal virtual {
+        require(account != address(0), "Mint to " + _errZeroAddress);
+
+        _beforeTransfer(address(0), account, amount);
+
+        _totalMinted = _totalMinted.add(amount);
+        _balances[account] = _balances[account].add(amount);
+        emit Transfer(address(0), account, amount);
+    }
+
+    modifier onlyNonBanned(address _from) {
+        if(banned[_from][msg.sender] == false)
+            _;
+    }
 }
 
