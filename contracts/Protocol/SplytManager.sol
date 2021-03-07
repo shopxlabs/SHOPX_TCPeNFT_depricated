@@ -1,21 +1,19 @@
-pragma solidity >= 0.5.13;
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.7.3;
 
 
 //TODO: use interfaces instead after we plan out what functions should be exposed to this contract.
-import "./AssetManager.sol";
-import "./OrderManager.sol";
-import "./ArbitrationManager.sol";
-import "./ReputationManager.sol";
-
-import "./ManagerTracker.sol";
-
-import "./Events.sol";
-import "./Owned.sol";
-
-import "./SatToken.sol";
-import "./Stake.sol";
 import "./Asset.sol";
-
+import "./AssetManager.sol";
+import "./ArbitrationManager.sol";
+import "./OrderManager.sol";
+import "./ManagerTracker.sol";
+import "./ReputationManager.sol";
+import "./Stake.sol";
+import "../Token/ShopxToken.sol";
+import "../Utils/Events.sol";
+import "../Utils/Owned.sol";
+// END TODO
 
 // contract StakeInterface {
 //     function calculateStakeTokens(uint _itemCost) public returns (uint _stakeToken);
@@ -30,7 +28,7 @@ contract SplytManager is Events, Owned {
 
     uint public version;
     string public ownedBy;
-    SatToken public satToken;
+    ShopxToken public shopxToken;
     address public arbitrator;
     Stake public stake;
     
@@ -57,7 +55,7 @@ contract SplytManager is Events, Owned {
 
     //@dev set all contracts it's interacting with
     constructor(address _tokenAddress, address _stakeAddress) public {
-        satToken = SatToken(_tokenAddress);
+        shopxToken = ShopxToken(_tokenAddress);
         stake = Stake(_stakeAddress);      
     }
 
@@ -102,7 +100,7 @@ contract SplytManager is Events, Owned {
     }      
 
     function setTokenContract(address _newAddress) public onlyOwner {
-        satToken = SatToken(_newAddress);
+        shopxToken = ShopxToken(_newAddress);
     }      
 
     function setStakeContract(address _newAddress) public onlyOwner {
@@ -111,20 +109,20 @@ contract SplytManager is Events, Owned {
 
     //@dev User for single buy to transfer tokens from buyer address to seller address
     function internalContribute(address _from, address _to, uint _amount) public onlyManagers returns (bool) {
-        bool result = satToken.transferFrom(_from, _to, _amount);
+        bool result = shopxToken.transferFrom(_from, _to, _amount);
         return result;
     }
     
     // @dev Used for fractional ownership to transfer tokens from user address to listing address
     function internalRedeemFunds(address _listingAddress, address _seller, uint _amount) public onlyManagers returns (bool) {
         
-        bool result = satToken.transferFrom(_listingAddress, _seller, _amount);
+        bool result = shopxToken.transferFrom(_listingAddress, _seller, _amount);
         return result;
     }
 
     //@dev Getter function. returns token contract address
     function getBalance(address _wallet) public view returns (uint) {
-        return satToken.balanceOf(_wallet);
+        return shopxToken.balanceOf(_wallet);
     }
 
     //@dev calculate stake

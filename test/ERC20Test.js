@@ -1,14 +1,14 @@
-// satTokens.sol extends ERC20.sol thus truffle won't know about ERC20 but it will have all functions
-//  from ERC20 in satToken.sol
-const satToken = artifacts.require("./SatToken.sol");
-var SplytTracker = artifacts.require("./SplytTracker.sol")
+// ShopxToken.sol extends ERC20.sol thus truffle won't know about ERC20 but it will have all functions
+//  from ERC20 in shopxToken.sol
+const shopxToken = artifacts.require("../Token/ShopxToken.sol");
+var SplytTracker = artifacts.require("../Protocol/SplytTracker.sol")
 
 contract('ERC20 general test cases.', function(accounts) {
 
   let erc20Instance;
 
   beforeEach('Deploying ERC20 contract. ', async function() {
-    erc20Instance = await satToken.deployed();
+    erc20Instance = await shopxToken.deployed();
   })
 
   it('totalSupply() function retrieves valeu of totalTokensAllowed variable.', async function() {

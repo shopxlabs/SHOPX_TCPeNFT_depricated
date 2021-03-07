@@ -1,6 +1,7 @@
-pragma solidity >= 0.5.13;
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.7.3;
 
-import "./Owned.sol";
+import "../Utils/Owned.sol";
 
 contract AssetData is Owned {
     

@@ -1,7 +1,7 @@
-const Asset = artifacts.require("./Asset.sol");
-const SplytManager = artifacts.require("./SplytManager.sol")
-const AssetManager = artifacts.require("./AssetManager.sol")
-const SatToken = artifacts.require("./SatToken.sol")
+const Asset = artifacts.require("../Protocol/Asset.sol");
+const SplytManager = artifacts.require("../Protocol/SplytManager.sol")
+const AssetManager = artifacts.require("../Protocol/AssetManager.sol")
+const ShopxToken = artifacts.require("../Token/ShopxToken.sol")
 
 
 contract('AssetTest general test cases.', function(accounts) {
@@ -13,7 +13,7 @@ contract('AssetTest general test cases.', function(accounts) {
   let splytManagerInstance;
 
   const assetCost = 1000;
-  let satTokenInstance;
+  let shopxTokenInstance;
   const defaultTokenAmount = 20500;
 
   async function create_asset(_assetId = "0x31f2ae92057a7123ef0e490a", _term = 1, _seller = accounts[1], _title = "MyTitle",
@@ -28,9 +28,9 @@ contract('AssetTest general test cases.', function(accounts) {
   // This function gets ran before every test cases in this file.
   beforeEach('Deploying asset contract. ', async function() {
     // reset all account's token balance to 20500 before running each test
-    satTokenInstance = await SatToken.deployed()
+    shopxTokenInstance = await ShopxToken.deployed()
     accounts.forEach(async function(acc) {
-      await satTokenInstance.initUser(acc, 205000000)
+      await shopxTokenInstance.initUser(acc, 205000000)
     })
   })
 

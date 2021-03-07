@@ -1,9 +1,10 @@
-pragma solidity >= 0.5.13;
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.7.3;
 
 
-contract EncryptionInterface {
-    function recieveMessage(string memory _message) public;
-    function saveFriendPublicKey(string memory _key) public;
+interface IEncryption {
+    function recieveMessage(string memory _message) external;
+    function saveFriendPublicKey(string memory _key) external;
 }
 
 contract Encryption {
@@ -26,8 +27,8 @@ contract Encryption {
     }
     
     function sendMessageToFriend(string memory _message) public {
-        EncryptionInterface encryptionTestInterface = EncryptionInterface(friendContractAddress);
-        encryptionTestInterface.recieveMessage(_message);
+        IEncryption encryptionTest = IEncryption(friendContractAddress);
+        encryptionTest.recieveMessage(_message);
     }
     
     function recieveMessage(string memory _message) public {
@@ -35,8 +36,8 @@ contract Encryption {
     }
     
     function sendMyPublicKeyToFriend() public {
-        EncryptionInterface encryptionTestInterface = EncryptionInterface(friendContractAddress);
-        encryptionTestInterface.saveFriendPublicKey(publicKey);
+        IEncryption encryptionTest = IEncryption(friendContractAddress);
+        encryptionTest.saveFriendPublicKey(publicKey);
     }
     
     function returnMyPublicKey() public view returns (string memory) {

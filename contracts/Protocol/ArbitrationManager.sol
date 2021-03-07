@@ -1,11 +1,13 @@
-pragma solidity >= 0.5.13;
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.7.3;
 
-import "./Owned.sol";
-import "./Events.sol";
 import "./Arbitration.sol";
 import "./ArbitrationData.sol";
 import "./Asset.sol";
 import "./SplytManager.sol";
+import "../Utils/Owned.sol";
+import "../Utils/Events.sol";
+
 
 contract ArbitrationManager is Owned, Events {
 

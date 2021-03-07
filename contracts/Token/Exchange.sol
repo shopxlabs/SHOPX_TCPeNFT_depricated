@@ -1,13 +1,14 @@
-pragma solidity ^0.5.13;
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.7.4;
 
-import './Owned.sol';  //change to interface later
+import '../Utils/Owned.sol';  //change to interface later
 
 contract Exchange is Owned {
         
     uint public currentRate;
 
     //@dev 4 assumed decimals
-    constructor(uint _exchangeRate) public {
+    constructor() {
         currentRate = currentRate;
     }  
     

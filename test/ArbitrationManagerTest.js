@@ -3,7 +3,7 @@ const OrderManager = artifacts.require("./OrderManager.sol");
 const ArbitrationManager = artifacts.require("./ArbitrationManager.sol");
 
 const SplytManager = artifacts.require("./SplytManager.sol");
-const SatToken = artifacts.require("./SatToken.sol");
+const ShopxToken = artifacts.require("./ShopxToken.sol");
 const Asset = artifacts.require("./Asset.sol");
 const Arbitration = artifacts.require("./Arbitration.sol");
 
@@ -23,7 +23,7 @@ contract('ArbitrationManagerTest general test cases.', function(accounts) {
   const defaultInventoryCount = 2;
 
 
-  let satTokenInstance;
+  let shopxTokenInstance;
   let assetManagerInstance;
   let orderManagerInstance;
 
@@ -68,7 +68,7 @@ contract('ArbitrationManagerTest general test cases.', function(accounts) {
     console.log('defaulSeller wallet: ' + defaultSeller);
     console.log('defaultMarketPlace wallet: ' + defaultMarketPlace);
 
-    satTokenInstance = await SatToken.deployed()   
+    shopxTokenInstance = await ShopxToken.deployed()   
     arbitrationManagerInstance = await ArbitrationManager.deployed()
     assetManagerInstance = await AssetManager.deployed()
     splytManagerInstance = await SplytManager.deployed()
@@ -81,13 +81,13 @@ contract('ArbitrationManagerTest general test cases.', function(accounts) {
   beforeEach('Default instances of contracts for each test', async function() {
     //reinitalize each account balance
     accounts.forEach(async function(acc) {
-      await satTokenInstance.initUser(acc, 205000000)
+      await shopxTokenInstance.initUser(acc, 205000000)
     })
 
-    // let balance = await satTokenInstance.balanceOf(defaultBuyer)
+    // let balance = await shopxTokenInstance.balanceOf(defaultBuyer)
     // console.log('defaultBuyer balance:' + balance)
 
-    // balance = await satTokenInstance.balanceOf(defaultSeller)
+    // balance = await shopxTokenInstance.balanceOf(defaultSeller)
     // console.log('defaultSeller balance:' + balance)
 
   })

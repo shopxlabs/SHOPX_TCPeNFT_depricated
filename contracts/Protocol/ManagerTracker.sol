@@ -1,8 +1,10 @@
-pragma solidity >= 0.5.13;
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.7.3;
 
-import "./Owned.sol";
 import "./ManagerData.sol";
 import "./SplytManager.sol";
+import "../Utils/Owned.sol";
+
 
 //@dev this contract keeps history of all the managers. This contract is used when a contract is owned by a previous manager contract. 
 //This contract allows current managers access to write old contracts owned by depracated managers.

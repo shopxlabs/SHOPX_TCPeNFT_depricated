@@ -1,5 +1,5 @@
 var Migrations = artifacts.require("./Migrations.sol")
-var SatToken = artifacts.require("./SatToken.sol")
+var ShopxToken = artifacts.require("../Token/ShopxToken.sol")
 
 var SplytManager = artifacts.require("./SplytManager.sol")
 
@@ -27,7 +27,7 @@ var path = require('path')
 
 module.exports = function(deployer, network, accounts) {
 
-  const name = "SPLYT"
+  const name = "Splyt Shopx Token"
   const desc = "Global inventory on the blockchain"
   const ver  = 3
 
@@ -47,19 +47,19 @@ module.exports = function(deployer, network, accounts) {
   fetchCurrentEtherPrice()
   deployer.deploy(Migrations, walletConfig)
 
-  deployer.deploy(SatToken, name, desc, ver, walletConfig)
-  .then(async function(satToken) {
+  deployer.deploy(ShopxToken, name, desc, ver, walletConfig)
+  .then(async function(shopxToken) {
   
-    console.log('Sat Token address: ', SatToken.address)
-    fs.appendFileSync(historyPath, '\n Sat Token address: ' + SatToken.address);
+    console.log('Shopx Token address: ', shopxToken.address)
+    fs.appendFileSync(historyPath, '\n Shopx Token address: ' + shopxToken.address);
 
     //give accounts 1 default tokens
-    await satToken.initUser(accounts[0], 205000000, walletConfig)
+    await shopxToken.initUser(accounts[0], 205000000, walletConfig)
     var stake = await deployer.deploy(Stake, 10000000000000, 2000000000, walletConfig)
     console.log('Stake address: ', stake.address)
     fs.appendFileSync(historyPath, '\n Stake address: ' + stake.address);
 
-    var splytManager = await deployer.deploy(SplytManager, SatToken.address, stake.address, walletConfig)
+    var splytManager = await deployer.deploy(SplytManager, ShopxToken.address, stake.address, walletConfig)
     console.log('Splyt Manager address: ', splytManager.address)
     fs.appendFileSync(historyPath, '\n Splyt Manager address: ' + splytManager.address);
 

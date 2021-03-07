@@ -1,5 +1,5 @@
 var Migrations = artifacts.require("./Migrations.sol")
-var SatToken = artifacts.require("./SatToken.sol")
+var ShopxToken = artifacts.require("./ShopxToken.sol")
 
 var SplytManager = artifacts.require("./SplytManager.sol")
 

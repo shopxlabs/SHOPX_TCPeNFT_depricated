@@ -1,4 +1,5 @@
 **/.DS_Store
 /build/contracts/*
 .idea/*
+.vscode/*
 node_modules/*

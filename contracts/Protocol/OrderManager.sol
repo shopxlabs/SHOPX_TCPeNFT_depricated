@@ -1,12 +1,14 @@
-pragma solidity >= 0.5.13;
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.7.3;
 
-import "./Owned.sol";
-import "./Events.sol";
-import "./OrderData.sol";
-import "./Asset.sol";
-import "./SplytManager.sol";
-import "./AssetManager.sol";
 import "./ArbitrationManager.sol";
+import "./Asset.sol";
+import "./AssetManager.sol";
+import "./OrderData.sol";
+import "./SplytManager.sol";
+import "../Utils/Owned.sol";
+import "../Utils/Events.sol";
+
 
 contract OrderManager is Owned, Events {
     

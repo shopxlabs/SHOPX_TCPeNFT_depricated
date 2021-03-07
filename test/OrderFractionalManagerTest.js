@@ -1,9 +1,9 @@
-const AssetManager = artifacts.require("./AssetManager.sol");
-const OrderManager = artifacts.require("./OrderManager.sol");
+const AssetManager = artifacts.require("../Protocol/AssetManager.sol");
+const OrderManager = artifacts.require("../Protocol/OrderManager.sol");
 
-const SplytManager = artifacts.require("./SplytManager.sol");
-const SatToken = artifacts.require("./SatToken.sol");
-const Asset = artifacts.require("./Asset.sol");
+const SplytManager = artifacts.require("../Protocol/SplytManager.sol");
+const ShopxToken = artifacts.require("../Token/ShopxToken.sol");
+const Asset = artifacts.require("../Protocol/Asset.sol");
 
 
 contract('OrderManagerTest for fractional general test cases.', function(accounts) {
@@ -21,7 +21,7 @@ contract('OrderManagerTest for fractional general test cases.', function(account
 
   const defaultInventoryCount = 10;
 
-  let satTokenInstance;
+  let shopxTokenInstance;
   let assetManagerInstance;
   let orderManagerInstance;
 
@@ -61,14 +61,14 @@ contract('OrderManagerTest for fractional general test cases.', function(account
     console.log('defaulSeller wallet: ' + defaultSeller);
     console.log('defaultMarketPlace wallet: ' + defaultMarketPlace);
 
-    satTokenInstance = await SatToken.deployed()   
+    shopxTokenInstance = await ShopxToken.deployed()   
     assetManagerInstance = await AssetManager.deployed()
     splytManagerInstance = await SplytManager.deployed()
     orderManagerInstance = await OrderManager.deployed()
 
     //give your account some tokens
     // accounts.forEach(async function(acc) {
-    //   await satTokenInstance.initUser(acc, 205000000)
+    //   await shopxTokenInstance.initUser(acc, 205000000)
     // })
  
   }
@@ -78,13 +78,13 @@ contract('OrderManagerTest for fractional general test cases.', function(account
   beforeEach('Default instances of contracts for each test', async function() {
     //reinitalize each account balance
     accounts.forEach(async function(acc) {
-      await satTokenInstance.initUser(acc, 205000000)
+      await shopxTokenInstance.initUser(acc, 205000000)
     })
 
-    // let balance = await satTokenInstance.balanceOf(defaultBuyer)
+    // let balance = await shopxTokenInstance.balanceOf(defaultBuyer)
     // console.log('defaultBuyer balance:' + balance)
 
-    // balance = await satTokenInstance.balanceOf(defaultSeller)
+    // balance = await shopxTokenInstance.balanceOf(defaultSeller)
     // console.log('defaultSeller balance:' + balance)
 
   })

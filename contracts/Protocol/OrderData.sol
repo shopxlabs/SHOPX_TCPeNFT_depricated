@@ -1,6 +1,7 @@
-pragma solidity >= 0.5.13;
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.7.3;
 
-import "./Owned.sol";
+import "../Utils/Owned.sol";
 
 contract OrderData is Owned {
 
@@ -102,10 +103,10 @@ contract OrderData is Owned {
         orders[_orderId].status = _status; 
 
         // orders[_orderId].contributions[_contributor].amount += _amount; //mapping of contributors and amounts they contributed
-        // orders[_orderId].contributions[_contributor].date = now; //mapping of contributors and amounts they contributed
+        // orders[_orderId].contributions[_contributor].date = block.timestamp; //mapping of contributors and amounts they contributed
         // orders[_orderId].contributions[_contributor].contributor = _contributor; //mapping of contributors and amounts they contributed
         
-        orders[_orderId].contributions.push(Contribution(_contributor, _amount, now)); //address of contributors
+        orders[_orderId].contributions.push(Contribution(_contributor, _amount, block.timestamp)); //address of contributors
 
         fractionalOrders[_asset] = _orderId;
         orderIdByIndex[index] = _orderId;
@@ -114,13 +115,13 @@ contract OrderData is Owned {
     }   
 
     //add contributor for existing fractional orders
-    function addContribution(bytes12 _orderId, address _contributor, uint _amount, Statuses _status) public onlyOwner returns (uint) {
+    function addContribution(bytes12 _orderId, address _contributor, uint _amount, Statuses _status) public onlyOwner {
 
         // orders[_orderId].contributions[_contributor].amount += _amount; //mapping of contributors and amounts they contributed
-        // orders[_orderId].contributions[_contributor].date = now; //mapping of contributors and amounts they contributed
+        // orders[_orderId].contributions[_contributor].date = block.timestamp; //mapping of contributors and amounts they contributed
         // orders[_orderId].contributions[_contributor].contributor = _contributor; //mapping of contributors and amounts they contributed
         
-        orders[_orderId].contributions.push(Contribution(_contributor, _amount, now)); //address of contributors
+        orders[_orderId].contributions.push(Contribution(_contributor, _amount, block.timestamp)); //address of contributors
         orders[_orderId].status = _status; 
     }   
 

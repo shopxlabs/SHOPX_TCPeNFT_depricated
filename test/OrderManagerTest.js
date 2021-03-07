@@ -2,7 +2,7 @@ const AssetManager = artifacts.require("./AssetManager.sol");
 const OrderManager = artifacts.require("./OrderManager.sol");
 
 const SplytManager = artifacts.require("./SplytManager.sol");
-const SatToken = artifacts.require("./SatToken.sol");
+const ShopxToken = artifacts.require("./ShopxToken.sol");
 const Asset = artifacts.require("./Asset.sol");
 
 
@@ -18,7 +18,7 @@ contract('OrderManagerTest general test cases.', function(accounts) {
 
   const defaultInventoryCount = 10;
 
-  let satTokenInstance;
+  let shopxTokenInstance;
   let assetManagerInstance;
   let orderManagerInstance;
 
@@ -68,14 +68,14 @@ contract('OrderManagerTest general test cases.', function(accounts) {
     console.log('defaulSeller wallet: ' + defaultSeller);
     console.log('defaultMarketPlace wallet: ' + defaultMarketPlace);
 
-    satTokenInstance = await SatToken.deployed()   
+    shopxTokenInstance = await shopxTokenInstance.deployed()   
     assetManagerInstance = await AssetManager.deployed()
     splytManagerInstance = await SplytManager.deployed()
     orderManagerInstance = await OrderManager.deployed()
 
     //give your account some tokens
     // accounts.forEach(async function(acc) {
-    //   await satTokenInstance.initUser(acc, 205000000)
+    //   await shopxTokenInstance.initUser(acc, 205000000)
     // })
  
   }
@@ -85,13 +85,13 @@ contract('OrderManagerTest general test cases.', function(accounts) {
   beforeEach('Default instances of contracts for each test', async function() {
     //reinitalize each account balance
     accounts.forEach(async function(acc) {
-      await satTokenInstance.initUser(acc, 205000000)
+      await shopxTokenInstance.initUser(acc, 205000000)
     })
 
-    // let balance = await satTokenInstance.balanceOf(defaultBuyer)
+    // let balance = await shopxTokenInstance.balanceOf(defaultBuyer)
     // console.log('defaultBuyer balance:' + balance)
 
-    // balance = await satTokenInstance.balanceOf(defaultSeller)
+    // balance = await shopxTokenInstance.balanceOf(defaultSeller)
     // console.log('defaultSeller balance:' + balance)
 
   })
@@ -142,12 +142,12 @@ contract('OrderManagerTest general test cases.', function(accounts) {
   it('should defaultBuyer balance be less than 1000 off original balance', async function() {
     await create_asset();
 
-    let initBalance = await satTokenInstance.balanceOf(defaultBuyer);
+    let initBalance = await shopxTokenInstance.balanceOf(defaultBuyer);
     // console.log('before purchase balance:' + initBalance);
 
     await purchase("0x32", assetAddress, 1, 1000);
 
-    let updatedBalance = await satTokenInstance.balanceOf(defaultBuyer);
+    let updatedBalance = await shopxTokenInstance.balanceOf(defaultBuyer);
     // console.log('after purchase balance:' + updatedBalance);
 
     assert.equal((initBalance - defaultPrice), updatedBalance, "Balance is not -1000 as expected!");

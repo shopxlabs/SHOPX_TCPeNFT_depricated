@@ -1,6 +1,7 @@
-pragma solidity >= 0.5.13;
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.7.3;
 
-import "./SafeMath.sol";
+import "../Utils/SafeMath.sol";
 
 contract Stake {
     
@@ -11,7 +12,7 @@ contract Stake {
     uint public eqVar1;
     uint public eqVar2;
 
-    constructor(uint _eqVar1, uint _eqVar2) public {
+    constructor(uint _eqVar1, uint _eqVar2) {
         setConstants(_eqVar1, _eqVar2);
     }
     

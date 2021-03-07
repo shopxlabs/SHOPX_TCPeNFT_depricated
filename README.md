@@ -1,11 +1,11 @@
-# splytprotocol
+# Splyt_TCPeNFT
 Ethereum contracts for split protocol
 
 ### Branch specific info:
  - Derived from branch **ver2.1**
 
 ### Setup:
- - `git clone https://github.com/splytcore/splytprotocol.git`
+ - `git clone https://github.com/splytcore/Splyt_TCPeNFT.git`
  - `npm install truffle -g`
  - `npm install testrpc -g`
 
@@ -33,9 +33,9 @@ Contracts are modular meaning they can be exchanged for updated contracts and di
 
 ** Initial Deploy Contracts Schema.    
 Remeber only the wallet used to deploy these contracts are the 'owner'. The role gives him/her rights to swap addresses.  
--  Deploy the SatToken contract and keep the address in hand.    
+-  Deploy the ShopxToken contract and keep the address in hand.    
 -  Deploy the Stake contract and keep the address in hand.   
--  Deploy the SplytManager contract and pass the SatToken and Stake addresses as the constructors.   
+-  Deploy the SplytManager contract and pass the ShopxToken and Stake addresses as the constructors.   
 -  Deploy the manager contracts with the SplytManager address as the constructor parameter.  
 -  Using the SplytManager contract, call each functions to set the manager i.e. 'setAssetManager(_newAddress)'.   
 ** Note: Only manager contracts are authorized to write to the data contracts.     

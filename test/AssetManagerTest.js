@@ -1,10 +1,10 @@
-const AssetManager = artifacts.require("./AssetManager.sol");
-const SplytManager = artifacts.require("./SplytManager.sol");
-const ManagerTracker = artifacts.require("./ManagerTracker.sol");
+const AssetManager = artifacts.require("../Protocol/AssetManager.sol");
+const SplytManager = artifacts.require("../Protocol/SplytManager.sol");
+const ManagerTracker = artifacts.require("../Protocol/ManagerTracker.sol");
 
-const SatToken = artifacts.require("./SatToken.sol");
-const Stake = artifacts.require("./Stake.sol");
-const Asset = artifacts.require("./Asset.sol");
+const ShopxToken = artifacts.require("../Token/ShopxToken.sol");
+const Stake = artifacts.require("../Protocol/Stake.sol");
+const Asset = artifacts.require("../Protocol/Asset.sol");
 
 
 contract('AssetManagerTest general test cases.', function(accounts) {
@@ -13,7 +13,7 @@ contract('AssetManagerTest general test cases.', function(accounts) {
   const defaultSeller = accounts[1];
   const defaultMarketPlace = accounts[2];
 
-  let satTokenInstance;
+  let shopxTokenInstance;
   let assetManagerInstance;
   let splytManagerInstance;
   let assetInstance;
@@ -26,7 +26,7 @@ contract('AssetManagerTest general test cases.', function(accounts) {
     var walletConfig = {
       value: 1234567890123456789
     }
-    await assetManagerInstance.ethToSat(_assetId, _term, _seller, _title, _totalCost, _expirationDate, _mpAddress, _mpAmount, _inventoryCount, walletConfig);
+    await assetManagerInstance.ethToShopx(_assetId, _term, _seller, _title, _totalCost, _expirationDate, _mpAddress, _mpAmount, _inventoryCount, walletConfig);
     assetAddress = await assetManagerInstance.getAddressById(_assetId);
     assetInstance = await Asset.at(assetAddress);
 
@@ -35,14 +35,14 @@ contract('AssetManagerTest general test cases.', function(accounts) {
   // This function gets ran before every test cases in this file.
   before('Default instances of contracts for each test', async function() {
     console.log('Deploy contracts')
-    satTokenInstance = await SatToken.deployed()   
+    shopxTokenInstance = await ShopxToken.deployed()   
     assetManagerInstance = await AssetManager.deployed();
     splytManagerInstance = await SplytManager.deployed();
     managerTrackerInstance = await ManagerTracker.deployed();
     stakeInstance = await Stake.deployed();
 
     accounts.forEach(async function(acc) {
-      await satTokenInstance.initUser(acc, 205000000)
+      await shopxTokenInstance.initUser(acc, 205000000)
     })
 
   })

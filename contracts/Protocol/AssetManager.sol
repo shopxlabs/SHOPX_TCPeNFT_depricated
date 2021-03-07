@@ -1,27 +1,29 @@
-pragma solidity >= 0.5.13;
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.7.3;
 
-import "./Owned.sol";
-import "./Events.sol";
 import "./Asset.sol";
 import "./AssetData.sol";
 import "./SplytManager.sol";
+import "../Utils/Owned.sol";
+import "../Utils/Events.sol";
 
-contract OracleInterface {
-    function getEthUsd() public returns (uint _ethUsdPrice);
+
+interface IOracle {
+    function getEthUsd() external returns (uint _ethUsdPrice);
 }
 
 contract AssetManager is Owned, Events {
     
     AssetData public assetData;
     SplytManager public splytManager;
-    OracleInterface oracleInstance;
+    IOracle oracleInstance;
     address oracleAddress;
     address payable splytWalletAddress;
 
-    // Temp test variables
+    // Temp: test variables
     uint public depositTokensAllocated;
     uint public depositTokensNeeded;
-
+    // End Temp
 
     //allow owner or splytManager
     modifier onlyOwnerOrSplyt() {
@@ -192,7 +194,7 @@ contract AssetManager is Owned, Events {
         assetData.acceptOwnership();
     }
 
-    function ethToSat(
+    function ethToShopx(
         bytes12 _assetId, 
         uint _term, 
         address _seller, 
@@ -237,6 +239,6 @@ contract AssetManager is Owned, Events {
 
     function setOracleAddress(address _oracleAddress) public {
         oracleAddress = _oracleAddress;
-        oracleInstance = OracleInterface(oracleAddress);
+        oracleInstance = IOracle(oracleAddress);
     }
 } 

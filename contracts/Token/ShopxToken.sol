@@ -2,10 +2,10 @@
 pragma solidity >=0.7.4;
 
 import "./ERC20.sol";
-import "./SafeMath.sol";
+import "../Utils/SafeMath.sol";
 
 // Splyt logic on top of standard erc20 contract
-contract SatToken is ERC20, Owned {
+contract ShopxToken is ERC20, Owned {
     using SafeMath for uint256;
 
     uint _version;
@@ -27,8 +27,8 @@ contract SatToken is ERC20, Owned {
         _paused = pauseUnpause;
     }
 
-    // This function will trade your ether with sat tokens for you.
-    // the only way to attain sat tokens
+    // This function will trade your ether with shopx tokens for you.
+    // the only way to attain shopx tokens
     function buyTokenFromEth() public payable returns(bool) {
         _beforeTransfer();
         // Accepting minimum 1 ether per tx in ICO phase

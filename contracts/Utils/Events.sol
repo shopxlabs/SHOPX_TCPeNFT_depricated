@@ -1,4 +1,5 @@
-pragma solidity >= 0.5.13;
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.7.3;
 
 // Events to notify other market places of something
 // Success events gets triggered when a listing is created or a listing is fully/partially funded

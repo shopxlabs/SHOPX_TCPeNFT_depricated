@@ -25,7 +25,7 @@ contract('OrderTest general test cases.', function(accounts) {
   // This function gets ran before every test cases in this file.
   beforeEach('Deploying asset contract. ', async function() {
     // accounts.forEach(async function(acc) {
-    //   await satTokenInstance.initUser(acc, 205000000)
+    //   await shopxTokenInstance.initUser(acc, 205000000)
     // })
   })
 

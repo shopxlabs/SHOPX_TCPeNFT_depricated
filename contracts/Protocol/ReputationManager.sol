@@ -1,11 +1,11 @@
-pragma solidity >= 0.5.13;
-
-import "./Owned.sol";
-import "./Events.sol";
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.7.3;
 
 import "./Reputation.sol";
 import "./ReputationData.sol";
 import "./SplytManager.sol";
+import "../Utils/Owned.sol";
+import "../Utils/Events.sol";
 
 contract ReputationManager is Owned, Events  {
     

@@ -1,6 +1,11 @@
-pragma solidity >= 0.5.13;
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.7.3;
 
-import "./Asset.sol";  //change to interface later
+import "./Asset.sol";  //TODO: change to interface later
+
+interface IManager {
+    function isManager(address) external returns (bool);
+}
 
 contract Arbitration {
     
@@ -24,7 +29,7 @@ contract Arbitration {
 
 
     modifier onlyManager() {
-        require(ManagerAbstract(msg.sender).isManager(msg.sender) == true, "You aren't manager");
+        require(IManager(msg.sender).isManager(msg.sender) == true, "You aren't manager");
         _;
     }
 

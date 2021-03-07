@@ -2,7 +2,7 @@ const AssetManager = artifacts.require("./AssetManager.sol")
 const OrderManager = artifacts.require("./OrderManager.sol")
 const SplytManager = artifacts.require("./SplytManager.sol")
 const ManagerTracker = artifacts.require("./ManagerTracker.sol")
-const SatToken = artifacts.require("./SatToken.sol")
+const ShopxToken = artifacts.require("./ShopxToken.sol")
 const Stake = artifacts.require("./Stake.sol")
 const Asset = artifacts.require("./Asset.sol")
 
@@ -18,7 +18,7 @@ contract('StakeTest general test cases.', function(accounts) {
   const defaultAffiliate = accounts[5]
 
 
-  let satTokenInstance
+  let shopxTokenInstance
   let assetManagerInstance
   let splytManagerInstance
   let orderManagerInstance
@@ -59,7 +59,7 @@ contract('StakeTest general test cases.', function(accounts) {
   // This function gets ran before every test cases in this file.
   before('Default instances of contracts for each test', async function() {
     console.log('Deploy contracts')
-    satTokenInstance = await SatToken.deployed()   
+    shopxTokenInstance = await ShopxToken.deployed()   
     assetManagerInstance = await AssetManager.deployed()
     splytManagerInstance = await SplytManager.deployed()
     managerTrackerInstance = await ManagerTracker.deployed()
@@ -67,7 +67,7 @@ contract('StakeTest general test cases.', function(accounts) {
 
     stakeInstance = await Stake.deployed()
     accounts.forEach(async function(acc) {
-      await satTokenInstance.initUser(acc, 205000000)
+      await shopxTokenInstance.initUser(acc, 205000000)
     })
 
   })

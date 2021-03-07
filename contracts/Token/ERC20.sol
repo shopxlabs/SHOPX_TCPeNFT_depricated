@@ -1,16 +1,16 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.7.4;
 
-import "./SafeMath.sol";
+import "../Utils/SafeMath.sol";
 
 // Standard erc20 contract used from template
 contract ERC20 {
     using SafeMath for uint256;
         
-    uint256 private _totalSupply = 64321684210000; // ~6.4 billion
-    string private _name = "Splyt Autonomous Tokens";
-    string private _symbol = "SAT";
-    uint8 private _decimals = 4; // We use 4 decimals as of now
+    uint256 private _totalSupply = 500000000; // ~500 million
+    string private _name = "Splyt SHOPX Token";
+    string private _symbol = "SHOPX";
+    uint8 private _decimals = 4; // 4 decimal places for protocol
     mapping(address => uint256) _balances;
     mapping(address => mapping (address => uint256)) _allowances;
     
@@ -50,12 +50,19 @@ contract ERC20 {
         return true;
     }
     
-    function transferFrom(address sender, address recipient, uint amount) public 
-    onlyApprovedOrSplyt(_from, _to, _value) onlyNonBanned(_from) returns (bool success) {
+    function transferFrom(address sender, address recipient, uint amount) public returns (bool success) {
         _transfer(sender, recipient, amount);
         _approve(sender, _msgSender(), _allowances[sender][_msgSender()].sub(amount, "Transfer amount exceeds allowance"));
         return true;
     }
+
+    // TODO: fix above function so splyt and approved are allowed to move tokens like below function
+    // function transferFrom(address sender, address recipient, uint amount) public 
+    // onlyApprovedOrSplyt(_from, _to, _value) onlyNonBanned(_from) returns (bool success) {
+    //     _transfer(sender, recipient, amount);
+    //     _approve(sender, _msgSender(), _allowances[sender][_msgSender()].sub(amount, "Transfer amount exceeds allowance"));
+    //     return true;
+    // }
     
     function approve(address spender, uint256 amount) public virtual override returns (bool) {
         _approve(_msgSender(), spender, amount);

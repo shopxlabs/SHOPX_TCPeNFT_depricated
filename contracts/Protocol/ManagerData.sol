@@ -1,6 +1,7 @@
-pragma solidity >= 0.5.13;
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.7.3;
 
-import "./Owned.sol";
+import "../Utils/Owned.sol";
 
 //@dev This contract will not be updatable. This is used when a contract is deployed, the manager deployer is the owner. But when we update the manager contract, the asset is still owned by the old manager.
 //To get around this, this contract is used to keep track of all the past managers giving the current managers rights to update data contracts.
@@ -12,7 +13,7 @@ contract ManagerData is Owned {
 
     uint public index;
 
-    constructor() public {
+    constructor() {
         managers[msg.sender] = true;   //add creator
     }
 

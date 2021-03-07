@@ -1,15 +1,12 @@
-pragma solidity >= 0.5.13;
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.7.3;
 
-import "./Events.sol";
+import "../Utils/Events.sol";
 
-//TODO: use interfaces
+// TODO: convert to interfaces
 import "./Arbitration.sol";
 import "./Asset.sol";
-
-
-contract ManagerAbstract {
-    function isManager(address) public returns (bool);
-}
+// END TODO
 
 
 contract Asset is Events {
@@ -40,12 +37,12 @@ contract Asset is Events {
     uint public inventoryCount;
 
     modifier onlyManager() {
-        require(ManagerAbstract(msg.sender).isManager(msg.sender) == true, "You aren't the manager");
+        require(IManager(msg.sender).isManager(msg.sender) == true, "You aren't the manager");
         _;
     }
 
     constructor(bytes12 _assetId, uint _term, address _seller, string memory _title, uint _totalCost, uint _expirationDate, 
-      address _mpAddress, uint _mpAmount, uint _inventoryCount, uint _stakeAmount) public {
+      address _mpAddress, uint _mpAmount, uint _inventoryCount, uint _stakeAmount) {
         assetId = _assetId;
         term = _term;
         seller = _seller;
