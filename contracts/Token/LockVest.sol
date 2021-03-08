@@ -8,7 +8,7 @@ interface IToken {
     function mint(address account, uint256 amount) external;
 }
 
-contract LockVestManager is Owned {
+contract LockVest is Owned {
     
     using SafeMath for uint256;
 
