@@ -7,23 +7,20 @@ import "../Utils/SafeMath.sol";
 contract ERC20 {
     using SafeMath for uint256;
         
-    uint256 private _totalSupply = 500000000; // ~500 million
     string private _name = "Splyt SHOPX Token";
     string private _symbol = "SHOPX";
-    uint8 private _decimals = 4; // 4 decimal places for protocol
+    uint8 private _decimals = 18; // 18 decimal places for protocol
+    uint256 public _totalSupply = 500000000000000000000000000; // 0.5 billion
+        
     mapping(address => uint256) _balances;
     mapping(address => mapping (address => uint256)) _allowances;
     
-    uint public _version;
     uint256 public _totalMinted;
-    address _trackerAddress;
-    mapping(address => mapping (address => bool)) _banned;
+    
     string private _errZeroAddress = "zero address not allowed";
     
     
-    constructor(uint version) public {
-        _version = version;
-    }
+    constructor() {}
     
     //Interface for getters
     function name() public view returns (string memory) {
@@ -35,26 +32,26 @@ contract ERC20 {
     function decimals() public view returns (uint8) {
         return _decimals;
     }
-    function totalSupply() public view override returns (uint256) {
+    function totalSupply() public view returns (uint256) {
         return _totalSupply;
     }
-    function balanceOf(address account) public view override returns (uint256) {
+    function balanceOf(address account) public view returns (uint256) {
         return _balances[account];
     }
     
 
 
     // Interface for setters
-    function transfer(address recipient, uint amount) public virtual override returns (bool) {
-        _transfer(_msgSender(), recipient, amount);
+    function transfer(address recipient, uint amount) public virtual returns (bool) {
+        _transfer(msg.sender, recipient, amount);
         return true;
     }
     
-    function transferFrom(address sender, address recipient, uint amount) public returns (bool success) {
-        _transfer(sender, recipient, amount);
-        _approve(sender, _msgSender(), _allowances[sender][_msgSender()].sub(amount, "Transfer amount exceeds allowance"));
-        return true;
-    }
+    // function transferFrom(address sender, address recipient, uint amount) public returns (bool success) {
+    //     _transfer(sender, recipient, amount);
+    //     _approve(sender, tx.origin, _allowances[sender][tx.origin].sub(amount, "Transfer amount exceeds allowance"));
+    //     return true;
+    // }
 
     // TODO: fix above function so splyt and approved are allowed to move tokens like below function
     // function transferFrom(address sender, address recipient, uint amount) public 
@@ -64,12 +61,12 @@ contract ERC20 {
     //     return true;
     // }
     
-    function approve(address spender, uint256 amount) public virtual override returns (bool) {
-        _approve(_msgSender(), spender, amount);
-        return true;
-    }
+    // function approve(address spender, uint256 amount) public virtual returns (bool) {
+    //     _approve(tx.origin, spender, amount);
+    //     return true;
+    // }
     
-    function allowance(address owner, address spender) public view virtual override returns (uint256) {
+    function allowance(address owner, address spender) public view virtual returns (uint256) {
         return _allowances[owner][spender];
     }
 
@@ -77,22 +74,20 @@ contract ERC20 {
 
     // Internal functions
     function _transfer(address sender, address recipient, uint256 amount) internal virtual {
-        require(sender != address(0), "Transfer from " + _errZeroAddress);
-        require(recipient != address(0), "Transfer to " + _errZeroAddress);
-        _beforeTransfer();
+        require(sender != address(0) && recipient != address(0), "Transfer from and to zero address not allowed");
 
         _balances[sender] = _balances[sender].sub(amount, "Transfer amount exceeds balance");
         _balances[recipient] = _balances[recipient].add(amount);
         emit Transfer(sender, recipient, amount);
     }
 
-    function _approve(address owner, address spender, uint256 amount) internal virtual {
-        require(owner != address(0), "Approve from " + _errZeroAddress);
-        require(spender != address(0), "Approve to " + _errZeroAddress);
+    // function _approve(address owner, address spender, uint256 amount) internal virtual {
+    //     require(owner != address(0), "Approve from " + _errZeroAddress);
+    //     require(spender != address(0), "Approve to " + _errZeroAddress);
 
-        _allowances[owner][spender] = amount;
-        emit Approval(owner, spender, amount);
-    }
+    //     _allowances[owner][spender] = amount;
+    //     emit Approval(owner, spender, amount);
+    // }
     
     event Transfer(address indexed sender, address indexed recipient, uint amount);
     event Approval(address indexed owner, address indexed spender, uint amount);
