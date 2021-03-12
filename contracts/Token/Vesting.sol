@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.7.3;
 
-import "./VestingOwned.sol";
 import "./Owned.sol";
 import "../Utils/SafeMath.sol";
 import "./IERC20.sol";
@@ -11,24 +10,45 @@ contract Vesting is Owned {
     
     using SafeMath for uint256;
 
-    uint16  internal _cliff;
+    uint256  internal _cliff;
     uint256 internal _start;
     uint256 internal _duration;
     bool    internal _revocable;
     address internal _revokeTo;
     address internal _beneficiary;
     
+    uint16 internal _firstMonthPercent;
+    uint256 internal _aMonth = 2629743;
+    
     mapping (address => uint256) private _released;
     mapping (address => bool)    private _revoked;
 
 
-    constructor(address beneficiary_, uint16 cliff_, uint256 start_, uint256 duration_, bool revocable_, address revokeTo_) {
+    /**
+    * @dev Creates a vesting contract that vests its balance of any ERC20 token to the
+    * beneficiary, gradually in a linear fashion until start + duration. By then all
+    * of the balance will have vested.
+    * @param beneficiary_ address of the beneficiary to whom vested tokens are transferred
+    * @param cliffDuration_ duration in seconds of the cliff in which tokens will begin to vest (seconds of cliff after start)
+    * @param start_ the time (as Unix time) at which point vesting starts (current timestamp)
+    * @param duration_ duration in seconds of the period in which the tokens will vest (total seconds including cliffDuration)
+    * @param revocable_ whether the vesting is revocable or not
+    * @param revokeTo_ revoke tokens to this address
+    */
+    constructor(address beneficiary_, uint256 start_, uint256 cliffDuration_, uint256 duration_, bool revocable_, address revokeTo_, uint16 firstMonthPayout_) {
+        require(beneficiary_ != address(0), "TokenVesting: beneficiary is the zero address");
+        require(cliffDuration_ <= duration_, "TokenVesting: cliff is longer than duration");
+        require(duration_ > 0, "TokenVesting: duration is 0");
+        require(start_.add(duration_) > block.timestamp, "TokenVesting: final time is before current time");
+        
         _beneficiary =  beneficiary_;
-        _cliff =         cliff_;
-        _start =         start_;
-        _duration =      duration_;
-        _revocable =     revocable_;
-        _revokeTo =      revokeTo_;
+        _cliff =        start_.add(cliffDuration_);
+        _start =        start_;
+        _duration =     duration_;
+        _revocable =    revocable_;
+        _revokeTo =     revokeTo_;
+        
+        _firstMonthPayout = firstMonthPayout_;
     }
 
     //getters
@@ -96,13 +116,16 @@ contract Vesting is Owned {
     function _vestedAmount(IERC20 token) private view returns (uint256) {
         uint256 currentBalance = token.balanceOf(address(this));
         uint256 totalBalance = currentBalance.add(_released[address(token)]);
-
+        uint256 snappedTimestamp = block.timestamp.sub(block.timestamp.mod(_aMonth));
+        
         if (block.timestamp < _cliff) {
             return 0;
-        } else if (block.timestamp >= _start.add(_duration) || _revoked[address(token)]) {
+        } else if (snappedTimestamp >= _start.add(_duration) || _revoked[address(token)]) {
             return totalBalance;
         } else {
-            return totalBalance.mul(block.timestamp.sub(_start)).div(_duration);
+            uint256 firstMonth = totalBalance.mul(_firstMonthPercent).div(100);
+            uint256 restMonth = totalBalance.mul(snappedTimestamp.sub(_start)).div(_duration - _aMonth);
+            return firstMonth.add(restMonth);
         }
     }
     
