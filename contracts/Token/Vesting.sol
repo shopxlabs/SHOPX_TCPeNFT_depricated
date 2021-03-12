@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.7.3;
 
-import "./Owned.sol";
+import "../Utils/Owned.sol";
 import "../Utils/SafeMath.sol";
 import "./IERC20.sol";
 
@@ -34,8 +34,9 @@ contract Vesting is Owned {
     * @param duration_ duration in seconds of the period in which the tokens will vest (total seconds including cliffDuration)
     * @param revocable_ whether the vesting is revocable or not
     * @param revokeTo_ revoke tokens to this address
+    * @param firstMonthPercent_ diff in percentage between 1st month and rest
     */
-    constructor(address beneficiary_, uint256 start_, uint256 cliffDuration_, uint256 duration_, bool revocable_, address revokeTo_, uint16 firstMonthPayout_) {
+    constructor(address beneficiary_, uint256 start_, uint256 cliffDuration_, uint256 duration_, bool revocable_, address revokeTo_, uint16 firstMonthPercent_) {
         require(beneficiary_ != address(0), "TokenVesting: beneficiary is the zero address");
         require(cliffDuration_ <= duration_, "TokenVesting: cliff is longer than duration");
         require(duration_ > 0, "TokenVesting: duration is 0");
@@ -48,7 +49,7 @@ contract Vesting is Owned {
         _revocable =    revocable_;
         _revokeTo =     revokeTo_;
         
-        _firstMonthPayout = firstMonthPayout_;
+        _firstMonthPercent = firstMonthPercent_;
     }
 
     //getters
@@ -72,11 +73,11 @@ contract Vesting is Owned {
         return _revocable;
     }
 
-    function released(address token) public returns(uint256) {
+    function released(address token) public view returns(uint256) {
         return _released[token];
     }
 
-    function revocked(address token) public returns(bool) {
+    function revocked(address token) public view returns(bool) {
         return _revoked[token];
     }
 
@@ -123,9 +124,12 @@ contract Vesting is Owned {
         } else if (snappedTimestamp >= _start.add(_duration) || _revoked[address(token)]) {
             return totalBalance;
         } else {
-            uint256 firstMonth = totalBalance.mul(_firstMonthPercent).div(100);
-            uint256 restMonth = totalBalance.mul(snappedTimestamp.sub(_start)).div(_duration - _aMonth);
-            return firstMonth.add(restMonth);
+            uint256 firstMonthBonus = totalBalance.mul(_firstMonthPercent).div(100);
+            uint256 restMonth = totalBalance.mul(snappedTimestamp.sub(_start)).div(_duration);
+            if(_released[address(token)] == 0) {
+                restMonth.add(firstMonthBonus);
+            }
+            return restMonth;
         }
     }
     
