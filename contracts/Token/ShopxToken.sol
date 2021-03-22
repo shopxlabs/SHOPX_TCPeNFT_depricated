@@ -3,10 +3,9 @@ pragma solidity >=0.7.4;
 
 import "./ERC20.sol";
 import "../Utils/SafeMath.sol";
-import "../Utils/Owned.sol";
 
 // Splyt logic on top of standard erc20 contract
-contract ShopxToken is ERC20, Owned {
+abstract contract ShopxToken is ERC20 {
     using SafeMath for uint256;
 
     uint public  _version;
@@ -31,33 +30,10 @@ contract ShopxToken is ERC20, Owned {
     //         _;
     // }
     
-    function _beforeMint(address account, uint256 amount) internal virtual {
-        //minting to 0 address not allowed
-        require(account != address(0), "Mint to zero address not allowed");
-        //must be unpause to proceed
-        require(!_pauseMint, "Minting is paused");
-        //total supply reached
-        require(_totalMinted + amount <= _totalSupply, "Total supply reached");
-    }
-    
-    
-    function mint(address account, uint256 amount) public virtual {
-        _beforeMint(account, amount);
-
-        _totalMinted = _totalMinted.add(amount);
-        _balances[account] = _balances[account].add(amount);
-        emit Transfer(address(this), account, amount);
-    }
-
-
     modifier onlyNonBanned(address _from) {
         if(_banned[_from][msg.sender] == false)
             _;
     }
-    
-    fallback() external payable {
-        revert();
-    }
-    
+        
 }
 

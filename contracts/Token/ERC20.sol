@@ -54,7 +54,7 @@ contract ERC20 is Owned {
     /**
      * @dev See {IERC20-totalSupply}.
      */
-    function totalSupply() public view virtual override returns (uint256) {
+    function totalSupply() public view virtual returns (uint256) {
         return _totalSupply;
     }
 
@@ -93,7 +93,7 @@ contract ERC20 is Owned {
      * - `spender` cannot be the zero address.
      */
     function approve(address spender, uint256 amount) public virtual returns (bool) {
-        _approve(msg.sender(), spender, amount);
+        _approve(msg.sender, spender, amount);
         return true;
     }
 
@@ -113,9 +113,9 @@ contract ERC20 is Owned {
     function transferFrom(address sender, address recipient, uint256 amount) public virtual returns (bool) {
         _transfer(sender, recipient, amount);
 
-        uint256 currentAllowance = _allowances[sender][msg.sender()];
+        uint256 currentAllowance = _allowances[sender][msg.sender];
         require(currentAllowance >= amount, "ERC20: transfer amount exceeds allowance");
-        _approve(sender, msg.sender(), currentAllowance - amount);
+        _approve(sender, msg.sender, currentAllowance - amount);
 
         return true;
     }
@@ -133,7 +133,7 @@ contract ERC20 is Owned {
      * - `spender` cannot be the zero address.
      */
     function increaseAllowance(address spender, uint256 addedValue) public virtual returns (bool) {
-        _approve(msg.sender(), spender, _allowances[msg.sender()][spender] + addedValue);
+        _approve(msg.sender, spender, _allowances[msg.sender][spender] + addedValue);
         return true;
     }
 
@@ -152,9 +152,9 @@ contract ERC20 is Owned {
      * `subtractedValue`.
      */
     function decreaseAllowance(address spender, uint256 subtractedValue) public virtual returns (bool) {
-        uint256 currentAllowance = _allowances[msg.sender()][spender];
+        uint256 currentAllowance = _allowances[msg.sender][spender];
         require(currentAllowance >= subtractedValue, "ERC20: decreased allowance below zero");
-        _approve(msg.sender(), spender, currentAllowance - subtractedValue);
+        _approve(msg.sender, spender, currentAllowance - subtractedValue);
 
         return true;
     }
@@ -260,7 +260,7 @@ contract ERC20 is Owned {
     /**
      * @dev Returns the decimals places of the token.
      */
-    function decimals() external view returns (uint8) {
+    function decimals() external pure returns (uint8) {
         return 18;
     }
 

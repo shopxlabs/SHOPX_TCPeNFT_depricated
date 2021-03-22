@@ -19,7 +19,7 @@ contract ManagerTracker is Owned {
         _;
     }
 
-    constructor(address _splytManager) public {
+    constructor(address _splytManager) {
         managerData = new ManagerData();
         splytManager = SplytManager(_splytManager);
     }

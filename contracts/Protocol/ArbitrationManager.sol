@@ -40,7 +40,7 @@ contract ArbitrationManager is Owned, Events {
         _;
     }        
 
-    constructor(address _splytManager) public {
+    constructor(address _splytManager) {
         splytManager = SplytManager(_splytManager);
         arbitrationData = new ArbitrationData();
     }
@@ -189,17 +189,4 @@ contract ArbitrationManager is Owned, Events {
     function isManager(address _address) public view returns (bool) {
         return splytManager.isManager(_address);
     }
-   
-       
-   //@dev new manager contract that's going to be replacing this
-   //Old manager call this function and proposes the new address
-    function transferOwnership(address _newAddress) public onlyOwner {
-        arbitrationData.transferOwnership(_newAddress);
-    }
-
-    //@dev if new data contract is deployed, the creator proposes manager adress then the manager needs to accept
-    function acceptOwnership() public onlyOwner {
-        arbitrationData.acceptOwnership();
-    }
-
 }

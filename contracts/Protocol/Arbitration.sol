@@ -33,7 +33,7 @@ contract Arbitration {
         _;
     }
 
-    constructor(bytes12 _arbitrationId, address _assetAddress, Reasons _reason, address _reporter, uint _stakeAmount) public {
+    constructor(bytes12 _arbitrationId, address _assetAddress, Reasons _reason, address _reporter, uint _stakeAmount) {
         arbitrationId = _arbitrationId;
         reason = _reason;
         reporter = _reporter;

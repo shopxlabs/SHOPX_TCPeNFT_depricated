@@ -20,25 +20,26 @@ contract Reputation {
     Rate[] public rates;
 
     modifier onlyManager() {
-        require(ManagerAbstract(msg.sender).isManager(msg.sender) == true);
+        // TODO: fix this
+        // require(ManagerAbstract(msg.sender).isManager(msg.sender) == true);
         _;
     }
 
     //@dev only create new reputation when it creates first rate
-    constructor(address _wallet, uint _rating, address _from) public {
+    constructor(address _wallet, uint _rating, address _from) {
         wallet = _wallet;
-        rates.push(Rate(_rating, _from, now));    
+        rates.push(Rate(_rating, _from, block.timestamp));    
     }  
 
     //@dev only accept 100 to 500 
     function addRate(uint _rating, address _from) public onlyManager {
-        rates.push(Rate(_rating, _from, now));
+        rates.push(Rate(_rating, _from, block.timestamp));
     }  
 
     //@dev update rate
     function updateRate(uint _index, uint _rating) public onlyManager {
         rates[_index].rating = _rating;
-        rates[_index].date = now;
+        rates[_index].date = block.timestamp;
     }  
 
     //@dev get number of rates

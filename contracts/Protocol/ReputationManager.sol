@@ -24,7 +24,7 @@ contract ReputationManager is Owned, Events  {
         _;
     }
 
-    constructor(address _splytManager) public {
+    constructor(address _splytManager) {
         reputationData = new ReputationData();
         splytManager = SplytManager(_splytManager);
     }
@@ -135,18 +135,6 @@ contract ReputationManager is Owned, Events  {
         }
        return totalScore;
 
-    } 
-    
-   //@dev new manager contract that's going to be replacing this
-   //Old manager call this function and proposes the new address
-    function transferOwnership(address _newAddress) public onlyOwnerOrSplyt {
-        reputationData.transferOwnership(_newAddress);
-    }
-
-    //@dev if new data contract is deployed, the creator proposes manager adress then the manager needs to accept
-    //The new updated manager contract calls this function
-    function acceptOwnership() public onlyOwner {
-        reputationData.acceptOwnership();
     }
 
 } 

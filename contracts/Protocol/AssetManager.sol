@@ -31,7 +31,7 @@ contract AssetManager is Owned, Events {
         _;
     }
 
-    constructor ( address _splytManager ) public {
+    constructor ( address _splytManager ) {
         assetData = new AssetData();
         splytManager = SplytManager(_splytManager);
     }
@@ -180,18 +180,6 @@ contract AssetManager is Owned, Events {
     //@dev checks if address is authorized write to the data contracts
     function isManager(address _address) public view returns (bool) {
         return splytManager.isManager(_address);
-    }
-   
-   //@dev new manager contract that's going to be replacing this
-   //Old manager call this function and proposes the new address
-    function transferOwnership(address _newAddress) public onlyOwnerOrSplyt {
-        assetData.transferOwnership(_newAddress);
-    }
-
-    //@dev if new data contract is deployed, the creator proposes manager adress then the manager needs to accept
-    //The new updated manager contract calls this function
-    function acceptOwnership() public onlyOwner {
-        assetData.acceptOwnership();
     }
 
     function ethToShopx(

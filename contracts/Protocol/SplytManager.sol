@@ -54,7 +54,7 @@ contract SplytManager is Events, Owned {
     // event Error(uint _code, string _message);
 
     //@dev set all contracts it's interacting with
-    constructor(address _tokenAddress, address _stakeAddress) public {
+    constructor(address _tokenAddress, address _stakeAddress) {
         shopxToken = ShopxToken(_tokenAddress);
         stake = Stake(_stakeAddress);      
     }
