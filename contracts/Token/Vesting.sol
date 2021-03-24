@@ -77,7 +77,7 @@ contract Vesting is Owned {
         return _released[token];
     }
 
-    function revocked(address token) public view returns(bool) {
+    function revoked(address token) public view returns(bool) {
         return _revoked[token];
     }
 
