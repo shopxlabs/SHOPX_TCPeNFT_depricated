@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.7.3;
+pragma solidity 0.7.3;
 
 
 //TODO: use interfaces instead after we plan out what functions should be exposed to this contract.
