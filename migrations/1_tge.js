@@ -13,8 +13,8 @@ module.exports = async function(deployer, network, accounts) {
 
   let walletConfig = {}
 
-  if(network === 'ropsten') {
-    walletConfig = { from: "0xf606a61e2fbc2db9b0b74f26c45469509dfb33ac" }
+  if(network === 'staging') {
+    walletConfig = { from: "0xd9e5e4bde24faa2b277ab2be78c95b9ae24259a8" }
   } else {                                                      
     walletConfig = { from: accounts[0] }
   }
@@ -25,7 +25,7 @@ module.exports = async function(deployer, network, accounts) {
   const logFilePath = InitLogFile()
 
   // Load csv file
-  const csvFilePath = Path.resolve('./[Mock] Token Distribution List - Sheet1.csv')
+  const csvFilePath = Path.resolve('./DistributionList_Ropsten.csv')
   const csvData = await CsvToJson().fromFile(csvFilePath)
   Log("CSV imported with " + csvData.length + " rows")
 
@@ -78,7 +78,7 @@ module.exports = async function(deployer, network, accounts) {
       Log('Minted to vesting contract ' + vesting.address +  ' Tokens ' + vestingData.TotalTokens)
       await erc20.balanceOf(vesting.address, walletConfig)
       .then(balance => {
-        Log('Now Vesting Contract: ' + vesting.address + ' has balance of ' + balance)
+        Log(vestingData.Name + '\'s Vesting Contract: ' + vesting.address + ' has balance of ' + balance)
       })
     })
 

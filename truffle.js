@@ -11,6 +11,12 @@ module.exports = {
       host: '13.58.147.177',
       port: 8555,
       network_id: '*'
+    },
+    production: {
+      host: '',
+      port: 8555,
+      network_id: '*',
+      gasPrice: 175000000000 //175 GWei
     }
   },
   mocha: {

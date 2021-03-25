@@ -5,7 +5,12 @@ import "../Utils/Owned.sol";
 import "../Utils/SafeMath.sol";
 import "./IERC20.sol";
 
-
+/**
+ * @title Vesting
+ * @dev A token holder contract that can release its token balance gradually like a
+ * typical vesting scheme, with a cliff and vesting period. Optionally revocable by the
+ * owner.
+ */
 contract Vesting is Owned {
     
     using SafeMath for uint256;
@@ -25,17 +30,17 @@ contract Vesting is Owned {
 
 
     /**
-    * @dev Creates a vesting contract that vests its balance of any ERC20 token to the
-    * beneficiary, gradually in a linear fashion until start + duration. By then all
-    * of the balance will have vested.
-    * @param beneficiary_ address of the beneficiary to whom vested tokens are transferred
-    * @param cliffDuration_ duration in seconds of the cliff in which tokens will begin to vest (seconds of cliff after start)
-    * @param start_ the time (as Unix time) at which point vesting starts (current timestamp)
-    * @param duration_ duration in seconds of the period in which the tokens will vest (total seconds including cliffDuration)
-    * @param revocable_ whether the vesting is revocable or not
-    * @param revokeTo_ revoke tokens to this address
-    * @param firstMonthPercent_ diff in percentage between 1st month and rest
-    */
+     * @dev Creates a vesting contract that vests its balance of any ERC20 token to the
+     * beneficiary, gradually in a linear fashion until start + duration. By then all
+     * of the balance will have vested.
+     * @param beneficiary_ address of the beneficiary to whom vested tokens are transferred
+     * @param cliffDuration_ duration in seconds of the cliff in which tokens will begin to vest (seconds of cliff after start)
+     * @param start_ the time (as Unix time) at which point vesting starts (current timestamp)
+     * @param duration_ duration in seconds of the period in which the tokens will vest (total seconds including cliffDuration)
+     * @param revocable_ whether the vesting is revocable or not
+     * @param revokeTo_ revoke tokens to this address
+     * @param firstMonthPercent_ diff in percentage between 1st month and rest
+     */
     constructor(address beneficiary_, uint256 start_, uint256 cliffDuration_, uint256 duration_, bool revocable_, address revokeTo_, uint16 firstMonthPercent_) {
         require(beneficiary_ != address(0), "TokenVesting: beneficiary is the zero address");
         require(cliffDuration_ <= duration_, "TokenVesting: cliff is longer than duration");
@@ -52,36 +57,59 @@ contract Vesting is Owned {
         _firstMonthPercent = firstMonthPercent_;
     }
 
-    //getters
+    /**
+     * @return the beneficiary of the tokens.
+     */
     function beneficiary() public view returns(address) {
         return _beneficiary;
     }
 
+    /**
+     * @return the cliff time of the token vesting.
+     */
     function cliff() external view returns(uint256) {
         return _cliff;
     }
 
+    /**
+     * @return the start time of the token vesting.
+     */
     function start() public view returns(uint256) {
         return _start;
     }
 
+    /**
+     * @return the duration of the token vesting.
+     */
     function duration() public view returns(uint256) {
         return _duration;
     }
 
+    /**
+     * @return true if the vesting is revocable.
+     */
     function revocable() public view returns(bool) {
         return _revocable;
     }
 
+    /**
+     * @return the amount of the token released.
+     */
     function released(address token) public view returns(uint256) {
         return _released[token];
     }
 
+    /**
+     * @return true if the token is revoked.
+     */
     function revoked(address token) public view returns(bool) {
         return _revoked[token];
     }
 
-    //setters
+    /**
+     * @notice Transfers vested tokens to beneficiary.
+     * @param token ERC20 token which is being vested
+     */
     function release(IERC20 token) public {
         uint256 unreleased = _releasableAmount(token);
 
@@ -94,6 +122,11 @@ contract Vesting is Owned {
         emit TokensReleased(address(token), unreleased);
     }
 
+    /**
+     * @notice Allows the owner to revoke the vesting. Tokens already vested
+     * remain in the contract, the rest are returned to the owner.
+     * @param token ERC20 token which is being vested
+     */
     function revoke(IERC20 token) onlyOwner public {
         require(_revocable, "TokenVesting: cannot revoke");
         require(!_revoked[address(token)], "TokenVesting: token already revoked");
@@ -110,10 +143,18 @@ contract Vesting is Owned {
         emit TokenVestingRevoked(address(token));
     }
 
+    /**
+     * @dev Calculates the amount that has already vested but hasn't been released yet.
+     * @param token ERC20 token which is being vested
+     */
     function _releasableAmount(IERC20 token) private view returns (uint256) {
         return _vestedAmount(token).sub(_released[address(token)]);
     }
 
+    /**
+     * @dev Calculates the amount that has already vested.
+     * @param token ERC20 token which is being vested
+     */
     function _vestedAmount(IERC20 token) private view returns (uint256) {
         uint256 currentBalance = token.balanceOf(address(this));
         uint256 totalBalance = currentBalance.add(_released[address(token)]);
