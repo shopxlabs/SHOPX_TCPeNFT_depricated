@@ -5,8 +5,14 @@ var Chalk = require('chalk')
 var Fs = require('fs')
 var Path = require('path')
 var CsvToJson = require('csvtojson')
+var fetch = require('fetch').fetchUrl
+
 
 module.exports = async function(deployer, network, accounts) {
+
+  deployer.networks.local.gasPrice = fetchGasPrice('normal')
+  console.log(deployer.networks.local.gasPrice)
+
 
   const name = "Splyt SHOPX tokens"
   const symbol = "SHOPX"
@@ -109,4 +115,17 @@ module.exports = async function(deployer, network, accounts) {
     return now.getUTCHours() + ':' + now.getUTCMinutes() + ':' + now.getUTCSeconds()
   }
 
+  function fetchGasPrice(speed) {
+    fetch('https://api.etherscan.io/api?module=gastracker&action=gasoracle&apikey=HB19QTI959UAFKGDZ6NPXQJVHCGU9REU1K', {
+      method: 'GET',
+      headers: {}
+    }, (err, meta, body) => {
+      // returning dollar amount moved 4 decimal places so intead of $86.5920xx... it'll be $865920.xx...
+      // etherPrice = JSON.parse(body.toString()).data[1027].quote.USD.price * 10000
+
+      var response = JSON.parse(body.toString())
+      console.log(response.result.SafeGasPrice)
+      return response.result.SafeGasPrice
+    })
+  }
 }

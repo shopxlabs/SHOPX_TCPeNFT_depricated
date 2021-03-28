@@ -158,17 +158,16 @@ contract Vesting is Owned {
     function _vestedAmount(IERC20 token) private view returns (uint256) {
         uint256 currentBalance = token.balanceOf(address(this));
         uint256 totalBalance = currentBalance.add(_released[address(token)]);
-        uint256 snappedTimestamp = block.timestamp.sub(block.timestamp.mod(_aMonth));
-        
-        if (block.timestamp < _cliff) {
+
+        if (block.timestamp < _cliff || block.timestamp < _cliff.add(_aMonth) ) {
             return 0;
-        } else if (snappedTimestamp >= _start.add(_duration) || _revoked[address(token)]) {
+        } else if (block.timestamp >= _start.add(_duration) || _revoked[address(token)]) {
             return totalBalance;
         } else {
             uint256 firstMonthBonus = totalBalance.mul(_firstMonthPercent).div(100);
-            uint256 restMonth = totalBalance.mul(snappedTimestamp.sub(_start)).div(_duration);
+            uint256 restMonth = totalBalance.mul(block.timestamp.sub(_start)).div(_duration);
             if(_released[address(token)] == 0) {
-                restMonth.add(firstMonthBonus);
+                return restMonth.add(firstMonthBonus);
             }
             return restMonth;
         }
