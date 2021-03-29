@@ -159,19 +159,17 @@ contract Vesting is Owned {
         uint256 currentBalance = token.balanceOf(address(this));
         uint256 totalBalance = currentBalance.add(_released[address(token)]);
 
-        if (block.timestamp < _cliff || block.timestamp < _cliff.add(_aMonth) ) {
+        if (block.timestamp < _cliff) {
             return 0;
         } else if (block.timestamp >= _start.add(_duration) || _revoked[address(token)]) {
             return totalBalance;
         } else {
             uint256 firstMonthBonus = totalBalance.mul(_firstMonthPercent).div(100);
             uint256 restMonth = totalBalance.mul(block.timestamp.sub(_start)).div(_duration);
-            uint256 result = restMonth.add(firstMonthBonus);
-            
-            if(result > currentBalance)
-                return currentBalance;
-
-            return result;
+            if(block.timestamp > _start.add(_aMonth))
+                return restMonth.add(firstMonthBonus);
+                
+            return restMonth;
         }
     }
     
