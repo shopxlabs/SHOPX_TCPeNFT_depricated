@@ -22,7 +22,7 @@ contract Vesting is Owned {
     address internal _revokeTo;
     address internal _beneficiary;
     
-    uint16 internal _firstMonthPercent;
+    uint16 internal _firstMonthBonus;
     uint256 constant internal _aMonth = 2629743;
     
     mapping (address => uint256) private _released;
@@ -39,9 +39,9 @@ contract Vesting is Owned {
      * @param duration_ duration in seconds of the period in which the tokens will vest (total seconds including cliffDuration)
      * @param revocable_ whether the vesting is revocable or not
      * @param revokeTo_ revoke tokens to this address
-     * @param firstMonthPercent_ diff in percentage between 1st month and rest
+     * @param firstMonthBonus_ diff in tokens between 1st month and rest
      */
-    constructor(address beneficiary_, uint256 start_, uint256 cliffDuration_, uint256 duration_, bool revocable_, address revokeTo_, uint16 firstMonthPercent_) {
+    constructor(address beneficiary_, uint256 start_, uint256 cliffDuration_, uint256 duration_, bool revocable_, address revokeTo_, uint16 firstMonthBonus_) {
         require(beneficiary_ != address(0), "TokenVesting: beneficiary is the zero address");
         require(cliffDuration_ <= duration_, "TokenVesting: cliff is longer than duration");
         require(duration_ > 0, "TokenVesting: duration is 0");
@@ -54,7 +54,7 @@ contract Vesting is Owned {
         _revocable =    revocable_;
         _revokeTo =     revokeTo_;
         
-        _firstMonthPercent = firstMonthPercent_;
+        _firstMonthBonus = firstMonthBonus_;
     }
 
     /**
@@ -111,7 +111,7 @@ contract Vesting is Owned {
      * @param token ERC20 token which is being vested
      */
     function release(IERC20 token) public {
-        uint256 unreleased = _releasableAmount(token);
+        uint256 unreleased = releasableAmount(token);
 
         require(unreleased > 0, "TokenVesting: no tokens are due");
 
@@ -133,7 +133,7 @@ contract Vesting is Owned {
 
         uint256 balance = token.balanceOf(address(this));
 
-        uint256 unreleased = _releasableAmount(token);
+        uint256 unreleased = releasableAmount(token);
         uint256 refund = balance.sub(unreleased);
 
         _revoked[address(token)] = true;
@@ -147,7 +147,7 @@ contract Vesting is Owned {
      * @dev Calculates the amount that has already vested but hasn't been released yet.
      * @param token ERC20 token which is being vested
      */
-    function _releasableAmount(IERC20 token) private view returns (uint256) {
+    function releasableAmount(IERC20 token) public view returns (uint256) {
         return _vestedAmount(token).sub(_released[address(token)]);
     }
 
@@ -164,12 +164,15 @@ contract Vesting is Owned {
         } else if (block.timestamp >= _start.add(_duration) || _revoked[address(token)]) {
             return totalBalance;
         } else {
-            uint256 firstMonthBonus = totalBalance.mul(_firstMonthPercent).div(100);
-            uint256 restMonth = totalBalance.mul(block.timestamp.sub(_start)).div(_duration);
+            uint256 result = totalBalance.mul(block.timestamp.sub(_start)).div(_duration);
+
             if(block.timestamp > _start.add(_aMonth))
-                return restMonth.add(firstMonthBonus);
-                
-            return restMonth;
+                result  = result.add(_firstMonthBonus);
+
+            if(result > currentBalance)
+                result = currentBalance;
+
+            return result;
         }
     }
     
