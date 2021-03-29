@@ -166,10 +166,7 @@ contract Vesting is Owned {
         } else {
             uint256 firstMonthBonus = totalBalance.mul(_firstMonthPercent).div(100);
             uint256 restMonth = totalBalance.mul(block.timestamp.sub(_start)).div(_duration);
-            if(_released[address(token)] == 0) {
-                return restMonth.add(firstMonthBonus);
-            }
-            return restMonth;
+            return restMonth.add(firstMonthBonus);
         }
     }
     

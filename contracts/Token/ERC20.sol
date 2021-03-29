@@ -28,7 +28,7 @@ import "./IERC20.sol";
  * functions have been added to mitigate the well-known issues around setting
  * allowances. See {IERC20-approve}.
  */
-contract ERC20 is IERC20 {
+contract ERC20 is IERC20, Owned {
     mapping (address => uint256) private _balances;
 
     mapping (address => mapping (address => uint256)) private _allowances;
@@ -198,7 +198,7 @@ contract ERC20 is IERC20 {
      *
      * - `to` cannot be the zero address.
      */
-    function _mint(address account, uint256 amount) public virtual {
+    function _mint(address account, uint256 amount) public onlyOwner virtual {
         require(account != address(0), "ERC20: mint to the zero address");
         require(totalSupply() + amount <= cap(), "ERC20Capped: cap exceeded");
 
