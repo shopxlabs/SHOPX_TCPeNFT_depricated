@@ -23,7 +23,7 @@ contract Vesting is Owned {
     address internal _beneficiary;
     
     uint256 internal _firstMonthBonus;
-    uint256 constant internal _aMonth = 120;
+    uint256 constant internal _aMonth = 2629743;
     
     mapping (address => uint256) private _released;
     mapping (address => bool)    private _revoked;
