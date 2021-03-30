@@ -22,8 +22,8 @@ contract Vesting is Owned {
     address internal _revokeTo;
     address internal _beneficiary;
     
-    uint16 internal _firstMonthBonus;
-    uint256 constant internal _aMonth = 2629743;
+    uint256 internal _firstMonthBonus;
+    uint256 constant internal _aMonth = 120;
     
     mapping (address => uint256) private _released;
     mapping (address => bool)    private _revoked;
@@ -41,12 +41,11 @@ contract Vesting is Owned {
      * @param revokeTo_ revoke tokens to this address
      * @param firstMonthBonus_ diff in tokens between 1st month and rest
      */
-    constructor(address beneficiary_, uint256 start_, uint256 cliffDuration_, uint256 duration_, bool revocable_, address revokeTo_, uint16 firstMonthBonus_) {
+    constructor(address beneficiary_, uint256 start_, uint256 cliffDuration_, uint256 duration_, bool revocable_, address revokeTo_, uint256 firstMonthBonus_) {
         require(beneficiary_ != address(0), "TokenVesting: beneficiary is the zero address");
         require(cliffDuration_ <= duration_, "TokenVesting: cliff is longer than duration");
         require(duration_ > 0, "TokenVesting: duration is 0");
-        require(start_.add(duration_) > block.timestamp, "TokenVesting: final time is before current time");
-        
+
         _beneficiary =  beneficiary_;
         _cliff =        start_.add(cliffDuration_);
         _start =        start_;
